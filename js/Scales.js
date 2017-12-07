@@ -4,62 +4,62 @@ Chroma.Notes = [
   {
     name:'A',
     posY:0,
-    posX:0,
+    posX:10,
   },
   {
     name:'A#',
     posY:1,
-    posX:1,
+    posX:11,
   },
   {
     name:'B',
     posY:0,
-    posX:2,
+    posX:12,
   },
   {
     name:'C',
     posY:0,
-    posX:4,
+    posX:0,
   },
   {
     name:'C#',
     posY:1,
-    posX:5,
+    posX:1,
   },
   {
     name:'D',
     posY:0,
-    posX:6,
+    posX:2,
   },
   {
     name:'D#',
     posY:1,
-    posX:7,
+    posX:3,
   },
   {
     name:'E',
     posY:0,
-    posX:8,
+    posX:4,
   },
   {
     name:'F',
     posY:0,
-    posX:10,
+    posX:6,
   },
   {
     name:'F#',
     posY:1,
-    posX:11,
+    posX:7,
   },
   {
     name:'G',
     posY:0,
-    posX:12,
+    posX:8,
   },
   {
     name:'G#',
     posY:1,
-    posX:13,
+    posX:9,
   }
 ]
 

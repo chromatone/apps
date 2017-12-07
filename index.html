@@ -5,11 +5,11 @@
     <title>Vuetone</title>
     <link href="css/styles.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="css/bootstrap.css" />
 		<link rel="stylesheet" href="css/Chromatone.css" />
 		<script src="js/Scales.js"></script>
-    <script src="js/Synth.js"></script>
+    <script src="assets/StartAudioContext.js"></script>
+    <script src="assets/Tone.js"></script>
     <script src="https://unpkg.com/vue"></script>
     <script src="assets/vue-slider.js"></script>
 
@@ -20,15 +20,15 @@
         v-for="(note, pitch) in notes"
         :data-octave="octave"
         :data-pitch="pitch"
-        @touchstart.stop.prevent="down(pitch,octave,shift,$event)"
-        @touchend.stop.prevent="up(pitch,octave,shift,$event)"
-        @touchcancel.stop.prevent="up(pitch,octave,shift,$event)"
-        @mousedown.stop.prevent="down(pitch,octave,shift,$event)"
-        @mouseup.stop.prevent="up(pitch,octave,shift,$event)"
-        @mouseout.stop.prevent="up(pitch,octave,shift,$event)"
+        @touchstart.stop.prevent="down(note.name + octave,$event)"
+        @touchend.stop.prevent="up(note.name + octave,$event)"
+        @touchcancel.stop.prevent="up(note.name + octave,$event)"
+        @mousedown.stop.prevent="down(note.name + octave,$event)"
+        @mouseup.stop.prevent="up(note.name + octave,$event)"
+        @mouseout.stop.prevent="up(note.name + octave,$event)"
         >
-      <circle :cx="95+note.posX*70" :cy="200-note.posY*120" :r="r "/>
-      <text text-anchor="middle" :x="95+note.posX*70" :y="225-note.posY*120" class="letters">{{note.name}}</text>
+      <circle :cx="120+note.posX*70" :cy="200-note.posY*120" :r="r "/>
+      <text text-anchor="middle" :x="120+note.posX*70" :y="225-note.posY*120" class="letters">{{note.name}}</text>
     </g>
     </svg>
     </script>
@@ -49,7 +49,8 @@
           :dot-size="24"
           :height="150"
           :width="24"
-          :max="100"
+          :max="0"
+          :min="-30"
           direction="vertical"
           tooltip="hover"
           tooltip-dir="right"
@@ -68,12 +69,13 @@
           :piecewise-label="true"
           tooltip="hover"
           tooltip-dir="right"
-          ></vue-slider>
+          ><div slot="tooltip">{{setOsc}}</div></vue-slider>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-1 col-xs-2">Octave</div>
-      <div class="col-md-11 col-xs-10">
+
+      <div class="col-md-12 col-xs-12">
+
         <vue-slider
            v-model="octaves"
            :dot-size="36"
@@ -83,6 +85,7 @@
            :tooltip="false"
          ></vue-slider>
        </div>
+
       <div v-for="(oct, ind) in octavesNum">
         <keys
         @play="play"

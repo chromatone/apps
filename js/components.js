@@ -17,31 +17,33 @@ Vue.component ('keys' ,{
     }
   },
   mounted: function() {
-
+    
   },
   methods: {
-    down: function (pitch,octave,shift,ev) {
+    down: function (note, ev) {
 
       if (ev.type=="touchstart") {
         for (let i=0;i<ev.changedTouches.length;i++) {
-          this.$emit('play', ev.changedTouches[i].identifier, pitch,octave,shift)
+          this.$emit('play', note , ev.changedTouches[i].identifier)
+
         }
       } else {
-        this.$emit('play', 0, pitch,octave,shift)
+        this.$emit('play', note, 0)
       }
 
 
     },
-    up: function (pitch,octave,shift,ev) {
+    up: function (note,ev) {
 
       if (ev.type=="touchend" || ev.type=="touchcancel") {
         for (let i=0;i<ev.changedTouches.length;i++) {
-          this.$emit('stop', ev.changedTouches[i].identifier, pitch,octave,shift)
+          this.$emit('stop', note, ev.changedTouches[i].identifier)
+
         }
       } else {
-          this.$emit('stop', 0, pitch,octave,shift)
+          this.$emit('stop', note, 0)
         }
-      
+
 
     }
   }
