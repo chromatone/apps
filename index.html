@@ -41,7 +41,7 @@
 
     <div id="vuetone">
 
-      <div class="row">
+      <div class="row sliders">
         <div class="col-md-2 col-xs-2">
           <vue-slider
           v-model="vol"
@@ -52,9 +52,10 @@
           :max="0"
           :min="-30"
           direction="vertical"
-          tooltip="hover"
-          tooltip-dir="right"
-          ><div slot="tooltip">{{setVolume}}</div>
+          tooltip="always"
+          tooltip-dir="top"
+          >
+          <div class="tip" slot="tooltip">VOL<br>{{setVolume}}</div>
         </vue-slider>
         </div>
         <div class="col-md-2 col-xs-2">
@@ -66,10 +67,67 @@
           :width="24"
           direction="vertical"
           :piecewise="true"
-          :piecewise-label="true"
-          tooltip="hover"
-          tooltip-dir="right"
-          ><div slot="tooltip">{{setOsc}}</div></vue-slider>
+          :piecewise-label="false"
+          tooltip="always"
+          tooltip-dir="top">
+            <div class="tip" slot="tooltip">OSC<br>{{setOsc}}</div>
+          </vue-slider>
+        </div>
+        <div class="col-md-2 col-xs-2">
+          <vue-slider
+          v-model="attack"
+          :dot-size="24"
+          :height="150"
+          :width="24"
+          :max="200"
+          :min="1"
+          direction="vertical"
+          tooltip="always"
+          tooltip-dir="top"
+          ><div class="tip" slot="tooltip">A<br>{{setAttack}}</div>
+        </vue-slider>
+        </div>
+        <div class="col-md-2 col-xs-2">
+          <vue-slider
+          v-model="decay"
+          :dot-size="24"
+          :height="150"
+          :width="24"
+          :max="200"
+          :min="1"
+          direction="vertical"
+          tooltip="always"
+          tooltip-dir="top"
+          ><div class="tip" slot="tooltip">D<br>{{setDecay}}</div>
+        </vue-slider>
+        </div>
+        <div class="col-md-2 col-xs-2">
+          <vue-slider
+          v-model="sustain"
+          :dot-size="24"
+          :height="150"
+          :width="24"
+          :max="200"
+          :min="1"
+          direction="vertical"
+          tooltip="always"
+          tooltip-dir="top"
+          ><div class="tip" slot="tooltip">S<br>{{setSustain}}</div>
+        </vue-slider>
+        </div>
+        <div class="col-md-2 col-xs-2">
+          <vue-slider
+          v-model="release"
+          :dot-size="24"
+          :height="150"
+          :width="24"
+          :max="200"
+          :min="1"
+          direction="vertical"
+          tooltip="always"
+          tooltip-dir="top"
+          ><div class="tip" slot="tooltip">R<br>{{setRelease}}</div>
+        </vue-slider>
         </div>
       </div>
       <div class="row">

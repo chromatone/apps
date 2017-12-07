@@ -1,7 +1,6 @@
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-    var button = document.querySelectorAll('body');
-    StartAudioContext(Tone.context, button, function(){
-      console.log(button)
+    StartAudioContext(Tone.context, 'body').then(function(){
+      console.log(Tone.context)
     });
   }
 
@@ -44,12 +43,28 @@ var vuetone = new Vue({
       return octs
     },
     setOsc: function () {
-      return this.synth.set('oscillator.type',this.oscType)
+        this.synth.set('oscillator.type',this.oscType)
+      return this.oscType.substr(0,3).toUpperCase()
     },
     setVolume: function () {
-      console.log(this.volume)
-      return this.volume.volume.value=this.vol
-
+      this.volume.volume.value=this.vol
+      return (this.vol/3+10).toFixed(1)
+    },
+    setAttack: function () {
+      this.synth.set('envelope.attack', this.attack*0.005)
+      return (this.attack*0.005).toFixed(3)
+    },
+    setDecay: function () {
+      this.synth.set('envelope.decay', this.decay*0.005)
+      return (this.decay*0.005).toFixed(3)
+    },
+    setSustain: function () {
+      this.synth.set('envelope.sustain', this.sustain*0.005)
+      return (this.sustain*0.005).toFixed(3)
+    },
+    setRelease: function () {
+      this.synth.set('envelope.release', this.release*0.005)
+      return (this.release*0.005).toFixed(3)
     }
   },
   created: function () {

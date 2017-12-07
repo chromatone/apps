@@ -11,3 +11,20 @@
 body {
   margin:40px !important;
 }
+
+.vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top {
+  top:0!important;
+}
+
+.tip {
+  text-align: center;
+  background:rgba(255,255,255,0.8);
+  border-radius: 6px;
+  box-shadow:0.5px 0.5px 2px 1px rgba(0,0,0,.32);
+  font-size:12px;
+  padding:4px;
+}
+
+.sliders {
+  margin-top:40px;
+}
