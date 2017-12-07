@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Vuetone</title>
+    <link href="css/styles.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="css/Chromatone.css" />
+		<script src="js/Scales.js"></script>
+    <script src="js/Synth.js"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="assets/vue-slider.js"></script>
+    <script id="field" type="x-template">
+    <div class="field"
+    @mousemove="updateXY">
+    {{x}} - {{y}}</div>
+    </script>
+  </head>
+
+
+  <body>
+    <a href="index.html">Keys</a>
+    <div id="vuetone">
+
+      <field></field>
+
+      <vue-slider
+   v-model="volume"
+  ></vue-slider>
+      {{volume}}
+    </div>
+
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
