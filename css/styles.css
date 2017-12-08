@@ -1,19 +1,17 @@
-.field {
-  width:300px;
-  height:300px;
-  border:1px solid black
-}
+
 
 .note {
   cursor: pointer;
+  opacity:0.8;
 }
 
 body {
-  margin:40px !important;
+  margin:4% !important;
+  background-color: #eee !important;
 }
 
 .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top {
-  top:0!important;
+  top:-4px!important;
 }
 
 .tip {
@@ -25,6 +23,30 @@ body {
   padding:4px;
 }
 
+.row {
+  margin:12px 0;
+
+  background-color: #ddd;
+  border-radius: 24px;
+}
+
 .sliders {
-  margin-top:40px;
+  padding:52px 0 10px 0;
+}
+.field {
+  background: none;
+}
+.field-notes {
+  font-family:OpenSans, sans-serif;
+  font-size:40px;
+}
+.scroller {
+  fill:#fff;
+  opacity:0.4;
+}
+.scroller-button {
+  stroke: #fff;
+  stroke-width:3;
+  opacity:0.5;
+  fill:transparent;
 }

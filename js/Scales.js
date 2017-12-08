@@ -3,63 +3,75 @@ var Chroma = {};
 Chroma.Notes = [
   {
     name:'A',
-    posY:0,
-    posX:10,
-  },
-  {
-    name:'A#',
-    posY:1,
-    posX:11,
-  },
-  {
-    name:'B',
-    posY:0,
-    posX:12,
-  },
-  {
-    name:'C',
+    pitch:0,
     posY:0,
     posX:0,
   },
   {
-    name:'C#',
+    name:'A#',
+    pitch:1,
     posY:1,
     posX:1,
   },
   {
-    name:'D',
+    name:'B',
+    pitch:2,
     posY:0,
     posX:2,
   },
   {
-    name:'D#',
-    posY:1,
-    posX:3,
-  },
-  {
-    name:'E',
+    name:'C',
+    pitch:3,
     posY:0,
     posX:4,
   },
   {
-    name:'F',
+    name:'C#',
+    pitch:4,
+    posY:1,
+    posX:5,
+  },
+  {
+    name:'D',
+    pitch:5,
     posY:0,
     posX:6,
   },
   {
-    name:'F#',
+    name:'D#',
+    pitch:6,
     posY:1,
     posX:7,
   },
   {
-    name:'G',
+    name:'E',
+    pitch:7,
     posY:0,
     posX:8,
   },
   {
-    name:'G#',
+    name:'F',
+    pitch:8,
+    posY:0,
+    posX:10,
+  },
+  {
+    name:'F#',
+    pitch:9,
     posY:1,
-    posX:9,
+    posX:11,
+  },
+  {
+    name:'G',
+    pitch:10,
+    posY:0,
+    posX:12,
+  },
+  {
+    name:'G#',
+    pitch:11,
+    posY:1,
+    posX:13,
   }
 ]
 

@@ -38,7 +38,7 @@
   stroke:transparent;
 }
 
-.notes, .plank, #Chromatone circle,.note circle,.segment,.note g, .note {
+.notes, .scroller, .plank, #Chromatone circle,.note circle,.segment,.note g, .note {
   transition: all 0.4s ease;
 }
 .octaves {

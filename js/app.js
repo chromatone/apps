@@ -12,13 +12,14 @@ var vuetone = new Vue({
   },
   data: {
     scale:'',
+    base:440,
     root:0,
     octaves:[2,4],
     vol: 70,
-    attack: 0.1,
-    decay: 0.3,
-    sustain: 0.4,
-    release: 0.4,
+    attack: 200,
+    decay: 300,
+    sustain:90,
+    release: 120,
     oscTypes: ['sine','triangle','square','sawtooth'],
     oscType: 'sawtooth',
     scales:Chroma.Scales,
@@ -26,12 +27,18 @@ var vuetone = new Vue({
     band:{}
   },
   methods: {
-    play: function (note, id) {
-      console.log(note, id);
-      this.synth.triggerAttack(note)
+    calcFrequency: function(pitch,octave) {
+      console.log(pitch, octave)
+      octave=octave||4;
+      return this.base * Math.pow(2, (octave-4) + (pitch / 12));
     },
-    stop: function (note, id) {
-      this.synth.triggerRelease(note)
+    play: function (note, octave, id) {
+      console.log(note, octave);
+      this.synth.triggerAttack(this.calcFrequency(note.pitch,octave))
+    },
+    stop: function (note, octave, id) {
+      console.log(note, octave);
+      this.synth.triggerRelease(this.calcFrequency(note.pitch,octave))
     }
   },
   computed: {
@@ -48,23 +55,23 @@ var vuetone = new Vue({
     },
     setVolume: function () {
       this.volume.volume.value=this.vol
-      return (this.vol/3+10).toFixed(1)
+      return (this.vol/5+10).toFixed(1)
     },
     setAttack: function () {
       this.synth.set('envelope.attack', this.attack*0.005)
-      return (this.attack*0.005).toFixed(3)
+      return (this.attack*0.005).toFixed(2)
     },
     setDecay: function () {
       this.synth.set('envelope.decay', this.decay*0.005)
-      return (this.decay*0.005).toFixed(3)
+      return (this.decay*0.005).toFixed(2)
     },
     setSustain: function () {
       this.synth.set('envelope.sustain', this.sustain*0.005)
-      return (this.sustain*0.005).toFixed(3)
+      return (this.sustain*0.005).toFixed(2)
     },
     setRelease: function () {
       this.synth.set('envelope.release', this.release*0.005)
-      return (this.release*0.005).toFixed(3)
+      return (this.release*0.005).toFixed(2)
     }
   },
   created: function () {
