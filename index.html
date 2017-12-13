@@ -78,7 +78,7 @@
   	 viewBox="0 100 1072 1155" style="enable-background:new 0 100 1072 1155;" xml:space="preserve">
      <defs>
          <clipPath id="clip-frame">
-         <path d="M1007.5,137c23.1,0,42,18.9,42,42v924c0,23.1-18.9,42-42,42h-944c-23.1,0-42-18.9-42-42V179c0-23.1,18.9-42,42-42H1007.5"/>
+         <rect width="1028" :height="1008" x="21.5" y="137" rx="42px"/>
          </clipPath>
      </defs>
 
@@ -148,12 +148,28 @@
          :tooltip="false"></vue-slider>
       </div>
       <div class="keys-container">
-        <div v-for="(oct, ind) in octavesNum">
-          <keys
-          :octave="oct"
-          :scale="scale"
-          :root="root"
-          :key="ind"></keys>
+        <div v-for="(octave, ind) in octavesNum">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="30 0 1090 280" style="enable-background:new 0 0 1090 280;" xml:space="preserve">
+           <rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
+            <g class="note"
+              v-for="(note, pitch) in activeNotes"
+              :data-octave="octave"
+              :data-pitch="pitch"
+              :class="note.name + octave"
+              @touchstart.stop.prevent="down(note, octave,$event)"
+              @touchend.stop.prevent="up(note, octave,$event)"
+              @touchcancel.stop.prevent="up(note, octave,$event)"
+              @mousedown.stop.prevent="down(note, octave,$event)"
+              @mouseup.stop.prevent="up(note, octave,$event)"
+              @mouseout.stop.prevent="up(note, octave,$event)">
+                <circle :cx="120+note.posX*70" :cy="200-note.posY*120" :r="r "/>
+                <text
+                text-anchor="middle"
+                :x="120+note.posX*70"
+                :y="225-note.posY*120" class="letters">{{note.name}}</text>
+            </g>
+        </svg>
         </div>
       </div>
     </div>
@@ -301,34 +317,14 @@
         </div>
       </div>
 
-    
+      <div v-if="open.keys" class="row">
+        <key-stack
+        @play="play"
+        @stop="stop"
+        :scale="scale"></key-stack>
+      </div>
 
-      <div v-if="open.keys" class="row keys">
-        <div>
-        <div class="octave-slider">
-          <vue-slider
-           v-model="octaves"
-           :dot-size="36"
-           :max="8"
-           :height="24"
-           direction="horizontal"
-           :piecewise="true"
-           :piecewise-label="true"
-           :tooltip="false"></vue-slider>
-        </div>
-        <div class="keys-container">
-          <div v-for="(oct, ind) in octavesNum">
-            <keys
-            @play="play"
-            @stop="stop"
-            :octave="oct"
-            :scale="scale"
-            :root="root"
-            :key="ind"></keys>
-          </div>
-        </div>
-      </div>
-      </div>
+
     </div>
 
     <script src="js/components.js"></script>

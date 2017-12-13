@@ -5,8 +5,19 @@ Vue.component('key-stack', {
   data: function () {
     return {
       octaves:[2,4],
-      scale:Chroma.scales.major,
-      root:0
+      root:0,
+      notes:Chroma.Notes
+    }
+  },
+  components: {
+    'vueSlider': window[ 'vue-slider-component' ]
+  },
+  props: {
+    steps: {
+      type: Array
+    },
+    r: {
+      default:65
     }
   },
   computed: {
@@ -16,9 +27,41 @@ Vue.component('key-stack', {
         octs.push(i);
       }
       return octs
+    },
+    activeNotes: function () {
+  //    console.log(this.notes)
+      return this.notes
+    }
+  },
+  methods: {
+    down: function (note, octave, ev) {
+        ev.target.parentNode.style.opacity=1;
+        let touches = ev.changedTouches;
+      if (ev.type=="touchstart") {
+        for (let i=0;i<touches.length;i++) {
+          this.$emit('play', note, octave , touches[i].identifier)
+        }
+      } else {
+        this.$emit('play', note, octave, 0)
+      }
+    },
+    up: function (note,octave, ev) {
+        ev.target.parentNode.style.opacity=0.8;
+        let touches = ev.changedTouches;
+      if (ev.type=="touchend" || ev.type=="touchcancel") {
+        for (let i=0;i<touches.length;i++) {
+          this.$emit('stop', note, octave, touches[i].identifier)
+        }
+      } else {
+          this.$emit('stop', note, octave, 0)
+        }
     }
   }
 })
+
+
+
+
 
 
 // METRONOME
@@ -78,66 +121,9 @@ Vue.component('metronome', {
 });
 
 
-// KEYS
 
-Vue.component ('keys' ,{
-  template:'#keys',
-  data: function() {
-    return {
-      notes:Chroma.Notes
-    }
-  },
-  props: {
-    octave: {
-      default:4
-    },
-    shift: {
-      default:0
-    },
-    steps: {
-      type: Array
-    },
-    root: {
-      type: Number
-    },
-    r: {
-      default:65
-    }
-  },
-  mounted: function() {
 
-  },
-  computed:  {
-    activeNotes: function () {
-  //    console.log(this.notes)
-      return this.notes
-    }
-  },
-  methods: {
-    down: function (note, octave, ev) {
-        ev.target.parentNode.style.opacity=1;
-        let touches = ev.changedTouches;
-      if (ev.type=="touchstart") {
-        for (let i=0;i<touches.length;i++) {
-          this.$emit('play', note, octave , touches[i].identifier)
-        }
-      } else {
-        this.$emit('play', note, octave, 0)
-      }
-    },
-    up: function (note,octave, ev) {
-        ev.target.parentNode.style.opacity=0.8;
-        let touches = ev.changedTouches;
-      if (ev.type=="touchend" || ev.type=="touchcancel") {
-        for (let i=0;i<touches.length;i++) {
-          this.$emit('stop', note, octave, touches[i].identifier)
-        }
-      } else {
-          this.$emit('stop', note, octave, 0)
-        }
-    }
-  }
-});
+
 
 Vue.component ('field', {
   template:'#field',
