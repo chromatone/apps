@@ -5,19 +5,51 @@
     <title>Vuetone</title>
     <link href="css/styles.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="assets/buefy.min.css" />
 		<link rel="stylesheet" href="css/Chromatone.css" />
 		<script src="js/Scales.js"></script>
     <script src="assets/StartAudioContext.js"></script>
     <script src="assets/Tone.js"></script>
     <script src="https://unpkg.com/vue"></script>
     <script src="assets/vue-slider.js"></script>
+    <script src="assets/buefy.js"></script>
+
+
+    <script id="metronome" type="x-template">
+      <div class="rythm-box level is-mobile">
+        <div class="level-item is-4 is-narrow is-centered">
+
+
+          <svg  width="32" height="32" viewBox="0 0 32 32">
+            <circle id="metro-flash" v-show="playing" cx="16" cy="16" r="12" style="fill:#444"/>
+          </svg>
+
+          </div>
+        <div class="level-item is-4 is-narrow is-centered">
+          <a is="b-switch" v-model="play" />
+        </div>
+
+        <div class="level-item is-narrow is-4">
+          <b-field>
+          <button class="button" @click="bpm--">-</button>
+          <input style="width:50px" class="input is-primary" v-model="bpm" type="text"></input>
+          <button class="button" @click="bpm++">+</button>
+          </b-field>
+        </div>
+
+        <div class="level-item is-4 is-centered">
+          {{beatFrequency.toFixed(2)}} Hz – {{toNote}}
+        </div>
+
+      </div>
+    </script>
+
 
     <script id="keys" type="x-template">
     <svg version="1.1" id="Keys" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="30 0 1090 280" style="enable-background:new 0 0 1090 280;" xml:space="preserve">
-<rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
-    <g class="note"
+       <rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
+      <g class="note"
         v-for="(note, pitch) in activeNotes"
         :data-octave="octave"
         :data-pitch="pitch"
@@ -30,35 +62,43 @@
         @mouseout.stop.prevent="up(note, octave,$event)"
         >
       <circle :cx="120+note.posX*70" :cy="200-note.posY*120" :r="r "/>
-      <text text-anchor="middle" :x="120+note.posX*70" :y="225-note.posY*120" class="letters">{{note.name}}</text>
+      <text
+      text-anchor="middle"
+      :x="120+note.posX*70"
+      :y="225-note.posY*120" class="letters">{{note.name}}</text>
     </g>
 
     </svg>
     </script>
+
+
     <script id="field" type="x-template">
 
     <svg version="1.1" id="Chromatone" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
   	 viewBox="0 100 1072 1155" style="enable-background:new 0 100 1072 1155;" xml:space="preserve">
+     <defs>
+         <clipPath id="clip-frame">
+         <path d="M1007.5,137c23.1,0,42,18.9,42,42v924c0,23.1-18.9,42-42,42h-944c-23.1,0-42-18.9-42-42V179c0-23.1,18.9-42,42-42H1007.5"/>
+         </clipPath>
+     </defs>
+
   <rect id="body" rx="50" class="chr0" x="0" y="108" width="1072" height="1150"/>
-  <g id="cols" class="chr1">
-  	<path class="octave0" d="M21.5,1033 l1028,0v70c0,23.2-18.9,42-42.2,42l-943.7,0c-23.3,0-42.2-18.8-42.2-42 L21.5,1033z"/>
-  	<rect x="21.5" y="921" class="octave1" width="1028" height="112"/>
-  	<rect x="21.5" y="809" class="octave2" width="1028" height="112"/>
-  	<rect x="21.5" y="697" class="octave3" width="1028" height="112"/>
-  	<rect x="21.5" y="585" class="octave4" width="1028" height="112"/>
-  	<rect x="21.5" y="473" class="octave5" width="1028" height="112"/>
-  	<rect x="21.5" y="361" class="octave6" width="1028" height="112"/>
-  	<rect x="21.5" y="249" class="octave7" width="1028" height="112"/>
-  	<path class="octave8" d="M21.5,179c0-23.2,18.9-42,42.2-42l943.7,0c23.3,0,42.2,18.8,42.2,42v70l-1028,0L21.5,179z"/>
+
+  <g id="cols" class="chr1" style="clip-path: url(#clip-frame);">
+    <rect v-for="oct in 9" x="21.5"
+    :y="1033-(oct-1)*112"
+    :class="{['octave'+(oct-1)]:true}" width="1028" height="112"/>
   </g>
+
   <g id="plank">
   	<rect
     class="scroller"
     width="84"
-    height="1080"
+    height="1090"
     :x="33+84*root" y="150" rx="42"/>
-  	<circle class="scroller" :cx="75+84*root" cy="1185" r="34"/>
+  	<circle class="scroller" :cx="75+84*root" cy="1195" r="34"/>
   </g>
+
   <g id="108notes">
     <g v-for="(octave,octInd) in notes108">
       <circle
@@ -67,10 +107,14 @@
       :cy="1090-112*octInd"
       r="38"
       :data-pitch="note.pitch"
-      :data-octave="octInd"/>
+      :data-octave="octInd"
+      :data-active="note.active"/>
     </g>
   </g>
-  <g id="chr-frame" class="frame">
+
+  <g id="chroma-frame" class="frame"
+      @mousemove.stop.prevent="updateXY"
+      @touchstart.stop.prevent="touchStart" >
   	<path class="frame-out" d="M63.5,1150.7c-26.3,0-47.7-21.4-47.7-47.7V179c0-26.3,21.4-47.7,47.7-47.7h944c26.3,0,47.7,21.4,47.7,47.7v924c0,26.3-21.4,47.7-47.7,47.7H63.5z"/>
   	<path class="frame-in" d="M1007.5,137c23.1,0,42,18.9,42,42v924c0,23.1-18.9,42-42,42h-944c-23.1,0-42-18.9-42-42V179c0-23.1,18.9-42,42-42H1007.5 M1007.5,125.7h-944c-29.4,0-53.3,23.9-53.3,53.3v924c0,29.4,23.9,53.3,53.3,53.3h944c29.4,0,53.3-23.9,53.3-53.3V179C1060.9,149.6,1036.9,125.7,1007.5,125.7L1007.5,125.7z"/>
   </g>
@@ -79,16 +123,42 @@
     <text
     text-anchor="middle"
     :x="75+ind*84"
-    y="1200"
+    y="1210"
     class="field-notes"
     :data-pitch="ind"
     >
     {{note.name}}</text>
-    <circle @click="root=ind" :cx="75+ind*84" cy="1185" r="38" class="scroller-button"/>
+    <circle @click="root=ind" :cx="75+ind*84" cy="1195" r="38" class="scroller-button"/>
     </g>
   </g>
   </svg>
     </script>
+
+    <script id="key-stack" type="x-template">
+    <div>
+      <div class="octave-slider">
+        <vue-slider
+         v-model="octaves"
+         :dot-size="36"
+         :max="8"
+         :height="24"
+         direction="horizontal"
+         :piecewise="true"
+         :piecewise-label="true"
+         :tooltip="false"></vue-slider>
+      </div>
+      <div class="keys-container">
+        <div v-for="(oct, ind) in octavesNum">
+          <keys
+          :octave="oct"
+          :scale="scale"
+          :root="root"
+          :key="ind"></keys>
+        </div>
+      </div>
+    </div>
+  </script>
+
   </head>
 
 
@@ -96,47 +166,84 @@
 
 
 
-    <div id="vuetone">
-      <div class="row head">
-        <img src="logo.svg" width="300px">
+  <div id="vuetone">
 
-      </div>
-      <div class="row field">
-        <field></field>
-      </div>
-      <div class="row sliders">
-        <div class="col-md-2 col-xs-2">
+    <div class="row">
+      <div class="level">
+        <div class="logo level-item is-6 has-text-centered">
+          <img src="logo.svg" style="min-width:150px">
           <vue-slider
           v-model="vol"
           value="70"
           :dot-size="24"
-          :height="150"
-          :width="24"
+          :height="10"
+          :width="200"
           :max="0"
           :min="-50"
-          direction="vertical"
-          tooltip="always"
-          tooltip-dir="top"
+          direction="horizontal"
+          tooltip="hover"
+          tooltip-dir="left"
           >
           <div class="tip" slot="tooltip">VOL<br><b>{{setVolume}}</b></div>
         </vue-slider>
         </div>
-        <div class="col-md-2 col-xs-2">
+
+        <div class="level is-mobile">
+          <div class="level-item is-3 has-text-centered">
+            <div>
+            <p>Metronome</p>
+                <a is="b-switch" v-model="open.metronome"></a>
+              </div>
+          </div>
+          <div class="level-item is-3 has-text-centered">
+            <div>
+                <p>Field</p>
+                <a is="b-switch" v-model="open.field"></a>
+            </div>
+          </div>
+          <div class="level-item is-3 has-text-centered">
+            <div>
+                <p>Synth</p>
+                <a is="b-switch" v-model="open.synth"></a>
+            </div>
+          </div>
+          <div class="level-item is-3 has-text-centered">
+            <div>
+                <p>Keys</p>
+                <a is="b-switch" v-model="open.keys"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div v-if="open.metronome" class="row rythm">
+        <metronome
+          ></metronome>
+      </div>
+
+      <div v-if="open.field" class="row field">
+        <field :root="root" :steps="scale.steps"></field>
+      </div>
+
+
+      <div v-if="open.synth" class="row level adsr-sliders">
+        <div class="level-item ">
           <vue-slider
           v-model="oscType"
           :data="oscTypes"
           :dot-size="24"
-          :height="150"
+          :height="200"
           :width="24"
           direction="vertical"
           :piecewise="true"
-          :piecewise-label="false"
+          :piecewise-label="true"
           tooltip="always"
           tooltip-dir="top">
             <div class="tip" slot="tooltip">OSC<br><b>{{setOsc}}</b></div>
           </vue-slider>
         </div>
-        <div class="col-md-2 col-xs-2">
+        <div class="level-item">
           <vue-slider
           v-model="attack"
           :dot-size="24"
@@ -150,7 +257,7 @@
           ><div class="tip" slot="tooltip">ATT<br><b>{{setAttack}}</b></div>
         </vue-slider>
         </div>
-        <div class="col-md-2 col-xs-2">
+        <div class="level-item">
           <vue-slider
           v-model="decay"
           :dot-size="24"
@@ -164,7 +271,7 @@
           ><div class="tip" slot="tooltip">DEC<br><b>{{setDecay}}</b></div>
         </vue-slider>
         </div>
-        <div class="col-md-2 col-xs-2">
+        <div class="level-item">
           <vue-slider
           v-model="sustain"
           :dot-size="24"
@@ -178,7 +285,7 @@
           ><div class="tip" slot="tooltip">SUS<br><b>{{setSustain}}</b></div>
         </vue-slider>
         </div>
-        <div class="col-md-2 col-xs-2">
+        <div class="level-item ">
           <vue-slider
           v-model="release"
           :dot-size="24"
@@ -193,30 +300,35 @@
         </vue-slider>
         </div>
       </div>
-      <div class="row keys">
 
-      <div class="col-md-12 col-xs-12">
+    
 
-        <vue-slider
+      <div v-if="open.keys" class="row keys">
+        <div>
+        <div class="octave-slider">
+          <vue-slider
            v-model="octaves"
            :dot-size="36"
            :max="8"
+           :height="24"
+           direction="horizontal"
            :piecewise="true"
            :piecewise-label="true"
-           :tooltip="false"
-         ></vue-slider>
-       </div>
-
-      <div v-for="(oct, ind) in octavesNum">
-        <keys
-        @play="play"
-        @stop="stop"
-        :octave="oct"
-        :scale="scale"
-        :root="root"
-        :key="ind"></keys>
+           :tooltip="false"></vue-slider>
+        </div>
+        <div class="keys-container">
+          <div v-for="(oct, ind) in octavesNum">
+            <keys
+            @play="play"
+            @stop="stop"
+            :octave="oct"
+            :scale="scale"
+            :root="root"
+            :key="ind"></keys>
+          </div>
+        </div>
       </div>
-    </div>
+      </div>
     </div>
 
     <script src="js/components.js"></script>

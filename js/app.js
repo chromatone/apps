@@ -4,6 +4,8 @@ if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     });
   }
 
+  Vue.use(Buefy.default);
+
 
 var vuetone = new Vue({
   el:'#vuetone',
@@ -12,6 +14,12 @@ var vuetone = new Vue({
   },
   data: {
     scale:'',
+    open: {
+      metronome:true,
+      keys:true,
+      synth:true,
+      field:true
+    },
     base:440,
     root:0,
     octaves:[2,4],
@@ -20,24 +28,28 @@ var vuetone = new Vue({
     decay: 300,
     sustain:90,
     release: 120,
-    oscTypes: ['sine','triangle','square','sawtooth'],
-    oscType: 'sawtooth',
+    oscTypes: ['sine','triangle','square','sawtooth', 'pulse', 'pwm'],
+    oscType: 'sine',
     scales:Chroma.Scales,
     scale:Chroma.Scales.major,
     band:{}
   },
   methods: {
     calcFrequency: function(pitch,octave) {
-      console.log(pitch, octave)
-      octave=octave||4;
+  //    console.log(pitch, octave)
+
       return this.base * Math.pow(2, (octave-4) + (pitch / 12));
     },
     play: function (note, octave, id) {
-      console.log(note, octave);
+      console.log(note.pitch, octave);
       this.synth.triggerAttack(this.calcFrequency(note.pitch,octave))
     },
+    playOnce: function (note, octave, id) {
+      console.log(note.pitch, octave);
+      this.synth.triggerAttackRelease(this.calcFrequency(note.pitch,octave))
+    },
     stop: function (note, octave, id) {
-      console.log(note, octave);
+  //    console.log(note, octave);
       this.synth.triggerRelease(this.calcFrequency(note.pitch,octave))
     }
   },
@@ -54,7 +66,7 @@ var vuetone = new Vue({
       return this.oscType.substr(0,3).toUpperCase()
     },
     setVolume: function () {
-      this.volume.volume.value=this.vol
+      Tone.context.volume.volume.value=this.vol
       return (this.vol/5+10).toFixed(1)
     },
     setAttack: function () {
@@ -77,8 +89,8 @@ var vuetone = new Vue({
   created: function () {
 
     this.synth = new Tone.PolySynth(12,Tone.Synth);
-    this.volume = new Tone.Volume(0).toMaster();
-    this.synth.connect(this.volume);
+    Tone.context.volume = new Tone.Volume(0).toMaster();
+    this.synth.connect(Tone.context.volume);
     console.log(Tone.context)
   }
 });

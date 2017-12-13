@@ -7,11 +7,25 @@
 
 body {
   margin:4% !important;
-  background-color: #eee !important;
+  -webkit-font-smoothing:antialiased;
 }
 
 .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top {
   top:-4px!important;
+}
+
+.adsr-sliders {
+  display:flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+.adsr-slider {
+  flex:1 1 10%;
+}
+
+.letters {
+    pointer-events: none;
+    font-family: sans-serif;
 }
 
 .tip {
@@ -25,7 +39,7 @@ body {
 
 .row {
   margin:12px 0;
-
+  padding:8px;
   background-color: #ddd;
   border-radius: 24px;
 }
@@ -39,14 +53,13 @@ body {
 .field-notes {
   font-family:OpenSans, sans-serif;
   font-size:40px;
+  font-weight: bold;
 }
 .scroller {
   fill:#fff;
   opacity:0.4;
 }
 .scroller-button {
-  stroke: #fff;
-  stroke-width:3;
-  opacity:0.5;
-  fill:transparent;
+  fill:#555;
+  fill-opacity:0.2;
 }
