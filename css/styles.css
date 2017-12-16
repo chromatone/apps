@@ -63,3 +63,16 @@ body {
   fill:#555;
   fill-opacity:0.2;
 }
+
+.chord-icon {
+  display: inline-block;
+  width:8%;
+  margin:1px;
+  cursor:pointer;
+}
+.minor{
+  transform:rotate(180deg);
+}
+.minor text {
+  transform:translateY(-4px);
+}

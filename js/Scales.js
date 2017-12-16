@@ -6,72 +6,84 @@ Chroma.Notes = [
     pitch:0,
     posY:0,
     posX:0,
+    color:'#FE130C'
   },
   {
     name:'A#',
     pitch:1,
     posY:1,
     posX:1,
+    color:'#FF8000'
   },
   {
     name:'B',
     pitch:2,
     posY:0,
     posX:2,
+    color:'#fadc00'
   },
   {
     name:'C',
     pitch:3,
     posY:0,
     posX:4,
+    color:'#7AC11D'
   },
   {
     name:'C#',
     pitch:4,
     posY:1,
     posX:5,
+    color:'#5BB224'
   },
   {
     name:'D',
     pitch:5,
     posY:0,
     posX:6,
+    color:'#41AF7F'
   },
   {
     name:'D#',
     pitch:6,
     posY:1,
     posX:7,
+    color:'#6EC7C1'
   },
   {
     name:'E',
     pitch:7,
     posY:0,
     posX:8,
+    color:'#3A59A6'
   },
   {
     name:'F',
     pitch:8,
     posY:0,
     posX:10,
+    color:'#202C90'
   },
   {
     name:'F#',
     pitch:9,
     posY:1,
     posX:11,
+    color:'#4F268E'
   },
   {
     name:'G',
     pitch:10,
     posY:0,
     posX:12,
+    color:'#963396'
   },
   {
     name:'G#',
     pitch:11,
     posY:1,
     posX:13,
+    color:'#F2187E'
   }
 ]
 

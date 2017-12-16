@@ -92,14 +92,14 @@
 
   [data-pitch="0"] .seg, [data-pitch="0"], [data-pitch="0"] circle {fill:#FE130C;}
   [data-pitch="1"] .seg, [data-pitch="1"], [data-pitch="1"] circle {fill:#FF8000;}
-  [data-pitch="2"] .seg, [data-pitch="2"], [data-pitch="2"] circle {fill:#FFFF00;}
+  [data-pitch="2"] .seg, [data-pitch="2"], [data-pitch="2"] circle {fill:#fadc00;}
   [data-pitch="3"] .seg, [data-pitch="3"], [data-pitch="3"] circle {fill:#7AC11D;}
   [data-pitch="4"] .seg, [data-pitch="4"], [data-pitch="4"] circle {fill:#5BB224;}
   [data-pitch="5"] .seg, [data-pitch="5"], [data-pitch="5"] circle {fill:#41AF7F;}
   [data-pitch="6"] .seg, [data-pitch="6"], [data-pitch="6"] circle {fill:#6EC7C1;}
   [data-pitch="7"] .seg, [data-pitch="7"], [data-pitch="7"] circle {fill:#3A59A6;}
   [data-pitch="8"] .seg, [data-pitch="8"], [data-pitch="8"] circle {fill:#202C90;}
-  [data-pitch="9"] .seg, [data-pitch="9"], [data-pitch="9"] circle {fill:#3F268E;}
+  [data-pitch="9"] .seg, [data-pitch="9"], [data-pitch="9"] circle {fill:#4F268E;}
   [data-pitch="10"] .seg, [data-pitch="10"], [data-pitch="10"] circle {fill:#963396;}
   [data-pitch="11"] .seg, [data-pitch="11"], [data-pitch="11"] circle {fill:#F2187E;}
 

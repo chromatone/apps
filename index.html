@@ -13,6 +13,7 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="assets/vue-slider.js"></script>
     <script src="assets/buefy.js"></script>
+    <script src="assets/chroma.js"></script>
 
 
     <script id="metronome" type="x-template">
@@ -45,12 +46,14 @@
     </script>
 
 
+
+
     <script id="keys" type="x-template">
     <svg version="1.1" id="Keys" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="30 0 1090 280" style="enable-background:new 0 0 1090 280;" xml:space="preserve">
        <rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
       <g class="note"
-        v-for="(note, pitch) in activeNotes"
+        v-for="(note, pitch) in notes"
         :data-octave="octave"
         :data-pitch="pitch"
         :class="note.name + octave"
@@ -70,6 +73,9 @@
 
     </svg>
     </script>
+
+
+
 
 
     <script id="field" type="x-template">
@@ -113,8 +119,11 @@
   </g>
 
   <g id="chroma-frame" class="frame"
-      @mousemove.stop.prevent="updateXY"
-      @touchstart.stop.prevent="touchStart" >
+  @touchstart.stop.prevent="touchStart($event)"
+  @touchend.stop.prevent="touchEnd($event)"
+  @touchmove.stop.prevent="touchMove($event)"
+  @touchcancel.stop.prevent="touchEnd($event)"
+   >
   	<path class="frame-out" d="M63.5,1150.7c-26.3,0-47.7-21.4-47.7-47.7V179c0-26.3,21.4-47.7,47.7-47.7h944c26.3,0,47.7,21.4,47.7,47.7v924c0,26.3-21.4,47.7-47.7,47.7H63.5z"/>
   	<path class="frame-in" d="M1007.5,137c23.1,0,42,18.9,42,42v924c0,23.1-18.9,42-42,42h-944c-23.1,0-42-18.9-42-42V179c0-23.1,18.9-42,42-42H1007.5 M1007.5,125.7h-944c-29.4,0-53.3,23.9-53.3,53.3v924c0,29.4,23.9,53.3,53.3,53.3h944c29.4,0,53.3-23.9,53.3-53.3V179C1060.9,149.6,1036.9,125.7,1007.5,125.7L1007.5,125.7z"/>
   </g>
@@ -133,6 +142,10 @@
   </g>
   </svg>
     </script>
+
+
+
+
 
     <script id="key-stack" type="x-template">
     <div>
@@ -153,7 +166,7 @@
            viewBox="30 0 1090 280" style="enable-background:new 0 0 1090 280;" xml:space="preserve">
            <rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
             <g class="note"
-              v-for="(note, pitch) in activeNotes"
+              v-for="(note, pitch) in notes"
               :data-octave="octave"
               :data-pitch="pitch"
               :class="note.name + octave"
@@ -174,6 +187,86 @@
       </div>
     </div>
   </script>
+
+
+
+
+
+<script id="synth" type="x-template">
+<div class="level adsr-sliders">
+<div class="level-item ">
+  <vue-slider
+  v-model="oscType"
+  :data="oscTypes"
+  :dot-size="24"
+  :height="200"
+  :width="24"
+  direction="vertical"
+  :piecewise="true"
+  :piecewise-label="true"
+  tooltip="always"
+  tooltip-dir="top">
+    <div class="tip" slot="tooltip">OSC<br><b>{{setOsc}}</b></div>
+  </vue-slider>
+</div>
+<div class="level-item">
+  <vue-slider
+  v-model="attack"
+  :dot-size="24"
+  :height="150"
+  :width="24"
+  :max="400"
+  :min="1"
+  direction="vertical"
+  tooltip="always"
+  tooltip-dir="top"
+  ><div class="tip" slot="tooltip">ATT<br><b>{{setAttack}}</b></div>
+</vue-slider>
+</div>
+<div class="level-item">
+  <vue-slider
+  v-model="decay"
+  :dot-size="24"
+  :height="150"
+  :width="24"
+  :max="1200"
+  :min="1"
+  direction="vertical"
+  tooltip="always"
+  tooltip-dir="top"
+  ><div class="tip" slot="tooltip">DEC<br><b>{{setDecay}}</b></div>
+</vue-slider>
+</div>
+<div class="level-item">
+  <vue-slider
+  v-model="sustain"
+  :dot-size="24"
+  :height="150"
+  :width="24"
+  :max="200"
+  :min="1"
+  direction="vertical"
+  tooltip="always"
+  tooltip-dir="top"
+  ><div class="tip" slot="tooltip">SUS<br><b>{{setSustain}}</b></div>
+</vue-slider>
+</div>
+<div class="level-item ">
+  <vue-slider
+  v-model="release"
+  :dot-size="24"
+  :height="150"
+  :width="24"
+  :max="1000"
+  :min="1"
+  direction="vertical"
+  tooltip="always"
+  tooltip-dir="top"
+  ><div class="tip" slot="tooltip">REL<br><b>{{setRelease}}</b></div>
+</vue-slider>
+</div>
+</div>
+</script>
 
   </head>
 
@@ -205,31 +298,62 @@
         </div>
 
         <div class="level is-mobile">
-          <div class="level-item is-3 has-text-centered">
+          <div class="level-item is-4 has-text-centered">
             <div>
-            <p>Metronome</p>
+            <p>Rythm</p>
                 <a is="b-switch" v-model="open.metronome"></a>
               </div>
           </div>
-          <div class="level-item is-3 has-text-centered">
+          <div class="level-item is-4 has-text-centered">
+            <div>
+            <p>Chords</p>
+                <a is="b-switch" v-model="open.chords"></a>
+              </div>
+          </div>
+          <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Field</p>
                 <a is="b-switch" v-model="open.field"></a>
             </div>
           </div>
-          <div class="level-item is-3 has-text-centered">
+          <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Synth</p>
                 <a is="b-switch" v-model="open.synth"></a>
             </div>
           </div>
-          <div class="level-item is-3 has-text-centered">
+          <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Keys</p>
                 <a is="b-switch" v-model="open.keys"></a>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div v-if="open.chords" class="row">
+
+      <div class="chord-icon" v-for="(note,index) in notes">
+        <svg @click="playChord(index,[0,4,7])" viewBox="0 0 37 32">
+          <g>
+            <path :style="{fill:notes[(index+7)%12].color}" d="M7.79,21.33A10.64,10.64,0,0,1,8.9,16.61L0,32H18.49A10.7,10.7,0,0,1,7.79,21.33Z"/>
+            <path :style="{fill:notes[(index+4)%12].color}" d="M28.08,16.61A10.68,10.68,0,0,1,18.49,32H37Z"/>
+            <path :style="{fill:notes[index].color}" d="M28.08,16.61l-.76-1.31L18.49,0,9.66,15.3,8.9,16.61a10.7,10.7,0,1,0,19.18,0Z"/>
+            <text  x="18" y="25" text-anchor="middle" fill="white" style="font-size:12px;font-weight:bold">{{note.name}}</text>
+        </g>
+        </svg>
+      </div>
+      <div class="chord-icon " v-for="(note,index) in notes">
+        <svg @click="playChord(index,[0,3,7])" class="minor" viewBox="0 0 37 32">
+          <g class="triad">
+            <path :style="{fill:notes[(index+3)%12].color}" d="M7.79,21.33A10.64,10.64,0,0,1,8.9,16.61L0,32H18.49A10.7,10.7,0,0,1,7.79,21.33Z"/>
+            <path :style="{fill:notes[(index+7)%12].color}" d="M28.08,16.61A10.68,10.68,0,0,1,18.49,32H37Z"/>
+            <path :style="{fill:notes[index].color}" d="M28.08,16.61l-.76-1.31L18.49,0,9.66,15.3,8.9,16.61a10.7,10.7,0,1,0,19.18,0Z"/>
+          </g>
+            <text x="18" y="25" text-anchor="middle" dominant-baseline="central" fill="white" style="font-size:12px;font-weight:bold">{{note.name}}</text>
+
+        </svg>
       </div>
     </div>
 
@@ -243,85 +367,16 @@
       </div>
 
 
-      <div v-if="open.synth" class="row level adsr-sliders">
-        <div class="level-item ">
-          <vue-slider
-          v-model="oscType"
-          :data="oscTypes"
-          :dot-size="24"
-          :height="200"
-          :width="24"
-          direction="vertical"
-          :piecewise="true"
-          :piecewise-label="true"
-          tooltip="always"
-          tooltip-dir="top">
-            <div class="tip" slot="tooltip">OSC<br><b>{{setOsc}}</b></div>
-          </vue-slider>
-        </div>
-        <div class="level-item">
-          <vue-slider
-          v-model="attack"
-          :dot-size="24"
-          :height="150"
-          :width="24"
-          :max="400"
-          :min="1"
-          direction="vertical"
-          tooltip="always"
-          tooltip-dir="top"
-          ><div class="tip" slot="tooltip">ATT<br><b>{{setAttack}}</b></div>
-        </vue-slider>
-        </div>
-        <div class="level-item">
-          <vue-slider
-          v-model="decay"
-          :dot-size="24"
-          :height="150"
-          :width="24"
-          :max="1200"
-          :min="1"
-          direction="vertical"
-          tooltip="always"
-          tooltip-dir="top"
-          ><div class="tip" slot="tooltip">DEC<br><b>{{setDecay}}</b></div>
-        </vue-slider>
-        </div>
-        <div class="level-item">
-          <vue-slider
-          v-model="sustain"
-          :dot-size="24"
-          :height="150"
-          :width="24"
-          :max="200"
-          :min="1"
-          direction="vertical"
-          tooltip="always"
-          tooltip-dir="top"
-          ><div class="tip" slot="tooltip">SUS<br><b>{{setSustain}}</b></div>
-        </vue-slider>
-        </div>
-        <div class="level-item ">
-          <vue-slider
-          v-model="release"
-          :dot-size="24"
-          :height="150"
-          :width="24"
-          :max="1000"
-          :min="1"
-          direction="vertical"
-          tooltip="always"
-          tooltip-dir="top"
-          ><div class="tip" slot="tooltip">REL<br><b>{{setRelease}}</b></div>
-        </vue-slider>
-        </div>
+      <div v-if="open.synth" class="row">
+        <synth></synth>
       </div>
 
       <div v-if="open.keys" class="row">
         <key-stack
+        :root="root"
+        :steps="scale.steps"
         @play="play"
-        @stop="stop"
-        :scale="scale"></key-stack>
+        @stop="stop"></key-stack>
       </div>
 
 
