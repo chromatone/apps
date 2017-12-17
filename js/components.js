@@ -49,6 +49,123 @@ Vue.component('synth', {
 
 
 
+// CHORDION
+
+
+Vue.component('chordion', {
+  template:'#chordion',
+  data: function () {
+    return {
+      notes:Chroma.Notes,
+      chords:Chroma.Chords,
+      inversion:-1
+    }
+  },
+  props: {
+    scale: {
+      type: Object
+    },
+    root: {
+      default:0
+    }
+  },
+  computed: {
+    activeSteps: function () {
+      let activeSteps=Tone.arrayRotate(this.scale.steps, -this.root);
+      console.log(activeSteps)
+      return activeSteps
+    },
+    activeNotes: function () {
+      for (let i=0;i<12;i++) {
+          this.notes[i].active = this.activeSteps[i];
+        }
+      return this.notes
+    }
+  },
+  methods:{
+    invert: function(chord, inv) {
+      let invChord=chord.slice();
+      for (i=0;i<inv;i++) {
+        invChord.push(invChord.shift())
+        invChord[chord.length-1]+=12;
+      }
+      return invChord
+    },
+    changeChord: function  (pitch,chord,inv) {
+      let octave=2;
+      if (pitch<this.root) {
+        octave++
+      }
+      if(chord.inversion !=inv) {
+        let toStop = [];
+        let playing = this.invert(chord.steps,chord.inversion);
+        for (i=0;i<playing.length; i++) {
+          toStop[i]=Tone.calcFrequency(pitch+playing[i],octave);
+        }
+        Tone.chromaSynth.triggerRelease(toStop);
+        chord.inversion=inv;
+      }
+      let invChord=this.invert(chord.steps,inv);
+      let toPlay = [];
+      for (i=0;i<invChord.length; i++) {
+        toPlay[i]=Tone.calcFrequency(pitch+invChord[i],octave);
+      }
+
+      Tone.chromaSynth.triggerAttack(toPlay,'+0.001');
+    },
+    invertChord: function (pitch, chord, event) {
+
+      for (i=0;i<event.changedTouches.length;i++) {
+        let clientX=event.changedTouches[i].clientX;
+        let clientY=event.changedTouches[i].clientY;
+        let rect=event.changedTouches[i].target.getBoundingClientRect();
+        let x=clientX-rect.x-rect.width/2;
+        let y= clientY-rect.y-rect.height/2;
+        if (chord.handle == 'min') {
+          y=-y;
+        }
+            if (chord.inversion!=2 && x>0 && y>0 && Math.sqrt(3)*x+y>50) {
+              this.changeChord(pitch,chord,2)
+
+            } else if (chord.inversion!=1 && x<0 && y>0  && Math.sqrt(3)*Math.abs(x)+y>50){
+              this.changeChord(pitch,chord,1)
+
+            } else if (chord.inversion!=0 && (Math.sqrt(3)*Math.abs(x)+y<50 || y<0)){
+              this.changeChord(pitch,chord,0);
+
+            }
+      }
+
+    },
+    chordTranslate: function (index, size, shift, top, topshift) {
+      let translate = 'translate(';
+
+      if (index>5) {
+        translate+=Number(index-6)*size+shift+' '+topshift+')'
+      } else {
+        translate+=Number(index*size+shift)+' '+Number(top+topshift)+')'
+      }
+      return translate
+    },
+    stopChord: function (pitch, chord, event) {
+      let octave=2;
+      if (pitch<this.root) {
+        octave++
+      }
+        let toStop = [];
+        let playing = this.invert(chord.steps,chord.inversion);
+        for (i=0;i<playing.length; i++) {
+          toStop[i]=Tone.calcFrequency(pitch+playing[i],octave);
+        }
+
+        Tone.chromaSynth.triggerRelease(toStop);
+        chord.inversion=-1;
+
+    },
+  }
+})
+
+
 
 
 //KEY stack
@@ -143,8 +260,7 @@ Vue.component ('field', {
   },
   computed: {
     activeSteps: function () {
-      let activeSteps = [];
-      activeSteps=activeSteps.concat(this.steps.slice(-this.root),this.steps.slice(0,12-this.root));
+      let activeSteps=Tone.arrayRotate(this.steps,-this.root);
       console.log(activeSteps)
       return activeSteps
     },
@@ -166,7 +282,7 @@ Vue.component ('field', {
 //        playingNotes[id]=[pitch,octave];
 //          console.log('start '+id +' ('+pitch +','+ octave+') '+active);
           Tone.field[id]= new Tone.Synth(Tone.chromaOptions).connect(Tone.context.volume);
-          console.log(Tone.field[id])
+      //    console.log(Tone.field[id])
           Tone.field[id].frequency = Tone.calcFrequency(pitch,octave);
           Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave))
     },
@@ -180,7 +296,7 @@ Vue.component ('field', {
         setTimeout( function(){
           Tone.field[id].dispose();
           delete Tone.field[id]
-          console.log(Tone.field)
+    //      console.log(Tone.field)
         }, Tone.chromaOptions.envelope.release*1000);
       }
     },
@@ -206,7 +322,7 @@ Vue.component ('field', {
       if (idx >= 0) {
 
         this.ongoingTouches.splice(idx, 1);  // remove it; we're done
-        console.log('stop '+ touches[i].identifier, this.ongoingTouches)
+  //      console.log('stop '+ touches[i].identifier, this.ongoingTouches)
         this.stopNote(touches[i].identifier)
         }
       }
@@ -222,7 +338,7 @@ Vue.component ('field', {
             if (Tone.checkActive(copy.pitch, this.root, this.steps) && (this.ongoingTouches[idx].pitch!=copy.pitch || this.ongoingTouches[idx].octave!=copy.octave)) {
               this.ongoingTouches.splice(idx, 1, copy);  // swap in the new touch record
               this.changeNote(copy.identifier,copy.pitch,copy.octave);
-              console.log('change' + touches[i].identifier + ' to '+ copy.pitch+' '+copy.octave)
+  //            console.log('change' + touches[i].identifier + ' to '+ copy.pitch+' '+copy.octave)
             }
 
           } else {
@@ -230,7 +346,7 @@ Vue.component ('field', {
             if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
               this.ongoingTouches.push(copy);
               this.playNote(copy.identifier,copy.pitch,copy.octave);
-              console.log('play '+copy.identifier +' '+ copy.pitch+' '+ copy.octave, this.ongoingTouches)
+  //            console.log('play '+copy.identifier +' '+ copy.pitch+' '+ copy.octave, this.ongoingTouches)
             }
           }
 

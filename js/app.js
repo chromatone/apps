@@ -1,10 +1,8 @@
-if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-    StartAudioContext(Tone.context, 'body').then(function(){
-      console.log(Tone.context)
-    });
-  }
+
 
   Vue.use(Buefy.default);
+
+  Vue.use(VueLocalStorage)
 
 
 var vuetone = new Vue({
@@ -13,18 +11,18 @@ var vuetone = new Vue({
     'vueSlider': window[ 'vue-slider-component' ]
   },
   data: {
-    scale:'',
     open: {
       metronome:true,
       keys:true,
       synth:true,
       field:true,
-      chords:true
+      chords:false,
+      scales:true
     },
     base:440,
     root:0,
     octaves:[2,4],
-    vol: 70,
+    vol: -15,
     notes:Chroma.Notes,
     chords:Chroma.Chords,
     scales:Chroma.Scales,
@@ -33,34 +31,12 @@ var vuetone = new Vue({
     band:{}
   },
   methods: {
-    chordTranslate: function (index, size, shift, top, topshift) {
-      let translate = 'translate('
 
-      if (index>5) {
-        translate+=Number(index-6)*size+shift+' '+topshift+')'
-      } else {
-        translate+=Number(index*size+shift)+' '+Number(top+topshift)+')'
-      }
-      return translate
-    },
-    chroma: chroma,
-    average: chroma.average,
     play: function (note, octave, id) {
       console.log(note.pitch, octave);
       Tone.chromaSynth.triggerAttack(Tone.calcFrequency(note.pitch,octave))
     },
-    playChord: function (pitch, chord) {
-      console.log(chord.length)
-      for (i=0;i<chord.length; i++) {
-        Tone.chromaSynth.triggerAttack(Tone.calcFrequency(pitch+chord[i],2));
-      }
-    },
-    stopChord: function (pitch, chord) {
-      console.log(chord.length)
-      for (i=0;i<chord.length; i++) {
-        Tone.chromaSynth.triggerRelease(Tone.calcFrequency(pitch+chord[i],2));
-      }
-    },
+
     playOnce: function (note, octave, id) {
       console.log(note.pitch, octave);
       Tone.chromaSynth.triggerAttackRelease(Tone.calcFrequency(note.pitch,octave))
@@ -73,6 +49,11 @@ var vuetone = new Vue({
   computed: {
     mixedColors: function () {
       return chroma.mix(this.color1,this.color2,0.5,'rgb')
+    },
+    opened: function() {
+      Vue.localStorage.set('open', JSON.stringify(this.open));
+      console.log(this.open);
+      return ''
     },
     octavesNum: function() {
       let octs = [];
@@ -107,8 +88,20 @@ var vuetone = new Vue({
     }
   },
   created: function () {
+
+      this.open = JSON.parse(Vue.localStorage.get('open','{ "metronome": true, "keys": false, "synth": false, "field": false, "chords": false, "scales": false }'));
+
+
+    Tone.arrayRotate = function (arr, count) {
+      count -= arr.length * Math.floor(count / arr.length)
+      let array=arr.slice();
+      array.push.apply(array, array.splice(0, count))
+      return array
+    }
+
     Tone.calcFrequency= function(pitch,octave) {
-      return 440 * Math.pow(2, (octave-4) + (pitch / 12))
+      octave=octave||4;
+      return Number(440 * Math.pow(2, (octave-4) + (pitch / 12)))
     };
     Tone.ongoingTouchIndexById = function (ongoingTouches, idToFind) {
           for (var i = 0; i < ongoingTouches.length; i++) {
@@ -157,5 +150,12 @@ var vuetone = new Vue({
     Tone.chromaSynth = new Tone.PolySynth(12,Tone.Synth);
     Tone.context.volume = new Tone.Volume(0).toMaster();
     Tone.chromaSynth.connect(Tone.context.volume);
+  },
+  mounted: function () {
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        StartAudioContext(Tone.context, '.switch').then(function(){
+          console.log(Tone.context)
+        });
+      }
   }
 });
