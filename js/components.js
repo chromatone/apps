@@ -254,7 +254,7 @@ Vue.component('metronome', {
   template:'#metronome',
   data: function () {
     return {
-      bpm: 120,
+      bpm: 60,
       play:0,
       loop: {}
     }

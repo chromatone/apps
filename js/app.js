@@ -19,7 +19,7 @@ var vuetone = new Vue({
       keys:true,
       synth:true,
       field:true,
-      chords:false
+      chords:true
     },
     base:440,
     root:0,
@@ -33,15 +33,18 @@ var vuetone = new Vue({
     band:{}
   },
   methods: {
+    chordTranslate: function (index, size, shift, top, topshift) {
+      let translate = 'translate('
+
+      if (index>5) {
+        translate+=Number(index-6)*size+shift+' '+topshift+')'
+      } else {
+        translate+=Number(index*size+shift)+' '+Number(top+topshift)+')'
+      }
+      return translate
+    },
     chroma: chroma,
     average: chroma.average,
-    mixChord: function (pitch,chord) {
-      let colors=[];
-      for (let i=0;i<chord.length;i++) {
-        colors[i]=chroma((pitch+chord[i])*30,1,0.5,'hsl')
-      }
-      return chroma.average(colors, 'rgb').saturate(3).brighten(2)
-    },
     play: function (note, octave, id) {
       console.log(note.pitch, octave);
       Tone.chromaSynth.triggerAttack(Tone.calcFrequency(note.pitch,octave))
@@ -49,10 +52,14 @@ var vuetone = new Vue({
     playChord: function (pitch, chord) {
       console.log(chord.length)
       for (i=0;i<chord.length; i++) {
-
-        Tone.chromaSynth.triggerAttackRelease(Tone.calcFrequency(pitch+chord[i],4), '4n','+'+i/6);
+        Tone.chromaSynth.triggerAttack(Tone.calcFrequency(pitch+chord[i],2));
       }
-
+    },
+    stopChord: function (pitch, chord) {
+      console.log(chord.length)
+      for (i=0;i<chord.length; i++) {
+        Tone.chromaSynth.triggerRelease(Tone.calcFrequency(pitch+chord[i],2));
+      }
     },
     playOnce: function (note, octave, id) {
       console.log(note.pitch, octave);
