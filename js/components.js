@@ -72,7 +72,7 @@ Vue.component('chordion', {
   computed: {
     activeSteps: function () {
       let activeSteps=Tone.arrayRotate(this.scale.steps, -this.root);
-      console.log(activeSteps)
+
       return activeSteps
     },
     activeNotes: function () {
@@ -113,7 +113,7 @@ Vue.component('chordion', {
 
       Tone.chromaSynth.triggerAttack(toPlay,'+0.001');
     },
-    invertChord: function (pitch, chord, event) {
+    slideChord: function (pitch, chord, event) {
 
       for (i=0;i<event.changedTouches.length;i++) {
         let clientX=event.changedTouches[i].clientX;
@@ -261,7 +261,6 @@ Vue.component ('field', {
   computed: {
     activeSteps: function () {
       let activeSteps=Tone.arrayRotate(this.steps,-this.root);
-      console.log(activeSteps)
       return activeSteps
     },
     notes108: function () {
@@ -308,7 +307,7 @@ Vue.component ('field', {
         if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
           this.ongoingTouches.push(copy);
           this.playNote(copy.identifier,copy.pitch,copy.octave);
-          console.log('play '+copy.identifier +' '+ copy.pitch+' '+ copy.octave, this.ongoingTouches)
+      //    console.log('play '+copy.identifier +' '+ copy.pitch+' '+ copy.octave, this.ongoingTouches)
         }
 
       }
@@ -386,7 +385,6 @@ Vue.component('metronome', {
       } else {
         Tone.Transport.stop()
       }
-      console.log(this.play)
       return this.play
     },
     loopTempo: function() {

@@ -9,8 +9,8 @@
 		<link rel="stylesheet" href="css/Chromatone.css" />
 		<script src="js/Scales.js"></script>
     <script src="assets/StartAudioContext.js"></script>
-    <script src="assets/Tone.js"></script>
-    <script src="https://unpkg.com/vue"></script>
+    <script src="assets/Tone.min.js"></script>
+    <script src="assets/vue.min.js"></script>
     <script src="assets/vue-slider.js"></script>
     <script src="assets/buefy.js"></script>
     <script src="assets/vue-local-storage.js"></script>
@@ -152,9 +152,9 @@
       <div class="octave-slider">
         <vue-slider
          v-model="octaves"
-         :dot-size="36"
+         :dot-size="24"
          :max="8"
-         :height="24"
+         :height="12"
          direction="horizontal"
          :piecewise="true"
          :piecewise-label="true"
@@ -200,12 +200,12 @@
   v-model="attack"
   :dot-size="24"
   :height="150"
-  :width="24"
+  :width="12"
   :max="400"
   :min="1"
   direction="vertical"
   tooltip="always"
-  tooltip-dir="top"
+  tooltip-dir="right"
   ><div class="tip" slot="tooltip">ATT<br><b>{{setAttack}}</b></div>
 </vue-slider>
 </div>
@@ -214,12 +214,12 @@
   v-model="decay"
   :dot-size="24"
   :height="150"
-  :width="24"
+  :width="12"
   :max="1200"
   :min="1"
   direction="vertical"
   tooltip="always"
-  tooltip-dir="top"
+  tooltip-dir="right"
   ><div class="tip" slot="tooltip">DEC<br><b>{{setDecay}}</b></div>
 </vue-slider>
 </div>
@@ -228,12 +228,12 @@
   v-model="sustain"
   :dot-size="24"
   :height="150"
-  :width="24"
+  :width="12"
   :max="200"
   :min="1"
   direction="vertical"
   tooltip="always"
-  tooltip-dir="top"
+  tooltip-dir="right"
   ><div class="tip" slot="tooltip">SUS<br><b>{{setSustain}}</b></div>
 </vue-slider>
 </div>
@@ -242,12 +242,12 @@
   v-model="release"
   :dot-size="24"
   :height="150"
-  :width="24"
+  :width="12"
   :max="1000"
   :min="1"
   direction="vertical"
   tooltip="always"
-  tooltip-dir="top"
+  tooltip-dir="left"
   ><div class="tip" slot="tooltip">REL<br><b>{{setRelease}}</b></div>
 </vue-slider>
 </div>
@@ -258,7 +258,7 @@
   v-model="oscType"
   :data="oscTypes"
   :dot-size="24"
-  :height="24"
+  :height="12"
   :width="400"
   direction="horizontal"
   :piecewise="true"
@@ -295,8 +295,8 @@
         style="fill:transparent"
         points="27.74 16.02 18.49 0 9.25 16.02 18.49 32.03 27.74 16.02 27.74 16.02"/>
         <polygon
-        @touchstart.stop.prevent="invertChord(index,chords['maj'], $event)"
-        @touchmove.stop.prevent="invertChord(index,chords['maj'], $event)"
+        @touchstart.stop.prevent="slideChord(index,chords['maj'], $event)"
+        @touchmove.stop.prevent="slideChord(index,chords['maj'], $event)"
         @touchend.stop.prevent="stopChord(index,chords['maj'], $event)"
         :style="{stroke:notes[index].color}"
 
@@ -320,8 +320,8 @@
           points="9.25 16.02 18.49 32.03 27.74 16.02 18.49 0 9.25 16.02 9.25 16.02"/>
         <text  x="18" y="18" text-anchor="middle" fill="white" style="font-size:6px;font-weight:bold">{{note.name}}m</text>
         <polygon
-        @touchstart.stop.prevent="invertChord(index,chords['min'], $event)"
-        @touchmove.stop.prevent="invertChord(index,chords['min'], $event)"
+        @touchstart.stop.prevent="slideChord(index,chords['min'], $event)"
+        @touchmove.stop.prevent="slideChord(index,chords['min'], $event)"
         @touchend.stop.prevent="stopChord(index,chords['min'], $event)"
         :style="{stroke:notes[index].color}"
         class="chord-frame" points="18.49 32.03 36.98 0 0 0 18.49 32.03"/>
@@ -343,7 +343,7 @@
 
   <div id="vuetone">
 
-    <div class="row">
+    <div class="row switches">
       <div class="level">
         <div class="logo level-item is-6 has-text-centered">
           <img src="logo.svg" style="min-width:150px">
@@ -367,42 +367,45 @@
           <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Scales</p>
-                <a is="b-switch" v-model="open.scales"></a>
+                <a is="b-switch" size="is-small" v-model="open.scales"></a>
             </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
             <p>Rythm</p>
-                <a is="b-switch" v-model="open.metronome"></a>
+                <a is="b-switch" size="is-small" v-model="open.metronome"></a>
               </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
             <p>Chords</p>
-                <a is="b-switch" v-model="open.chords"></a>
+                <a is="b-switch" size="is-small" v-model="open.chords"></a>
               </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Field</p>
-                <a is="b-switch" v-model="open.field"></a>
+                <a is="b-switch" size="is-small" v-model="open.field"></a>
             </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Synth</p>
-                <a is="b-switch" v-model="open.synth"></a>
+                <a is="b-switch" size="is-small" v-model="open.synth"></a>
             </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
                 <p>Keys</p>
-                <a is="b-switch" v-model="open.keys"></a>
+                <a is="b-switch" size="is-small" v-model="open.keys"></a>
             </div>
-            <span>{{opened}}</span>
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-show="open.synth" class="row">
+      <synth></synth>
     </div>
 
     <div v-if="open.scales" class="row">
@@ -443,12 +446,9 @@
         ></metronome>
     </div>
 
-    <div v-show="open.synth" class="row">
-      <synth></synth>
-    </div>
 
-    <div v-if="open.chords" class="row">
 
+    <div v-show="open.chords" class="row">
       <chordion :root="root" :scale="scale"></chordion>
     </div>
 

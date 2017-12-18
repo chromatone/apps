@@ -33,12 +33,12 @@ var vuetone = new Vue({
   methods: {
 
     play: function (note, octave, id) {
-      console.log(note.pitch, octave);
+    //  console.log(note.pitch, octave);
       Tone.chromaSynth.triggerAttack(Tone.calcFrequency(note.pitch,octave))
     },
 
     playOnce: function (note, octave, id) {
-      console.log(note.pitch, octave);
+    //  console.log(note.pitch, octave);
       Tone.chromaSynth.triggerAttackRelease(Tone.calcFrequency(note.pitch,octave))
     },
     stop: function (note, octave, id) {
@@ -49,11 +49,6 @@ var vuetone = new Vue({
   computed: {
     mixedColors: function () {
       return chroma.mix(this.color1,this.color2,0.5,'rgb')
-    },
-    opened: function() {
-      Vue.localStorage.set('open', JSON.stringify(this.open));
-      console.log(this.open);
-      return ''
     },
     octavesNum: function() {
       let octs = [];
@@ -88,9 +83,6 @@ var vuetone = new Vue({
     }
   },
   created: function () {
-
-      this.open = JSON.parse(Vue.localStorage.get('open','{ "metronome": true, "keys": false, "synth": false, "field": false, "chords": false, "scales": false }'));
-
 
     Tone.arrayRotate = function (arr, count) {
       count -= arr.length * Math.floor(count / arr.length)
@@ -154,7 +146,7 @@ var vuetone = new Vue({
   mounted: function () {
     if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         StartAudioContext(Tone.context, '.switch').then(function(){
-          console.log(Tone.context)
+
         });
       }
   }

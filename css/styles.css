@@ -12,6 +12,14 @@ body {
   -webkit-font-smoothing:antialiased;
 }
 
+.switches p {
+  font-size:14px;
+}
+
+.rythm {
+  font-size:14px;
+}
+
 .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top {
   top:-4px!important;
 }
@@ -21,6 +29,7 @@ body {
   flex-flow: row wrap;
   justify-content: space-between;
   padding:25px 0 0 0;
+  margin-bottom:0 !important;
 }
 .adsr-slider {
   flex:1 1 10%;
@@ -36,7 +45,7 @@ body {
   background:rgba(255,255,255,0.8);
   border-radius: 6px;
   box-shadow:0.5px 0.5px 2px 1px rgba(0,0,0,.32);
-  font-size:12px;
+  font-size:10px;
   padding:4px;
 }
 
