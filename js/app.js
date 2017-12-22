@@ -92,7 +92,7 @@ var vuetone = new Vue({
     }
 
     Tone.calcFrequency= function(pitch,octave) {
-      octave=octave||4;
+      
       return Number(440 * Math.pow(2, (octave-4) + (pitch / 12)))
     };
     Tone.ongoingTouchIndexById = function (ongoingTouches, idToFind) {
