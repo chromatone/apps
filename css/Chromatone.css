@@ -86,6 +86,13 @@
   [data-active="0"] {
     opacity:0.1;
   }
+[data-root] {
+    transition: all 0.5s ease;
+  }
+  [data-root="1"] {
+    stroke:rgba(255,255,255,0.8);
+    stroke-width:6;
+  }
   .playing {
     opacity:0.7
   }

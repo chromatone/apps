@@ -15,7 +15,9 @@ body {
 .switches p {
   font-size:14px;
 }
-
+.scale-select .field:not(:last-child){
+  margin-bottom:0;
+}
 .rythm {
   font-size:14px;
 }
@@ -28,11 +30,15 @@ body {
   display:flex;
   flex-flow: row wrap;
   justify-content: space-between;
-  padding:25px 0 0 0;
+  padding:0;
   margin-bottom:0 !important;
 }
 .adsr-slider {
   flex:1 1 10%;
+}
+
+.adsr-sliders .level-item:not(:last-child) {
+  margin-bottom:0;
 }
 
 .letters {
@@ -101,4 +107,81 @@ body {
 
 .root-select {
   cursor:pointer;
+}
+
+/*
+sequencer
+*/
+
+
+.dot {
+  fill:#999;
+}
+.dot.highlight {
+  stroke:#99e;
+  stroke-width:4px;
+}
+
+.dot.active {
+  fill:#555;
+}
+
+.track {
+  fill:#bbb;
+}
+
+.beat {
+  fill:rgba(255,255,255,0.5);
+  stroke:#fff;
+  stroke-width:2px;
+  opacity:0.2;
+ transition: all 0.1s ease;
+}
+
+.beat.highlight {
+  opacity:0.5;
+}
+
+.beat.fourth {
+  fill:rgba(125,125,125,0.5);
+  stroke:#333;
+}
+
+/*
+knob
+*/
+
+.knob{
+  user-select: none;
+  margin-left: 10px;
+}
+.knob circle.mainCircle{
+  fill: #eee;
+  stroke: #aaa;
+  stroke-width: 3px;
+  box-shadow:
+  0 3px 1px 0 rgba(0,0,0,.05),
+  0 2px 2px 0 rgba(0,0,0,.1),
+  0 3px 3px 0 rgba(0,0,0,.05);
+}
+
+.knob circle.mainCircle.active{
+  fill: #ddd;
+}
+
+.knob circle.shadow{
+  fill: #CDCCCC;
+}
+
+.knob line {
+  stroke: #666B5B;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.knob text {
+  font-size: 12px;
+  text-anchor: middle;
+  fill: #777;
 }

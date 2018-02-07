@@ -15,31 +15,119 @@
     <script src="assets/buefy.js"></script>
     <script src="assets/vue-local-storage.js"></script>
 
+    <script id="knob" type="x-template">
+    <svg width="40" height="60"
+      viewBox="0 -15 34 65"
+      class="knob"
+      @mousedown.stop.prevent="activate"
+      @touchstart.stop.prevent="activate">
+     <text x="17" y="-4">{{value | round}}</text>
+      <circle class="shadow" cx="17" cy="17" r="16"></circle>
+      <circle class="mainCircle" cx="17" cy="15" r="13"
+      :class="{ active: active}" />
+      <line x1="17" y1="15" x2="17" y2="3" :transform="knobRotation"/>
+      <text x="17" y="45">{{param}}</text>
+    </svg>
+    </script>
+
 
     <script id="metronome" type="x-template">
-      <div class="rythm-box level is-mobile">
-        <div class="level-item is-4 is-narrow is-centered">
+      <div class="rythm-box">
+        <div class="level is-mobile">
+          <div class="level-item is-4 is-narrow is-centered">
 
 
-          <svg  width="32" height="32" viewBox="0 0 32 32">
-            <circle id="metro-flash" v-show="playing" cx="16" cy="16" r="12" style="fill:#444"/>
-          </svg>
+            <svg  width="32" height="32" viewBox="0 0 32 32">
+              <circle id="metro-flash" v-show="playing" cx="16" cy="16" r="12" style="fill:#444"/>
+            </svg>
 
+            </div>
+          <div class="level-item is-4 is-narrow is-centered">
+            <a is="b-switch" v-model="playing" />
           </div>
-        <div class="level-item is-4 is-narrow is-centered">
-          <a is="b-switch" v-model="play" />
+
+          <div class="level-item is-narrow is-4">
+          <knob min="20" max="320" param="BPM" step="1"
+          v-model="tempo" />
+          </div>
+
+          <div class="level-item is-4 is-centered">
+            {{beatFrequency.toFixed(2)}} Hz – {{toNote}}
+          </div>
+          <div class="level-item is-centered">
+            <b-field><b>Beats: &nbsp;</b>
+                     <button @click="delBeat" class="button is-small">
+                         -
+                     </button>
+                     <button  class="button is-small is-static">
+                         {{beatCount}}
+                     </button>
+                     <button @click="addBeat" class="button is-small">
+                         +
+                     </button>
+            </b-field>
+          </div>
+          <div class="level-item is-centered">
+            <b-field><b>Tracks: &nbsp;</b>
+                     <button @click="delTrack" class="button is-small">
+                         -
+                     </button>
+                     <button  class="button is-small is-static">
+                         {{trackCount}}
+                     </button>
+                     <button @click="addTrack" class="button is-small">
+                         +
+                     </button>
+            </b-field>
+          </div>
         </div>
 
-        <div class="level-item is-narrow is-4">
-          <b-field>
-          <button class="button" @click="bpm--">-</button>
-          <input style="width:50px" class="input is-primary" v-model="bpm" type="text"></input>
-          <button class="button" @click="bpm++">+</button>
-          </b-field>
-        </div>
+        <div>
 
-        <div class="level-item is-4 is-centered">
-          {{beatFrequency.toFixed(2)}} Hz – {{toNote}}
+
+        <svg @touchstart.stop.prevent="1" version="1.1"
+        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        x="0px" y="0px"
+        :viewBox="'0 0 '+beatCount*60+' '+trackCount*60" xml:space="preserve">
+        <g
+          @mouseleave="pressed=false"
+          @mouseup="pressed=false"
+          class="sequencer">
+
+        <rect v-for="(track,i) in trackCount"
+          class="track"
+          height="50"
+          :width="60*beatCount-10"
+          :y="5.5+60*i" x="5" rx="25"
+        />
+
+        <rect v-for="(beat,j) in beatCount"
+          class="beat"
+          width="50"
+          :class="{highlight: currentStep==j, fourth: j%4==0}"
+          :height="60*trackCount-10"
+          :x="5+60*j" y="6" rx="25"
+        />
+          <g class="seq-row" v-for="(track,i) in trackCount">
+            <g class="cell" v-for="(beat,j) in beatCount"
+              @mousedown="act(i,j,true)"
+              @touchstart.prevent.stop="act(i,j,true)"
+              @touchend.prevent.stop="pressed=false"
+              @mouseenter="act(i,j)"
+
+              >
+              <circle
+              class="dot"
+              :class="{active: pattern[i][j].active, highlight: currentStep==j}"
+
+                :cx="30+60*j"
+                :cy="30+60*i"
+                r="20"
+              />
+            </g>
+          </g>
+        </g>
+        </svg>
         </div>
 
       </div>
@@ -127,6 +215,7 @@
   	<path class="frame-out" d="M63.5,1150.7c-26.3,0-47.7-21.4-47.7-47.7V179c0-26.3,21.4-47.7,47.7-47.7h944c26.3,0,47.7,21.4,47.7,47.7v924c0,26.3-21.4,47.7-47.7,47.7H63.5z"/>
   	<path class="frame-in" d="M1007.5,137c23.1,0,42,18.9,42,42v924c0,23.1-18.9,42-42,42h-944c-23.1,0-42-18.9-42-42V179c0-23.1,18.9-42,42-42H1007.5 M1007.5,125.7h-944c-29.4,0-53.3,23.9-53.3,53.3v924c0,29.4,23.9,53.3,53.3,53.3h944c29.4,0,53.3-23.9,53.3-53.3V179C1060.9,149.6,1036.9,125.7,1007.5,125.7L1007.5,125.7z"/>
   </g>
+
   <g>
     <g v-for="(note,ind) in notes">
     <text
@@ -196,77 +285,32 @@
 <div class="">
 <div class="level adsr-sliders">
 <div class="level-item">
-  <vue-slider
-  v-model="attack"
-  :dot-size="24"
-  :height="150"
-  :width="12"
-  :max="400"
-  :min="1"
-  direction="vertical"
-  tooltip="always"
-  tooltip-dir="right"
-  ><div class="tip" slot="tooltip">ATT<br><b>{{setAttack}}</b></div>
-</vue-slider>
+  <knob min="0.005" max="2" param="ATT"
+  v-model="attack" />
 </div>
 <div class="level-item">
-  <vue-slider
-  v-model="decay"
-  :dot-size="24"
-  :height="150"
-  :width="12"
-  :max="1200"
-  :min="1"
-  direction="vertical"
-  tooltip="always"
-  tooltip-dir="right"
-  ><div class="tip" slot="tooltip">DEC<br><b>{{setDecay}}</b></div>
-</vue-slider>
+  <knob min="0.005" max="8" param="DEC"
+  v-model="decay" />
 </div>
 <div class="level-item">
-  <vue-slider
-  v-model="sustain"
-  :dot-size="24"
-  :height="150"
-  :width="12"
-  :max="200"
-  :min="1"
-  direction="vertical"
-  tooltip="always"
-  tooltip-dir="right"
-  ><div class="tip" slot="tooltip">SUS<br><b>{{setSustain}}</b></div>
-</vue-slider>
+  <knob min="0.005" max="1" param="SUS"
+  v-model="sustain" />
 </div>
 <div class="level-item ">
-  <vue-slider
-  v-model="release"
-  :dot-size="24"
-  :height="150"
-  :width="12"
-  :max="1000"
-  :min="1"
-  direction="vertical"
-  tooltip="always"
-  tooltip-dir="left"
-  ><div class="tip" slot="tooltip">REL<br><b>{{setRelease}}</b></div>
-</vue-slider>
+<knob min="0.005" max="8" param="REL"
+v-model="release" />
 </div>
-</div>
-<div class="level">
-<div class="level-item is-12">
-  <vue-slider
-  v-model="oscType"
-  :data="oscTypes"
-  :dot-size="24"
-  :height="12"
-  :width="400"
-  direction="horizontal"
-  :piecewise="true"
-  :piecewise-label="true"
-  tooltip="false"
-  tooltip-dir="top">
-    <div class="tip" slot="tooltip">OSC<br><b>{{setOsc}}</b></div>
-  </vue-slider>
+
+<div class="level-item">
+<div class="block">
+
+<b-field><b>OSC: &nbsp;</b>
+         <b-radio-button v-for="type in oscTypes" v-model="oscType"
+             :native-value="type" size="is-small">
+             {{type | tri}}
+         </b-radio-button>
+</b-field>
+     </div>
 </div>
 </div>
 </div>
@@ -347,18 +391,10 @@
       <div class="level">
         <div class="logo level-item is-6 has-text-centered">
           <img src="logo.svg" style="min-width:150px">
-          <vue-slider
-          v-model="vol"
-          value="-10"
-          :dot-size="24"
-          :height="10"
-          :width="200"
-          :max="0"
-          :min="-50"
-          direction="horizontal"
-          tooltip="hover"
-          tooltip-dir="left"
-          >
+
+          <knob min="-30" max="0" param="VOL"
+     v-model="vol" />
+
           <div class="tip" slot="tooltip">VOL<br><b>{{setVolume}}</b></div>
         </vue-slider>
         </div>
@@ -404,14 +440,15 @@
       </div>
     </div>
 
-    <div v-show="open.synth" class="row">
-      <synth></synth>
+    <div v-show="open.metronome" class="row rythm">
+      <metronome
+        ></metronome>
     </div>
 
     <div v-if="open.scales" class="row">
       <div class="scale-select level">
 
-        <b-field class="level-item">
+        <b-field class="level-item scale-select">
             <b-select v-model="scale">
               <option v-for="scal in scales" v-bind:value="scal">
                 {{ scal.name }}
@@ -424,29 +461,29 @@
                 @click.stop.prevent="root=i"
                 class="root-select">
               <circle
-                    r="16"
+                    r="14"
                     :cx="20+i*32"
                     :cy="20"
                     :data-pitch="i"
-                    :data-active="Number(i==root)"></circle>
+                    :data-active="activeSteps[i]"
+                    :data-root="Number(i==root)"></circle>
               <text
                   :x="20+i*32"
-                  y="27"
+                  y="25"
                   text-anchor="middle"
                   fill="white"
-                  style="font-size:18px;font-weight:bold">{{note.name}}</text>
+                  style="font-size:14px;font-weight:bold;text-anchor: middle;">{{note.name}}</text>
             </g>
           </svg>
         </div>
       </div>
     </div>
 
-    <div v-show="open.metronome" class="row rythm">
-      <metronome
-        ></metronome>
+
+
+    <div v-show="open.synth" class="row">
+      <synth></synth>
     </div>
-
-
 
     <div v-show="open.chords" class="row">
       <chordion :root="root" :scale="scale"></chordion>

@@ -62,25 +62,13 @@ var vuetone = new Vue({
       return this.oscType.substr(0,3).toUpperCase()
     },
     setVolume: function () {
-      Tone.context.volume.volume.value=this.vol
+      Tone.volume.volume.value=this.vol
       return (this.vol/5+10).toFixed(1)
     },
-    setAttack: function () {
-      Tone.chromaSynth.set('envelope.attack', this.attack*0.005)
-      return (this.attack*0.005).toFixed(2)
-    },
-    setDecay: function () {
-      Tone.chromaSynth.set('envelope.decay', this.decay*0.005)
-      return (this.decay*0.005).toFixed(2)
-    },
-    setSustain: function () {
-      Tone.chromaSynth.set('envelope.sustain', this.sustain*0.005)
-      return (this.sustain*0.005).toFixed(2)
-    },
-    setRelease: function () {
-      Tone.chromaSynth.set('envelope.release', this.release*0.005)
-      return (this.release*0.005).toFixed(2)
-    }
+      activeSteps: function () {
+        let activeSteps=Tone.arrayRotate(this.scale.steps,-this.root);
+        return activeSteps
+      }
   },
   created: function () {
 
@@ -92,7 +80,7 @@ var vuetone = new Vue({
     }
 
     Tone.calcFrequency= function(pitch,octave) {
-      
+
       return Number(440 * Math.pow(2, (octave-4) + (pitch / 12)))
     };
     Tone.ongoingTouchIndexById = function (ongoingTouches, idToFind) {
@@ -140,8 +128,8 @@ var vuetone = new Vue({
       }
     };
     Tone.chromaSynth = new Tone.PolySynth(12,Tone.Synth);
-    Tone.context.volume = new Tone.Volume(0).toMaster();
-    Tone.chromaSynth.connect(Tone.context.volume);
+    Tone.volume = new Tone.Volume(0).toMaster();
+    Tone.chromaSynth.connect(Tone.volume);
   },
   mounted: function () {
     if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

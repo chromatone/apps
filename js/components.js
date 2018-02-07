@@ -1,3 +1,96 @@
+Vue.component('knob', {
+    template:'#knob',
+  props: ['max','min','value','step', 'param'],
+  data () {
+    return {
+      internalValue: this.mapNumber(this.value, this.min, this.max, 0, 100),
+      active: false,
+      initialX: undefined,
+      initialY: undefined,
+      initialDragValue: undefined,
+      shiftPressed: false
+    }
+  },
+  created () {
+    document.addEventListener('keydown', (e) => {
+      if (e.key=='Shift') this.shiftPressed = true
+    })
+    document.addEventListener('keyup', (e) => {
+      if (e.key=='Shift') this.shiftPressed = false
+    })
+  },
+  watch: {
+    value: function(newVal, oldVal){
+      this.internalValue = this.mapNumber(newVal, this.min, this.max, 0, 100)
+    }
+  },
+  filters: {
+    round(val){
+      return Math.floor(val*100)/100
+    }
+  },
+  computed:{
+    knobRotation(){
+      let rotation = this.mapNumber(this.internalValue, 0,100,0,270)-135
+      return `rotate( ${rotation} 17 15)`
+    }
+  },
+  methods: {
+    mapNumber(value,inputmin,inputmax,rangemin,rangemax){
+      rangemax = parseFloat(rangemax)
+      rangemin = parseFloat(rangemin)
+      inputmax = parseFloat(inputmax)
+      inputmin = parseFloat(inputmin)
+      let result = (value- inputmin) * (rangemax - rangemin) / (inputmax - inputmin) + rangemin;
+
+      return Math.round(result*(this.step||100))/(this.step||100)
+    },
+    activate(event){
+      this.initialX = event.pageX || event.changedTouches[0].pageX
+      this.initialY = event.pageY || event.changedTouches[0].pageY
+      this.active = true
+      this.initialDragValue = this.internalValue
+      document.onmouseup = this.deactivate
+      document.addEventListener('touchend', this.deactivate)
+      document.onmousemove = this.dragHandler
+      document.addEventListener('touchmove',this.dragHandler)
+    },
+    dragHandler(e){
+      let xLocation = e.pageX || e.changedTouches[0].pageX
+      let yLocation = e.pageY || e.changedTouches[0].pageY
+      if (Math.abs(xLocation - this.initialX)> Math.abs(yLocation - this.initialY))
+        {
+          if(this.shiftPressed){
+            this.internalValue = this.initialDragValue + (xLocation - this.initialX)/10
+          } else {
+            this.internalValue = this.initialDragValue + (xLocation - this.initialX)/2
+          }
+        } else {
+          if(this.shiftPressed){
+            this.internalValue = this.initialDragValue + (this.initialY-yLocation)/10
+          } else {
+            this.internalValue = this.initialDragValue + (this.initialY - yLocation)/2
+          }
+        }
+      if (this.internalValue>100) this.internalValue = 100
+      if (this.internalValue<0) this.internalValue = 0
+      if(isNaN(this.internalValue)) this.internalValue = this.initialDragValue
+      this.$emit('input', this.mapNumber(this.internalValue, 0,100,this.min,this.max))
+    },
+    deactivate(){
+      document.onmouseup = undefined
+      document.onmousemove = undefined
+      document.removeEventListener('touchmove',this.dragHandler)
+      document.removeEventListener('touchend',this.deactivate)
+      this.active = false
+    }
+  }
+
+})
+
+
+
+
 // Synth adsr
 
 
@@ -5,43 +98,45 @@ Vue.component('synth', {
   template:"#synth",
   data: function() {
     return {
-      attack: 30,
-      decay: 300,
-      sustain:90,
-      release: 120,
+      attack: 0.030,
+      decay: 1.5,
+      sustain:0.5,
+      release: 0.8,
       oscTypes: ['sine','triangle','square','sawtooth', 'pulse', 'pwm'],
-      oscType: 'pwm',
+      oscType: 'sine',
     }
   },
   components: {
     'vueSlider': window[ 'vue-slider-component' ]
   },
+  filters: {
+    tri: function(val) {
+      return val.slice(0,3).toUpperCase()
+    }
+  },
   computed: {
-    setOsc: function () {
-        Tone.chromaSynth.set('oscillator.type',this.oscType);
-        Tone.chromaOptions.oscillator.type=this.oscType;
-      return this.oscType.substr(0,3).toUpperCase()
+
+  },
+  watch: {
+    oscType: function () {
+      Tone.chromaSynth.set('oscillator.type',this.oscType);
+      Tone.chromaOptions.oscillator.type=this.oscType;
     },
-    setAttack: function () {
-      Tone.chromaSynth.set('envelope.attack', this.attack*0.005);
-      Tone.chromaOptions.envelope.attack=this.attack*0.005
-  //    Tone.chromaOptions.portamento=this.attack*0.005;
-      return (this.attack*0.005).toFixed(2)
+    attack: function () {
+      Tone.chromaSynth.set('envelope.attack', this.attack);
+      Tone.chromaOptions.envelope.attack=this.attack
     },
-    setDecay: function () {
-      Tone.chromaSynth.set('envelope.decay', this.decay*0.005);
-      Tone.chromaOptions.envelope.decay=this.decay*0.005
-      return (this.decay*0.005).toFixed(2)
+    decay: function () {
+      Tone.chromaSynth.set('envelope.decay', this.decay);
+      Tone.chromaOptions.envelope.decay=this.decay
     },
-    setSustain: function () {
-      Tone.chromaSynth.set('envelope.sustain', this.sustain*0.005);
-      Tone.chromaOptions.envelope.sustain=this.sustain*0.005
-      return (this.sustain*0.005).toFixed(2)
+    sustain: function () {
+      Tone.chromaSynth.set('envelope.sustain', this.sustain);
+      Tone.chromaOptions.envelope.sustain=this.sustain
     },
-    setRelease: function () {
-      Tone.chromaSynth.set('envelope.release', this.release*0.005);
-      Tone.chromaOptions.envelope.release=this.release*0.005
-      return (this.release*0.005).toFixed(2)
+    release: function () {
+      Tone.chromaSynth.set('envelope.release', this.release);
+      Tone.chromaOptions.envelope.release=this.release
     }
   }
 });
@@ -280,7 +375,7 @@ Vue.component ('field', {
     playNote: function  (id, pitch, octave) {
 //        playingNotes[id]=[pitch,octave];
 //          console.log('start '+id +' ('+pitch +','+ octave+') '+active);
-          Tone.field[id]= new Tone.Synth(Tone.chromaOptions).connect(Tone.context.volume);
+          Tone.field[id]= new Tone.Synth(Tone.chromaOptions).connect(Tone.volume);
       //    console.log(Tone.field[id])
           Tone.field[id].frequency = Tone.calcFrequency(pitch,octave);
           Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave))
@@ -369,15 +464,138 @@ Vue.component('metronome', {
   template:'#metronome',
   data: function () {
     return {
-      bpm: 60,
       play:0,
-      loop: {}
+      pattern:[],
+      beatCount: 16,
+      tracks:[],
+      loop: {},
+      currentStep: 0,
+      secondsPerStep: 0,
+     lastScheduledTime: 0,
+     nextStepTime: 0,
+     mutes: [],
+     playing: false,
+     pressed:false,
+     tempo: 120,
+     audioTime: undefined,
+     presets: [
+    {
+      name: "Default",
+      pattern: [
+      [
+        { active: true },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false},
+        { active: true },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false }
+      ],
+      [
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false }
+      ],
+      [
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: true },
+        { active: false }
+      ],
+      [
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: true },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: false },
+        { active: true }
+      ]
+    ],
+      tracks: [
+        {
+          freq: 40,
+          gain: 0.9,
+          decay: 0.5,
+          endPitch: 0.3,
+          sineNoiseMix: 0.001
+        },
+        {
+          freq: 110,
+          gain: 0.3,
+          decay: 0.15,
+          endPitch: 0.9,
+          sineNoiseMix: 0.75
+        },
+        {
+          freq: 80,
+          gain: 0.1,
+          decay: 0.06,
+          endPitch: 1,
+          sineNoiseMix: 0.75
+        },
+        {
+          freq: 55,
+          gain: 0.4,
+          decay: 0.65,
+          endPitch: 1,
+          sineNoiseMix: 0.001
+        }
+      ],
+      tempo: 80
+    }]
     }
   },
   computed: {
+    trackCount(){
+      return this.tracks.length
+    },
     beatFrequency: function () {
-      Tone.Transport.bpm.value=this.bpm;
-      return this.bpm/60
+      Tone.Transport.bpm.value=this.tempo;
+      return this.tempo/60
     },
     playing: function () {
       if (this.play) {
@@ -388,16 +606,165 @@ Vue.component('metronome', {
       return this.play
     },
     loopTempo: function() {
-      console.log(this.bpm)
       return Tone.Transport.bpm.value
     },
     toNote: function () {
       return Tone.Frequency(this.beatFrequency, "hz").toNote();
     },
+    pattern: function () {
+      let array = [];
+      array.length=this.loopLength;
+      for (let col=0;col<array.length; col++) {
+        array[col]=[];
+        array[col].length=this.loopTracks
+      }
+      return array
+    }
+  },
+  methods: {
+  addTrack: function () {
+      this.tracks.push({
+        freq: 100,
+        gain: 0.2,
+        decay: 0.01,
+        endPitch: 0.01,
+        sineNoiseMix: 0.01
+      });
+      let track = [];
+      for (let beat=0;beat<this.beatCount;beat++) {
+        track[beat]={};
+        track[beat].active=false;
+      }
+      this.pattern.push(track)
+        console.log(this.pattern)
+
+  },
+    delTrack: function () {
+      this.tracks.pop();
+      this.pattern.pop();
+      console.log(this.pattern)
+    },
+    addBeat: function () {
+      this.beatCount++;
+      for (let track=0;track<this.pattern.length; track++) {
+        this.pattern[track].push({active:false});
+      }
+      console.log(this.pattern)
+    },
+    delBeat: function () {
+      this.beatCount--;
+      for (let track=0;track<this.pattern.length; track++) {
+        this.pattern[track].pop();
+      }
+      console.log(this.pattern)
+    },
+    act: function (i, j,pressed) {
+      if (pressed || this.pressed) {
+        this.pressed=true;
+        this.pattern[i][j].active=!this.pattern[i][j].active;
+      }
+
+      console.log(i +' '+ j)
+
+    },
+    loadPreset(preset){
+      let loadedPreset = JSON.parse(JSON.stringify(preset))
+      this.pattern = loadedPreset.pattern,
+      this.tempo = loadedPreset.tempo,
+      this.tracks = loadedPreset.tracks
+      for(let mute in this.mutes){
+        this.mutes[mute] = false
+      }
+    },
+    scheduleNote(instrument,startTime){
+      let osc = Tone.context.createOscillator()
+      let mainGainNode = Tone.context.createGain()
+      let whiteNoise = Tone.context.createBufferSource();
+
+      let oscVol = Tone.context.createGain()
+      osc.connect(oscVol)
+      oscVol.gain.setValueAtTime((1-instrument.sineNoiseMix)*2, startTime)
+      oscVol.connect(mainGainNode)
+      mainGainNode.connect(Tone.volume)
+      osc.start(startTime)
+      osc.stop(startTime+instrument.decay)
+      osc.frequency.setValueAtTime(instrument.freq, startTime)
+      osc.frequency.exponentialRampToValueAtTime(instrument.freq*instrument.endPitch, startTime+instrument.decay)
+
+      let noiseVol = Tone.context.createGain()
+      whiteNoise.buffer = this.noiseBuffer;
+      whiteNoise.loop = true;
+      whiteNoise.connect(noiseVol);
+      noiseVol.gain.setValueAtTime(instrument.sineNoiseMix*2, startTime)
+      noiseVol.connect(mainGainNode)
+      whiteNoise.start(startTime);
+      whiteNoise.stop(startTime+instrument.decay)
+      mainGainNode.gain.setValueAtTime(instrument.gain, startTime)
+      mainGainNode.gain.exponentialRampToValueAtTime(0.01, startTime+instrument.decay)
+
+
+    },
+    getSchedule(step,currentTime){
+      let stepTime = step * this.secondsPerStep + ( currentTime - currentTime % (this.secondsPerStep * this.beatCount))
+      if (stepTime<currentTime) { // skip to the next pattern if it's already too late
+        stepTime += this.secondsPerStep * this.beatCount
+      }
+      return stepTime
+    },
+    updateAudioTime(){
+      if(this.playing){
+        const LOOK_AHEAD = 0.1
+        this.secondsPerStep = 60/this.tempo/4
+        this.audioTime = Tone.context.currentTime
+        this.currentStep = Math.floor(this.audioTime/this.secondsPerStep % this.beatCount)
+        for (let track in this.pattern){
+        //  if(!this.mutes[track]){
+            for (let step in this.pattern[track]){
+              if (this.pattern[track][step].active){
+                let schedule = this.getSchedule(step, this.audioTime)
+                if (schedule > 0 && schedule-this.audioTime<LOOK_AHEAD && schedule>this.lastScheduledTime){
+                  this.scheduleNote(this.tracks[track], schedule)
+                }
+              }
+            }
+        //  }
+        }
+
+        this.lastScheduledTime = this.audioTime+LOOK_AHEAD
+      }
+      requestAnimationFrame(this.updateAudioTime)
+    }
+
   },
   created: function () {
 
-    var synth = new Tone.MembraneSynth().connect(Tone.context.volume);
+    for (let i=0; i<4; i++){
+      this.addTrack();
+    }
+
+    let bufferSize = 2 * Tone.context.sampleRate,
+    noiseBuffer = Tone.context.createBuffer(1, bufferSize, Tone.context.sampleRate),
+    output = noiseBuffer.getChannelData(0);
+    this.noiseBuffer=noiseBuffer;
+for (var i = 0; i < bufferSize; i++) {
+    output[i] = Math.random() * 2 - 1;
+}
+
+
+    // Create empty patterns
+
+   for(let i=0; i<this.trackCount; i++){
+     this.pattern.push([])
+     for(let j=0; j<this.beatCount; j++){
+       this.pattern[i].push({active: false})
+     }
+   }
+
+
+
+
+
+    var synth = new Tone.MembraneSynth().connect(Tone.volume);
 
   //this function is called right before the scheduled time
 
@@ -415,5 +782,11 @@ Vue.component('metronome', {
   Tone.Transport.loopEnd = '1m'
   Tone.Transport.loop = true
 
-  }
+  },
+  mounted: function () {
+    this.loadPreset(this.presets[0])
+    this.updateAudioTime();
+    if(!window.AudioContext) this.playing = false // Safari fix
+  },
+
 });
