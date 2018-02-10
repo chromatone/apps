@@ -478,6 +478,14 @@ Vue.component('metronome', {
      pressed:false,
      tempo: 120,
      audioTime: undefined,
+     instruments: [
+       {
+         name:'kick'
+       },
+       {
+         name:'dsh'
+       }
+     ],
      presets: [
     {
       name: "Default",
@@ -557,13 +565,16 @@ Vue.component('metronome', {
     ],
       tracks: [
         {
-          freq: 40,
-          gain: 0.9,
-          decay: 0.5,
-          endPitch: 0.3,
-          sineNoiseMix: 0.001
+          instrument:'kick',
+          freq: 15,
+          duration: '8n',
+          open:false,
+          gain:0.8,
+          decay: 0.15
         },
         {
+          instrument:'dsh',
+          open:true,
           freq: 110,
           gain: 0.3,
           decay: 0.15,
@@ -571,6 +582,8 @@ Vue.component('metronome', {
           sineNoiseMix: 0.75
         },
         {
+          instrument:'dsh',
+          open:false,
           freq: 80,
           gain: 0.1,
           decay: 0.06,
@@ -578,6 +591,8 @@ Vue.component('metronome', {
           sineNoiseMix: 0.75
         },
         {
+          instrument:'dsh',
+          open:false,
           freq: 55,
           gain: 0.4,
           decay: 0.65,
@@ -585,7 +600,7 @@ Vue.component('metronome', {
           sineNoiseMix: 0.001
         }
       ],
-      tempo: 80
+      tempo: 90
     }]
     }
   },
@@ -667,6 +682,9 @@ Vue.component('metronome', {
       console.log(i +' '+ j)
 
     },
+    toggle: function (track) {
+      console.log(track);
+    },
     loadPreset(preset){
       let loadedPreset = JSON.parse(JSON.stringify(preset))
       this.pattern = loadedPreset.pattern,
@@ -676,32 +694,40 @@ Vue.component('metronome', {
         this.mutes[mute] = false
       }
     },
-    scheduleNote(instrument,startTime){
-      let osc = Tone.context.createOscillator()
-      let mainGainNode = Tone.context.createGain()
-      let whiteNoise = Tone.context.createBufferSource();
+    scheduleNote(track,startTime){
 
-      let oscVol = Tone.context.createGain()
-      osc.connect(oscVol)
-      oscVol.gain.setValueAtTime((1-instrument.sineNoiseMix)*2, startTime)
-      oscVol.connect(mainGainNode)
-      mainGainNode.connect(Tone.volume)
-      osc.start(startTime)
-      osc.stop(startTime+instrument.decay)
-      osc.frequency.setValueAtTime(instrument.freq, startTime)
-      osc.frequency.exponentialRampToValueAtTime(instrument.freq*instrument.endPitch, startTime+instrument.decay)
+      if (track.instrument=='kick') {
+        this.tom.triggerAttackRelease(track.freq, '8n', startTime);
+      }
 
-      let noiseVol = Tone.context.createGain()
-      whiteNoise.buffer = this.noiseBuffer;
-      whiteNoise.loop = true;
-      whiteNoise.connect(noiseVol);
-      noiseVol.gain.setValueAtTime(instrument.sineNoiseMix*2, startTime)
-      noiseVol.connect(mainGainNode)
-      whiteNoise.start(startTime);
-      whiteNoise.stop(startTime+instrument.decay)
-      mainGainNode.gain.setValueAtTime(instrument.gain, startTime)
-      mainGainNode.gain.exponentialRampToValueAtTime(0.01, startTime+instrument.decay)
+      if(track.instrument=='dsh') {
 
+        let osc = Tone.context.createOscillator()
+        let mainGainNode = Tone.context.createGain()
+        let whiteNoise = Tone.context.createBufferSource();
+
+        let oscVol = Tone.context.createGain()
+        osc.connect(oscVol)
+        oscVol.gain.setValueAtTime((1-track.sineNoiseMix)*2, startTime)
+        oscVol.connect(mainGainNode)
+        mainGainNode.connect(Tone.volume)
+        osc.start(startTime)
+        osc.stop(startTime+track.decay)
+        osc.frequency.setValueAtTime(track.freq, startTime)
+        osc.frequency.exponentialRampToValueAtTime(track.freq*track.endPitch, startTime+track.decay)
+
+        let noiseVol = Tone.context.createGain()
+        whiteNoise.buffer = this.noiseBuffer;
+        whiteNoise.loop = true;
+        whiteNoise.connect(noiseVol);
+        noiseVol.gain.setValueAtTime(track.sineNoiseMix*2, startTime)
+        noiseVol.connect(mainGainNode)
+        whiteNoise.start(startTime);
+        whiteNoise.stop(startTime+track.decay)
+        mainGainNode.gain.setValueAtTime(track.gain, startTime)
+        mainGainNode.gain.exponentialRampToValueAtTime(0.01, startTime+track.decay)
+
+      }
 
     },
     getSchedule(step,currentTime){
@@ -749,7 +775,7 @@ Vue.component('metronome', {
 for (var i = 0; i < bufferSize; i++) {
     output[i] = Math.random() * 2 - 1;
 }
-
+  this.tom = new Tone.MembraneSynth().connect(Tone.volume);
 
     // Create empty patterns
 
@@ -764,27 +790,36 @@ for (var i = 0; i < bufferSize; i++) {
 
 
 
-    var synth = new Tone.MembraneSynth().connect(Tone.volume);
 
   //this function is called right before the scheduled time
 
-  this.loop = new Tone.Loop(function(time){
-    synth.triggerAttackRelease('A0', '8n', time);
-    Tone.Draw.schedule(function(){
-      let flash = document.getElementById('metro-flash');
-		   flash.style.fill="red";
-       setTimeout(function () {flash.style.fill="#444"}, 100)
-	}, time)
-  },'4n')
 
-  this.loop.start(0).stop('1m');
-
-  Tone.Transport.loopEnd = '1m'
-  Tone.Transport.loop = true
 
   },
   mounted: function () {
     this.loadPreset(this.presets[0])
+    let pattern=[];
+    for (let i=0;i<this.pattern[0].length;i++) {
+      pattern.push(this.pattern[0][i].active ? 'A0' : null)
+    }
+    console.log(pattern);
+    var synth = new Tone.MembraneSynth().connect(Tone.volume);
+    this.loop = new Tone.Sequence(function(time,pitch){
+      console.log(pitch)
+      synth.triggerAttackRelease('A0', '8n', time);
+  //    Tone.Draw.schedule(function(){
+  //      let flash = document.getElementById('metro-flash');
+  //		   flash.style.fill="red";
+  //       setTimeout(function () {flash.style.fill="#444"}, 100)
+  //	}, time)
+},[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
+
+    this.loop.start(0).stop('0:20');
+
+    Tone.Transport.loopEnd = '0:20'
+    Tone.Transport.loop = true
+  //  Tone.Transport.start();
+
     this.updateAudioTime();
     if(!window.AudioContext) this.playing = false // Safari fix
   },

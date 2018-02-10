@@ -22,7 +22,7 @@ var vuetone = new Vue({
     base:440,
     root:0,
     octaves:[2,4],
-    vol: -15,
+    vol: 0,
     notes:Chroma.Notes,
     chords:Chroma.Chords,
     scales:Chroma.Scales,

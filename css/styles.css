@@ -126,10 +126,17 @@ sequencer
   fill:#555;
 }
 
-.track {
+.track-rect {
   fill:#bbb;
 }
-
+.track {
+  background-color: #ccc;
+  border-radius: 12px;
+  transition: all 0.5s ease;
+}
+.track.open {
+  margin-bottom:10px;
+}
 .beat {
   fill:rgba(255,255,255,0.5);
   stroke:#fff;
@@ -145,6 +152,26 @@ sequencer
 .beat.fourth {
   fill:rgba(125,125,125,0.5);
   stroke:#333;
+}
+.track-toggle.open .arrow {
+  transform:rotate(180deg);
+}
+.toggle-track {
+  fill:#555;
+}
+.arrow {
+  fill:#eee;
+  transform-origin: 50% 36%;
+}
+.track-options {
+  border-radius: 0 0 12px 12px;
+  background-color: #eee;
+  padding:8px;
+  overflow: scroll;
+}
+
+.level {
+  overflow: scroll;
 }
 
 /*

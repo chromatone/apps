@@ -32,102 +32,145 @@
 
 
     <script id="metronome" type="x-template">
-      <div class="rythm-box">
-        <div class="level is-mobile">
-          <div class="level-item is-4 is-narrow is-centered">
-
-
-            <svg  width="32" height="32" viewBox="0 0 32 32">
-              <circle id="metro-flash" v-show="playing" cx="16" cy="16" r="12" style="fill:#444"/>
-            </svg>
-
-            </div>
-          <div class="level-item is-4 is-narrow is-centered">
+      <div class="rythm-box ">
+        <div class="level metro-options is-mobile">
+          <div class="level-item is-centered">
             <a is="b-switch" v-model="playing" />
           </div>
 
-          <div class="level-item is-narrow is-4">
+          <div class="level-item">
           <knob min="20" max="320" param="BPM" step="1"
           v-model="tempo" />
           </div>
 
-          <div class="level-item is-4 is-centered">
-            {{beatFrequency.toFixed(2)}} Hz – {{toNote}}
-          </div>
-          <div class="level-item is-centered">
-            <b-field><b>Beats: &nbsp;</b>
+
+          <div class="level-item">
+
                      <button @click="delBeat" class="button is-small">
                          -
                      </button>
                      <button  class="button is-small is-static">
-                         {{beatCount}}
+                         {{beatCount}} beats
                      </button>
                      <button @click="addBeat" class="button is-small">
                          +
                      </button>
-            </b-field>
+
           </div>
-          <div class="level-item is-centered">
-            <b-field><b>Tracks: &nbsp;</b>
+          <div class="level-item ">
+
                      <button @click="delTrack" class="button is-small">
                          -
                      </button>
                      <button  class="button is-small is-static">
-                         {{trackCount}}
+                         {{trackCount}} tracks
                      </button>
                      <button @click="addTrack" class="button is-small">
                          +
                      </button>
-            </b-field>
+
+          </div>
+          <div class="level-item is-4 ">
+          <button  class="button is-small is-static">
+              {{beatFrequency.toFixed(2)}} Hz
+          </button>
+          <button  class="button is-small is-static">
+              {{toNote}}
+          </button>
           </div>
         </div>
 
         <div>
 
+        <div class="track" v-for="(track,i) in tracks" :class="{open:track.open}">
 
-        <svg @touchstart.stop.prevent="1" version="1.1"
-        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-        x="0px" y="0px"
-        :viewBox="'0 0 '+beatCount*60+' '+trackCount*60" xml:space="preserve">
-        <g
-          @mouseleave="pressed=false"
-          @mouseup="pressed=false"
-          class="sequencer">
+                <svg @touchstart.stop.prevent="1" version="1.1"
+                x="0px" y="0px"
+                :viewBox="'-60 0 '+(beatCount*60+60)+' 60'">
+                      <g @mouseleave="pressed=false"
+                        @mouseup="pressed=false"
+                        class="sequencer">
 
-        <rect v-for="(track,i) in trackCount"
-          class="track"
-          height="50"
-          :width="60*beatCount-10"
-          :y="5.5+60*i" x="5" rx="25"
-        />
+                      <rect
+                        class="track-rect"
+                        height="50"
+                        :width="60*beatCount-10"
+                        :y="5.5" x="5" rx="25"
+                      />
 
-        <rect v-for="(beat,j) in beatCount"
-          class="beat"
-          width="50"
-          :class="{highlight: currentStep==j, fourth: j%4==0}"
-          :height="60*trackCount-10"
-          :x="5+60*j" y="6" rx="25"
-        />
-          <g class="seq-row" v-for="(track,i) in trackCount">
-            <g class="cell" v-for="(beat,j) in beatCount"
-              @mousedown="act(i,j,true)"
-              @touchstart.prevent.stop="act(i,j,true)"
-              @touchend.prevent.stop="pressed=false"
-              @mouseenter="act(i,j)"
+                      <g @click="track.open=!track.open"
+                          @touchstart.prevent.stop="track.open=!track.open"
+                        class="track-toggle" >
+                        <circle class="toggle-track"
+                        r="20" cx="-30" cy="30"/>
+                        <polygon  class="arrow" points="-30,37.6 -22.9,25.2 -37.1,25.2"/>
+                      </g>
 
-              >
-              <circle
-              class="dot"
-              :class="{active: pattern[i][j].active, highlight: currentStep==j}"
+                      <circle v-for="(beat,j) in beatCount"
+                        class="beat"
+                        r="25"
+                        :class="{highlight: currentStep==j, fourth: j%4==0}"
 
-                :cx="30+60*j"
-                :cy="30+60*i"
-                r="20"
-              />
-            </g>
-          </g>
-        </g>
-        </svg>
+                        :cx="30+60*j" cy="30"
+                      />
+
+                          <g class="cell" v-for="(beat,j) in beatCount"
+                            @mousedown="act(i,j,true)"
+                            @touchstart.prevent.stop="act(i,j,true)"
+                            @touchend.prevent.stop="pressed=false"
+                            @mouseenter="act(i,j)"
+                            >
+                            <circle
+                            class="dot"
+                            :class="{active: pattern[i][j].active, highlight: currentStep==j}"
+
+                              :cx="30+60*j"
+                              :cy="30"
+                              r="20"
+                            />
+
+                        </g>
+                      </g>
+                  </svg>
+          <div v-show="track.open" class="track-options" >
+
+
+
+            <div class="level is-mobile">
+              <div class="level-item">
+              <b-field class="">
+                  <b-select size="is-small" v-model="track.instrument">
+                    <option v-for="instr in instruments" v-bind:value="instr.name">
+                      {{ instr.name }}
+                    </option>
+                  </b-select>
+              </b-field>
+              </div>
+
+              <div class="level-item has-text-centered">
+                <knob min="10" max="8800" param="FREQ"
+                v-model="track.freq" />
+              </div>
+              <div class="level-item  has-text-centered" >
+                <knob min="0" max="0.9" param="GAIN"
+                v-model="track.gain" />
+              </div>
+              <div class="level-item  has-text-centered" >
+                <knob min="0.005" max="0.9" param="DECAY"
+                v-model="track.decay" />
+              </div>
+              <div class="level-item  has-text-centered" >
+                <knob min="0.005" max="1" param="ENV"
+                v-model="track.endPitch" />
+              </div>
+              <div class="level-item  has-text-centered" >
+                <knob min="0.005" max="1" param="MIX"
+                v-model="track.sineNoiseMix" />
+              </div>
+            </div>
+          </div>
+
+        </div>
         </div>
 
       </div>
