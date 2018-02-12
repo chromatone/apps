@@ -106,9 +106,6 @@ Vue.component('synth', {
       oscType: 'sine',
     }
   },
-  components: {
-    'vueSlider': window[ 'vue-slider-component' ]
-  },
   filters: {
     tri: function(val) {
       return val.slice(0,3).toUpperCase()
@@ -453,6 +450,230 @@ Vue.component ('field', {
 })
 
 
+// TRACK
+
+
+
+
+Vue.component('tracker', {
+  template: "#tracker",
+  props: {
+    active: {
+      default:true
+    },
+    trk: {
+      default: {
+        instrument:'kick',
+        pattern: [
+          { active: true },
+          { active: false },
+          { active: true },
+          { active: false },
+          { active: false },
+          { active: false},
+          { active: true },
+          { active: false },
+          { active: true },
+          { active: false },
+          { active: false },
+          { active: false },
+          { active: false },
+          { active: false },
+          { active: false },
+          { active: false }
+        ],
+        options: {
+          freq: 15,
+          decay: 0.15
+        },
+        duration: '8n',
+        gain:0.8,
+      }
+    }
+  },
+  data: function () {
+    return {
+      currentStep:0,
+      play:false,
+      instruments: {
+        kick: {
+          name:'kick',
+          options: {
+          }
+        },
+        dsh: {
+          name:'dsh',
+          options: {
+            freq: {
+              min:10,
+              max:8800,
+              default:30,
+              name:'freq',
+              param:'FREQ'
+            },
+            decay: {
+              min:0.005,
+              max:1,
+              default:0.005,
+              name:'decay',
+              param:'DECAY'
+            },
+            endPitch: {
+              min:0.005,
+              max:1,
+              default:0.5,
+              name:'endPitch',
+              param:'ENV'
+            },
+            sineNoiseMix: {
+              min:0.05,
+              max:1,
+              default:0.7,
+              name:'sineNoiseMix',
+              param:'NOISE'
+            }
+          }
+        }
+      },
+      open:true,
+      gain:0,
+
+      instrument:''
+    }
+  },
+  computed: {
+    beatCount: function () {
+      return this.trk.pattern.length
+    },
+    pattern: function () {
+      return this.trk.pattern
+    },
+    duration: function () {
+      var pos = this.trk.duration.indexOf('n');
+      var word = (pos > 0) ? this.trk.duration.substr(0, pos) : this.trk.duration;
+      console.log(word)
+    }
+  },
+  methods: {
+    act: function (pos) {
+      this.loop.at(pos, {active:!this.trk.pattern[pos].active, num:pos});
+      this.trk.pattern[pos].active=!this.trk.pattern[pos].active
+
+    },
+    toggleLoop: function () {
+      if (!this.play) {
+        this.gain.gain.value=1;
+
+        console.log('loopStart' , this.gain)
+      } else {
+        this.gain.gain.value=0;
+        console.log('loopStop', this.gain)
+      }
+      this.play=!this.play;
+    },
+    addBeat: function () {
+      this.loop.add(this.trk.pattern.length,{'active':false, num:this.trk.pattern.length});
+      this.trk.pattern.push({'active':false, num:this.trk.pattern.length});
+      this.loop.loopEnd=this.trk.pattern.length+'*'+this.trk.duration;
+    },
+    delBeat: function () {
+      if (this.trk.pattern.length>1) {
+        this.loop.remove(this.trk.pattern.length-1);
+        this.trk.pattern.pop();
+        this.loop.loopEnd=this.trk.pattern.length+'*'+this.trk.duration;
+      }
+    }
+  },
+  created: function () {
+    var that=this;
+    this.gain = new Tone.Gain(0).connect(Tone.volume);
+    let synth = {};
+    if (this.trk.instrument == 'kick') {
+
+
+      let kickVol = new Tone.Gain(0.8).connect(this.gain);
+      synth = new Tone.MembraneSynth().connect(kickVol);
+      synth.play = function (time) {
+        kickVol.gain.value=that.trk.gain;
+        synth.triggerAttackRelease('A0', '8n', time);
+      };
+
+    }
+    synth.beat = function (num) {
+      that.currentStep=num;
+
+    }
+
+    if (this.trk.instrument == 'dsh') {
+
+
+      let bufferSize = 2 * Tone.context.sampleRate,
+          noiseBuffer = Tone.context.createBuffer(1, bufferSize, Tone.context.sampleRate),
+          output = noiseBuffer.getChannelData(0);
+      this.noiseBuffer=noiseBuffer;
+      for (var i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+
+
+      synth.triggerAttackRelease = function (gain,freq, decay, endPitch, sineNoiseMix, startTime) {
+
+        let osc = Tone.context.createOscillator()
+        let mainGainNode = Tone.context.createGain()
+        let whiteNoise = Tone.context.createBufferSource();
+        let oscVol = Tone.context.createGain()
+        osc.connect(oscVol)
+        oscVol.connect(mainGainNode)
+        mainGainNode.connect(that.gain)
+        let noiseVol = Tone.context.createGain()
+        whiteNoise.buffer = that.noiseBuffer;
+        whiteNoise.loop = true;
+        whiteNoise.connect(noiseVol);
+        noiseVol.connect(mainGainNode)
+
+        oscVol.gain.setValueAtTime((1-sineNoiseMix)*2, startTime)
+
+
+        osc.start(startTime)
+        osc.stop(startTime+decay)
+        osc.frequency.setValueAtTime(freq, startTime)
+        osc.frequency.exponentialRampToValueAtTime(freq*endPitch, startTime+decay)
+        noiseVol.gain.setValueAtTime(sineNoiseMix*2, startTime)
+        whiteNoise.start(startTime);
+        whiteNoise.stop(startTime+decay)
+        mainGainNode.gain.setValueAtTime(gain, startTime)
+        mainGainNode.gain.exponentialRampToValueAtTime(0.01, startTime+decay)
+      }
+    let options=this.trk.options;
+    options.gain=this.trk.gain;
+    synth.play = function (time) {
+      synth.triggerAttackRelease(that.trk.gain, options.freq, options.decay, options.endPitch, options.sineNoiseMix, time)
+    }
+
+
+    }
+
+    this.loop = new Tone.Sequence(function(time,pitch){
+      if(pitch.active) {
+          synth.play(time)
+
+      }
+      synth.beat(pitch.num);
+  //    Tone.Draw.schedule(function(){
+  //      let flash = document.getElementById('metro-flash');
+  //		   flash.style.fill="red";
+  //       setTimeout(function () {flash.style.fill="#444"}, 100)
+  //	}, time)
+},this.trk.pattern, this.trk.duration)
+
+    this.loop.loop=true;
+    this.loop.start(0);
+
+//    Tone.Transport.start();
+  }
+});
+
 
 
 
@@ -464,144 +685,55 @@ Vue.component('metronome', {
   template:'#metronome',
   data: function () {
     return {
-      play:0,
+      play:false,
       pattern:[],
       beatCount: 16,
       tracks:[],
       loop: {},
       currentStep: 0,
-      secondsPerStep: 0,
-     lastScheduledTime: 0,
-     nextStepTime: 0,
-     mutes: [],
+     taps: [],
+     newDuration:'16',
      playing: false,
      pressed:false,
-     tempo: 120,
-     audioTime: undefined,
-     instruments: [
-       {
-         name:'kick'
-       },
-       {
-         name:'dsh'
-       }
-     ],
-     presets: [
-    {
-      name: "Default",
-      pattern: [
-      [
-        { active: true },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false},
-        { active: true },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false }
-      ],
-      [
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false }
-      ],
-      [
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: true },
-        { active: false }
-      ],
-      [
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: true },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: false },
-        { active: true }
-      ]
-    ],
-      tracks: [
+     tempo: 90,
+     tracks: [
         {
           instrument:'kick',
-          freq: 15,
+          pattern: [
+            { active: true, num:0 },
+            { active: false, num:1 },
+            { active: true, num:2 },
+            { active: false, num:3 },
+            { active: false, num:4 },
+            { active: false, num:5},
+            { active: true, num:6 },
+            { active: false, num:7}
+          ],
           duration: '8n',
-          open:false,
-          gain:0.8,
-          decay: 0.15
+          gain:0.8
         },
         {
           instrument:'dsh',
-          open:true,
-          freq: 110,
-          gain: 0.3,
-          decay: 0.15,
-          endPitch: 0.9,
-          sineNoiseMix: 0.75
-        },
-        {
-          instrument:'dsh',
-          open:false,
-          freq: 80,
-          gain: 0.1,
-          decay: 0.06,
-          endPitch: 1,
-          sineNoiseMix: 0.75
-        },
-        {
-          instrument:'dsh',
-          open:false,
-          freq: 55,
-          gain: 0.4,
-          decay: 0.65,
-          endPitch: 1,
-          sineNoiseMix: 0.001
+          pattern: [
+            { active: false, num:0 },
+            { active: false, num:1 },
+            { active: false, num:2 },
+            { active: false, num:3 },
+            { active: true, num:4 },
+            { active: false, num:5},
+            { active: false, num:6 },
+            { active: false, num:7}
+          ],
+          options: {
+            freq: 110,
+            decay: 0.15,
+            endPitch: 0.9,
+            sineNoiseMix: 0.75
+          },
+          gain: 0.5,
+          duration:'8n'
         }
-      ],
-      tempo: 90
-    }]
+      ]
     }
   },
   computed: {
@@ -612,78 +744,68 @@ Vue.component('metronome', {
       Tone.Transport.bpm.value=this.tempo;
       return this.tempo/60
     },
-    playing: function () {
-      if (this.play) {
-        Tone.Transport.start('+0.1')
-      } else {
-        Tone.Transport.stop()
-      }
-      return this.play
-    },
-    loopTempo: function() {
-      return Tone.Transport.bpm.value
-    },
     toNote: function () {
       return Tone.Frequency(this.beatFrequency, "hz").toNote();
-    },
-    pattern: function () {
-      let array = [];
-      array.length=this.loopLength;
-      for (let col=0;col<array.length; col++) {
-        array[col]=[];
-        array[col].length=this.loopTracks
-      }
-      return array
     }
   },
   methods: {
-  addTrack: function () {
-      this.tracks.push({
-        freq: 100,
-        gain: 0.2,
-        decay: 0.01,
-        endPitch: 0.01,
-        sineNoiseMix: 0.01
-      });
-      let track = [];
-      for (let beat=0;beat<this.beatCount;beat++) {
-        track[beat]={};
-        track[beat].active=false;
-      }
-      this.pattern.push(track)
-        console.log(this.pattern)
+    tap: function () {
+      let tapCount=3;
+      let tempo;
+      let sum=0;
+      let tap = (new Date()).getTime();
+      if (this.taps.length<tapCount) {
+         this.taps.push(tap);
+      } else {
+        this.taps.shift();
+        this.taps.push(tap);
+        for (let i=0;i<tapCount-1;i++) {
+          sum+=this.taps[i+1] - this.taps[i];
+        }
 
-  },
+        let tempo = Math.round(60000/(0.5*sum));
+
+        this.tempo = tempo>30 ? tempo: 30;
+      }
+    },
+    addTrack: function () {
+      this.tracks.push(
+        {
+          instrument:'dsh',
+          pattern: [
+            { active: false, num:0 },
+            { active: false, num:1 },
+            { active: false, num:2 },
+            { active: false, num:3 },
+            { active: false, num:4 },
+            { active: false, num:5},
+            { active: false, num:6 },
+            { active: false, num:7}
+          ],
+          options: {
+            freq: 110,
+            decay: 0.05,
+            endPitch: 0.9,
+            sineNoiseMix: 0.9
+          },
+          gain: 0.3,
+          duration:this.newDuration+'n'
+        }
+      )
+    },
     delTrack: function () {
       this.tracks.pop();
       this.pattern.pop();
       console.log(this.pattern)
     },
-    addBeat: function () {
-      this.beatCount++;
-      for (let track=0;track<this.pattern.length; track++) {
-        this.pattern[track].push({active:false});
+    toggleTransport: function () {
+      if (!this.play) {
+        this.play=true;
+        Tone.Transport.start();
+      } else {
+        this.play=false;
+        Tone.Transport.stop();
       }
-      console.log(this.pattern)
-    },
-    delBeat: function () {
-      this.beatCount--;
-      for (let track=0;track<this.pattern.length; track++) {
-        this.pattern[track].pop();
-      }
-      console.log(this.pattern)
-    },
-    act: function (i, j,pressed) {
-      if (pressed || this.pressed) {
-        this.pressed=true;
-        this.pattern[i][j].active=!this.pattern[i][j].active;
-      }
-
-      console.log(i +' '+ j)
-
-    },
-    toggle: function (track) {
-      console.log(track);
     },
     loadPreset(preset){
       let loadedPreset = JSON.parse(JSON.stringify(preset))
@@ -693,134 +815,16 @@ Vue.component('metronome', {
       for(let mute in this.mutes){
         this.mutes[mute] = false
       }
-    },
-    scheduleNote(track,startTime){
-
-      if (track.instrument=='kick') {
-        this.tom.triggerAttackRelease(track.freq, '8n', startTime);
-      }
-
-      if(track.instrument=='dsh') {
-
-        let osc = Tone.context.createOscillator()
-        let mainGainNode = Tone.context.createGain()
-        let whiteNoise = Tone.context.createBufferSource();
-
-        let oscVol = Tone.context.createGain()
-        osc.connect(oscVol)
-        oscVol.gain.setValueAtTime((1-track.sineNoiseMix)*2, startTime)
-        oscVol.connect(mainGainNode)
-        mainGainNode.connect(Tone.volume)
-        osc.start(startTime)
-        osc.stop(startTime+track.decay)
-        osc.frequency.setValueAtTime(track.freq, startTime)
-        osc.frequency.exponentialRampToValueAtTime(track.freq*track.endPitch, startTime+track.decay)
-
-        let noiseVol = Tone.context.createGain()
-        whiteNoise.buffer = this.noiseBuffer;
-        whiteNoise.loop = true;
-        whiteNoise.connect(noiseVol);
-        noiseVol.gain.setValueAtTime(track.sineNoiseMix*2, startTime)
-        noiseVol.connect(mainGainNode)
-        whiteNoise.start(startTime);
-        whiteNoise.stop(startTime+track.decay)
-        mainGainNode.gain.setValueAtTime(track.gain, startTime)
-        mainGainNode.gain.exponentialRampToValueAtTime(0.01, startTime+track.decay)
-
-      }
-
-    },
-    getSchedule(step,currentTime){
-      let stepTime = step * this.secondsPerStep + ( currentTime - currentTime % (this.secondsPerStep * this.beatCount))
-      if (stepTime<currentTime) { // skip to the next pattern if it's already too late
-        stepTime += this.secondsPerStep * this.beatCount
-      }
-      return stepTime
-    },
-    updateAudioTime(){
-      if(this.playing){
-        const LOOK_AHEAD = 0.1
-        this.secondsPerStep = 60/this.tempo/4
-        this.audioTime = Tone.context.currentTime
-        this.currentStep = Math.floor(this.audioTime/this.secondsPerStep % this.beatCount)
-        for (let track in this.pattern){
-        //  if(!this.mutes[track]){
-            for (let step in this.pattern[track]){
-              if (this.pattern[track][step].active){
-                let schedule = this.getSchedule(step, this.audioTime)
-                if (schedule > 0 && schedule-this.audioTime<LOOK_AHEAD && schedule>this.lastScheduledTime){
-                  this.scheduleNote(this.tracks[track], schedule)
-                }
-              }
-            }
-        //  }
-        }
-
-        this.lastScheduledTime = this.audioTime+LOOK_AHEAD
-      }
-      requestAnimationFrame(this.updateAudioTime)
     }
 
   },
   created: function () {
 
-    for (let i=0; i<4; i++){
-      this.addTrack();
-    }
-
-    let bufferSize = 2 * Tone.context.sampleRate,
-    noiseBuffer = Tone.context.createBuffer(1, bufferSize, Tone.context.sampleRate),
-    output = noiseBuffer.getChannelData(0);
-    this.noiseBuffer=noiseBuffer;
-for (var i = 0; i < bufferSize; i++) {
-    output[i] = Math.random() * 2 - 1;
-}
-  this.tom = new Tone.MembraneSynth().connect(Tone.volume);
-
-    // Create empty patterns
-
-   for(let i=0; i<this.trackCount; i++){
-     this.pattern.push([])
-     for(let j=0; j<this.beatCount; j++){
-       this.pattern[i].push({active: false})
-     }
-   }
-
-
-
-
-
-
-  //this function is called right before the scheduled time
-
-
 
   },
   mounted: function () {
-    this.loadPreset(this.presets[0])
-    let pattern=[];
-    for (let i=0;i<this.pattern[0].length;i++) {
-      pattern.push(this.pattern[0][i].active ? 'A0' : null)
-    }
-    console.log(pattern);
-    var synth = new Tone.MembraneSynth().connect(Tone.volume);
-    this.loop = new Tone.Sequence(function(time,pitch){
-      console.log(pitch)
-      synth.triggerAttackRelease('A0', '8n', time);
-  //    Tone.Draw.schedule(function(){
-  //      let flash = document.getElementById('metro-flash');
-  //		   flash.style.fill="red";
-  //       setTimeout(function () {flash.style.fill="#444"}, 100)
-  //	}, time)
-},[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
 
-    this.loop.start(0).stop('0:20');
 
-    Tone.Transport.loopEnd = '0:20'
-    Tone.Transport.loop = true
-  //  Tone.Transport.start();
-
-    this.updateAudioTime();
     if(!window.AudioContext) this.playing = false // Safari fix
   },
 

@@ -127,6 +127,14 @@ var vuetone = new Vue({
         release  : 1
       }
     };
+    Tone.instruments = [
+      {
+        name: 'membrane',
+        play: function () {
+          console.log('I play!')
+        }
+      }
+    ];
     Tone.chromaSynth = new Tone.PolySynth(12,Tone.Synth);
     Tone.volume = new Tone.Volume(0).toMaster();
     Tone.chromaSynth.connect(Tone.volume);

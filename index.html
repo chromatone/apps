@@ -35,41 +35,28 @@
       <div class="rythm-box ">
         <div class="level metro-options is-mobile">
           <div class="level-item is-centered">
-            <a is="b-switch" v-model="playing" />
+          <button class="button is-small is-rounded"
+            :class="{pushed:play}"
+            @click="toggleTransport()"
+            >
+            Rythm
+          </button>
           </div>
 
           <div class="level-item">
-          <knob min="20" max="320" param="BPM" step="1"
-          v-model="tempo" />
-          </div>
 
-
-          <div class="level-item">
-
-                     <button @click="delBeat" class="button is-small">
-                         -
-                     </button>
-                     <button  class="button is-small is-static">
-                         {{beatCount}} beats
-                     </button>
-                     <button @click="addBeat" class="button is-small">
-                         +
-                     </button>
+          <button @click="tempo--" class="button is-small">
+              -
+          </button>
+          <button @mousedown="tap()" @touchStart.prevent.stop="tap()"  class="button is-small">
+              {{tempo}} BPM
+          </button>
+          <button @click="tempo++" class="button is-small">
+              +
+          </button>
 
           </div>
-          <div class="level-item ">
 
-                     <button @click="delTrack" class="button is-small">
-                         -
-                     </button>
-                     <button  class="button is-small is-static">
-                         {{trackCount}} tracks
-                     </button>
-                     <button @click="addTrack" class="button is-small">
-                         +
-                     </button>
-
-          </div>
           <div class="level-item is-4 ">
           <button  class="button is-small is-static">
               {{beatFrequency.toFixed(2)}} Hz
@@ -82,101 +69,125 @@
 
         <div>
 
-        <div class="track" v-for="(track,i) in tracks" :class="{open:track.open}">
-
-                <svg @touchstart.stop.prevent="1" version="1.1"
-                x="0px" y="0px"
-                :viewBox="'-60 0 '+(beatCount*60+60)+' 60'">
-                      <g @mouseleave="pressed=false"
-                        @mouseup="pressed=false"
-                        class="sequencer">
-
-                      <rect
-                        class="track-rect"
-                        height="50"
-                        :width="60*beatCount-10"
-                        :y="5.5" x="5" rx="25"
-                      />
-
-                      <g @click="track.open=!track.open"
-                          @touchstart.prevent.stop="track.open=!track.open"
-                        class="track-toggle" >
-                        <circle class="toggle-track"
-                        r="20" cx="-30" cy="30"/>
-                        <polygon  class="arrow" points="-30,37.6 -22.9,25.2 -37.1,25.2"/>
-                      </g>
-
-                      <circle v-for="(beat,j) in beatCount"
-                        class="beat"
-                        r="25"
-                        :class="{highlight: currentStep==j, fourth: j%4==0}"
-
-                        :cx="30+60*j" cy="30"
-                      />
-
-                          <g class="cell" v-for="(beat,j) in beatCount"
-                            @mousedown="act(i,j,true)"
-                            @touchstart.prevent.stop="act(i,j,true)"
-                            @touchend.prevent.stop="pressed=false"
-                            @mouseenter="act(i,j)"
-                            >
-                            <circle
-                            class="dot"
-                            :class="{active: pattern[i][j].active, highlight: currentStep==j}"
-
-                              :cx="30+60*j"
-                              :cy="30"
-                              r="20"
-                            />
-
-                        </g>
-                      </g>
-                  </svg>
-          <div v-show="track.open" class="track-options" >
 
 
 
-            <div class="level is-mobile">
-              <div class="level-item">
-              <b-field class="">
-                  <b-select size="is-small" v-model="track.instrument">
-                    <option v-for="instr in instruments" v-bind:value="instr.name">
-                      {{ instr.name }}
-                    </option>
-                  </b-select>
-              </b-field>
-              </div>
+        <div class="track" v-for="(track,i) in tracks">
 
-              <div class="level-item has-text-centered">
-                <knob min="10" max="8800" param="FREQ"
-                v-model="track.freq" />
-              </div>
-              <div class="level-item  has-text-centered" >
-                <knob min="0" max="0.9" param="GAIN"
-                v-model="track.gain" />
-              </div>
-              <div class="level-item  has-text-centered" >
-                <knob min="0.005" max="0.9" param="DECAY"
-                v-model="track.decay" />
-              </div>
-              <div class="level-item  has-text-centered" >
-                <knob min="0.005" max="1" param="ENV"
-                v-model="track.endPitch" />
-              </div>
-              <div class="level-item  has-text-centered" >
-                <knob min="0.005" max="1" param="MIX"
-                v-model="track.sineNoiseMix" />
-              </div>
-            </div>
-          </div>
+<tracker :trk="track"></tracker>
 
         </div>
+        <b-field>
+
+          <b-select v-model="newDuration" size="is-small" placeholder="Duration">
+                 <option
+                     v-for="dur in [4,8,16,32]"
+                     :value="dur"
+                     :key="dur">
+                     {{ '8/'+ dur }}
+                 </option>
+           </b-select>
+           <button class="button is-small" @click="addTrack()">
+             Add track
+           </button>
+        </b-field>
         </div>
 
       </div>
     </script>
 
+    <script id="tracker" type="x-template">
 
+    <div class="track" :class="{open:open}">
+
+      <svg @touchstart.stop.prevent="1" version="1.1"
+            x="0px" y="0px"
+            :viewBox="'-60 0 '+(beatCount+2)*60+' 60'">
+                  <g @mouseleave="pressed=false"
+                    @mouseup="pressed=false"
+                    class="sequencer">
+
+                  <rect
+                    class="track-rect"
+                    height="50"
+                    :width="60*beatCount-10"
+                    :y="5.5" x="5" rx="25"
+                  />
+
+                  <g @click="open=!open"
+                      @touchstart.prevent.stop="open=!open"
+                      :style="{'transform': 'translateX('+60*(beatCount+0.9)+'px)'}"
+                    class="track-toggle" :class="{open:open}" >
+                    <circle   class="toggle-track"
+                    r="20" cx="-30" cy="30"/>
+                    <polygon  class="arrow" points="-30,37.6 -22.9,25.2 -37.1,25.2"/>
+                  </g>
+
+                  <g @click="toggleLoop"
+                      @touchstart.prevent.stop="toggleLoop"
+                    class="track-toggle" :class="{open:play}" >
+                    <circle :class="{'playing-track':play}"  class="toggle-track"
+                    r="20" cx="-30" cy="30"/>
+                    <polygon style="transform:rotate(-90deg)" class="arrow" points="-30,37.6 -22.9,25.2 -37.1,25.2"/>
+                  </g>
+
+
+
+                      <g class="cell" v-for="(beat,j) in trk.pattern"
+                        @mousedown="act(j)"
+                        @touchstart.prevent.stop="act(j)"
+                        @touchend.prevent.stop="pressed=false"
+                        >
+                        <circle
+                          class="beat"
+                          r="25"
+                          :class="{highlight: currentStep==j, fourth: j%4==0}"
+
+                          :cx="30+60*j" cy="30"
+                        />
+                        <circle
+                        class="dot"
+                        :class="{active: beat.active, highlight: false}"
+
+                          :cx="30+60*j"
+                          :cy="30"
+                          r="20"
+                        />
+
+                    </g>
+                  </g>
+      </svg>
+      <b-collapse class="track-options" :class="{closed:!open}" :open.sync="open">
+
+        <div class="level is-mobile">
+          <div class="level-item">  <button @click="delBeat()" class="button is-small">
+                -
+            </button>
+          <button class="button is-small" :class="{'is-primary':play}">
+            {{trk.pattern.length+'/'+ trk.duration.split('n')[0]}}
+          </button>
+          <button @click="addBeat()" class="button is-small">
+              +
+          </button>
+
+          </div>
+          <div class="level-item  has-text-centered" >
+            <knob min="0" max="0.9" param="GAIN"
+            v-model="trk.gain" />
+          </div>
+          <div v-for="option in instruments[trk.instrument].options"
+            class="level-item has-text-centered">
+            <knob :min="option.min" :max="option.max" :param="option.param"
+            v-model="trk.options[option.name]" />
+          </div>
+
+
+        </div>
+      </b-collapse>
+
+    </div>
+
+    </script>
 
 
     <script id="keys" type="x-template">
@@ -445,38 +456,63 @@ v-model="release" />
         <div class="level is-mobile">
           <div class="level-item is-4 has-text-centered">
             <div>
-                <p>Scales</p>
-                <a is="b-switch" size="is-small" v-model="open.scales"></a>
+                <button class="button is-small is-rounded"
+                  :class="{pushed:open.scales}"
+                  @click="open.scales=!open.scales"
+                  >
+                  Scales
+                </button>
             </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
-            <p>Rythm</p>
-                <a is="b-switch" size="is-small" v-model="open.metronome"></a>
+              <button class="button is-small is-rounded"
+                :class="{pushed:open.metronome}"
+                @click="open.metronome=!open.metronome"
+                >
+                Rythm
+              </button>
+
               </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
-            <p>Chords</p>
-                <a is="b-switch" size="is-small" v-model="open.chords"></a>
+              <button class="button is-small is-rounded"
+                :class="{pushed:open.chords}"
+                @click="open.chords=!open.chords"
+                >
+                Chords
+              </button>
               </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
-                <p>Field</p>
-                <a is="b-switch" size="is-small" v-model="open.field"></a>
+                 <button class="button is-small is-rounded"
+                    :class="{pushed:open.field}"
+                    @click="open.field=!open.field"
+                    >
+                    Field
+                  </button>
             </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
-                <p>Synth</p>
-                <a is="b-switch" size="is-small" v-model="open.synth"></a>
+              <button class="button is-small is-rounded"
+                :class="{pushed:open.synth}"
+                @click="open.synth=!open.synth"
+                >
+                Synth
+              </button>
             </div>
           </div>
           <div class="level-item is-4 has-text-centered">
             <div>
-                <p>Keys</p>
-                <a is="b-switch" size="is-small" v-model="open.keys"></a>
+              <button class="button is-small is-rounded"
+                :class="{pushed:open.keys}"
+                @click="open.keys=!open.keys"
+                >
+                Keys
+              </button>
             </div>
           </div>
         </div>
