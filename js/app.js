@@ -13,7 +13,7 @@ var vuetone = new Vue({
   data: {
     open: {
       metronome:true,
-      keys:true,
+      keys:false,
       synth:true,
       field:true,
       chords:false,
@@ -127,21 +127,15 @@ var vuetone = new Vue({
         release  : 1
       }
     };
-    Tone.instruments = [
-      {
-        name: 'membrane',
-        play: function () {
-          console.log('I play!')
-        }
-      }
-    ];
+
     Tone.chromaSynth = new Tone.PolySynth(12,Tone.Synth);
     Tone.volume = new Tone.Volume(0).toMaster();
     Tone.chromaSynth.connect(Tone.volume);
+    Tone.quantization = "@32n";
   },
   mounted: function () {
     if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        StartAudioContext(Tone.context, '.switch').then(function(){
+        StartAudioContext(Tone.context, 'button').then(function(){
 
         });
       }

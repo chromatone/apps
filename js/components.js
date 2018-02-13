@@ -102,6 +102,8 @@ Vue.component('synth', {
       decay: 1.5,
       sustain:0.5,
       release: 0.8,
+      portamento:0,
+      volume:0,
       oscTypes: ['sine','triangle','square','sawtooth', 'pulse', 'pwm'],
       oscType: 'sine',
     }
@@ -118,6 +120,14 @@ Vue.component('synth', {
     oscType: function () {
       Tone.chromaSynth.set('oscillator.type',this.oscType);
       Tone.chromaOptions.oscillator.type=this.oscType;
+    },
+    portamento: function () {
+      Tone.chromaSynth.set('portamento', this.portamento);
+      Tone.chromaOptions.portamento=this.portamento
+    },
+    volume: function () {
+      Tone.chromaSynth.set('volume', this.volume);
+      Tone.chromaOptions.volume=this.volume;
     },
     attack: function () {
       Tone.chromaSynth.set('envelope.attack', this.attack);
@@ -185,6 +195,7 @@ Vue.component('chordion', {
     },
     changeChord: function  (pitch,chord,inv) {
       let octave=2;
+      let time="+0.001";
       if (pitch<this.root) {
         octave++
       }
@@ -194,7 +205,8 @@ Vue.component('chordion', {
         for (i=0;i<playing.length; i++) {
           toStop[i]=Tone.calcFrequency(pitch+playing[i],octave);
         }
-        Tone.chromaSynth.triggerRelease(toStop);
+        time = Tone.Transport.state=='started' ? Tone.quantization : '+0.001';
+        Tone.chromaSynth.triggerRelease(toStop,time);
         chord.inversion=inv;
       }
       let invChord=this.invert(chord.steps,inv);
@@ -202,8 +214,8 @@ Vue.component('chordion', {
       for (i=0;i<invChord.length; i++) {
         toPlay[i]=Tone.calcFrequency(pitch+invChord[i],octave);
       }
-
-      Tone.chromaSynth.triggerAttack(toPlay,'+0.001');
+      time = Tone.Transport.state=='started' ? Tone.quantization : '+0.001';
+      Tone.chromaSynth.triggerAttack(toPlay,time);
     },
     slideChord: function (pitch, chord, event) {
 
@@ -249,8 +261,8 @@ Vue.component('chordion', {
         for (i=0;i<playing.length; i++) {
           toStop[i]=Tone.calcFrequency(pitch+playing[i],octave);
         }
-
-        Tone.chromaSynth.triggerRelease(toStop);
+        let time = Tone.Transport.state=='started' ? Tone.quantization : '+0.001';
+        Tone.chromaSynth.triggerRelease(toStop, time);
         chord.inversion=-1;
 
     },
@@ -372,16 +384,20 @@ Vue.component ('field', {
     playNote: function  (id, pitch, octave) {
 //        playingNotes[id]=[pitch,octave];
 //          console.log('start '+id +' ('+pitch +','+ octave+') '+active);
+
           Tone.field[id]= new Tone.Synth(Tone.chromaOptions).connect(Tone.volume);
-      //    console.log(Tone.field[id])
+         console.log(Tone.field[id])
+          let time = Tone.Transport.state=='started' ? Tone.quantization : Tone.context.now();
           Tone.field[id].frequency = Tone.calcFrequency(pitch,octave);
-          Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave))
+          Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave),time)
     },
     changeNote: function (id, pitch, octave) {
-      Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave));
+      let time = Tone.Transport.state=='started' ? Tone.quantization : Tone.context.now();
+      Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave),time);
   //    Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave))
     },
     stopNote: function (id) {
+      let time = Tone.Transport.state=='started' ? Tone.quantization : Tone.context.now();
       Tone.field[id].triggerRelease();
       if (id) {
         setTimeout( function(){
@@ -464,30 +480,7 @@ Vue.component('tracker', {
     trk: {
       default: {
         instrument:'kick',
-        pattern: [
-          { active: true },
-          { active: false },
-          { active: true },
-          { active: false },
-          { active: false },
-          { active: false},
-          { active: true },
-          { active: false },
-          { active: true },
-          { active: false },
-          { active: false },
-          { active: false },
-          { active: false },
-          { active: false },
-          { active: false },
-          { active: false }
-        ],
-        options: {
-          freq: 15,
-          decay: 0.15
-        },
-        duration: '8n',
-        gain:0.8,
+
       }
     }
   },
@@ -495,46 +488,7 @@ Vue.component('tracker', {
     return {
       currentStep:0,
       play:false,
-      instruments: {
-        kick: {
-          name:'kick',
-          options: {
-          }
-        },
-        dsh: {
-          name:'dsh',
-          options: {
-            freq: {
-              min:10,
-              max:8800,
-              default:30,
-              name:'freq',
-              param:'FREQ'
-            },
-            decay: {
-              min:0.005,
-              max:1,
-              default:0.005,
-              name:'decay',
-              param:'DECAY'
-            },
-            endPitch: {
-              min:0.005,
-              max:1,
-              default:0.5,
-              name:'endPitch',
-              param:'ENV'
-            },
-            sineNoiseMix: {
-              min:0.05,
-              max:1,
-              default:0.7,
-              name:'sineNoiseMix',
-              param:'NOISE'
-            }
-          }
-        }
-      },
+      instruments: {},
       open:true,
       gain:0,
 
@@ -560,16 +514,20 @@ Vue.component('tracker', {
       this.trk.pattern[pos].active=!this.trk.pattern[pos].active
 
     },
+    delTrack: function () {
+      this.loop.stop();
+      this.$emit('delTrack');
+
+    },
     toggleLoop: function () {
       if (!this.play) {
         this.gain.gain.value=1;
-
-        console.log('loopStart' , this.gain)
+        console.log(this.play)
       } else {
         this.gain.gain.value=0;
-        console.log('loopStop', this.gain)
       }
       this.play=!this.play;
+
     },
     addBeat: function () {
       this.loop.add(this.trk.pattern.length,{'active':false, num:this.trk.pattern.length});
@@ -585,24 +543,180 @@ Vue.component('tracker', {
     }
   },
   created: function () {
+    this.instruments = {
+      kick: {
+        name:'kick',
+        options: {
+          pitchDecay: {
+            min:0.01,
+            max:0.5,
+            default:0.05,
+            name:'pitchDecay',
+            param:'DECAY'
+          },
+          octaves: {
+            min:1,
+            max:20,
+            default:10,
+            name:'octaves',
+            param:'OCT'
+          },
+          freq: {
+            min:10,
+            max:110,
+            default:27.5,
+            name:'freq',
+            param:'FREQ'
+          }
+        },
+        envelope  : {
+          attack  : {
+            min:0.001,
+            max:0.5,
+            default:0.001,
+            name:'attack',
+            param:'ATT'
+          },
+          decay  : {
+            min:0.001,
+            max:1,
+            default:0.4,
+            name:'decay',
+            param:'DECAY'
+          },
+          sustain  : {
+            min:0.01,
+            max:1,
+            default:0.01,
+            name:'sustain',
+            param:'SUS'
+          }
+        }
+      },
+      dsh: {
+        name:'dsh',
+        options: {
+          freq: {
+            min:10,
+            max:8800,
+            default:30,
+            name:'freq',
+            param:'FREQ'
+          },
+          decay: {
+            min:0.005,
+            max:1,
+            default:0.005,
+            name:'decay',
+            param:'DECAY'
+          },
+          endPitch: {
+            min:0.005,
+            max:1,
+            default:0.5,
+            name:'endPitch',
+            param:'ENV'
+          },
+          sineNoiseMix: {
+            min:0.05,
+            max:1,
+            default:0.7,
+            name:'sineNoiseMix',
+            param:'NOISE'
+          }
+        }
+      },
+      metal: {
+        name:'metal',
+        options: {
+          harmonicity: {
+            min:0.1,
+            max:7,
+            default:1.4,
+            name:'harmonicity',
+            param:'HARM'
+          },
+          octaves: {
+            min:0.1,
+            max:3,
+            default:1.5,
+            name:'octaves',
+            param:'OCT'
+          },
+          modulationIndex: {
+            min:10,
+            max:110,
+            default:32,
+            name:'modulationIndex',
+            param:'MOD'
+          },
+          resonance: {
+            min:1,
+            max:8000,
+            default:4000,
+            name:'resonance',
+            param:'RES'
+          }
+        },
+        envelope  : {
+          attack  : {
+            min:0.005,
+            max:0.5,
+            default:0.005,
+            name:'attack',
+            param:'ATT'
+          },
+          decay  : {
+            min:0.001,
+            max:3,
+            default:1.4,
+            name:'decay',
+            param:'DECAY'
+          }
+        }
+      }
+    }
+
     var that=this;
     this.gain = new Tone.Gain(0).connect(Tone.volume);
+
     let synth = {};
+
     if (this.trk.instrument == 'kick') {
+          let kickVol = new Tone.Gain(0.8).connect(this.gain);
+          let options={};
+
+          synth = new Tone.MembraneSynth(options).connect(kickVol);
+          synth.play = function (time) {
+            kickVol.gain.value=that.trk.gain;
+            synth.envelope.attack=that.trk.envelope.attack;
+            synth.envelope.decay=that.trk.envelope.decay;
+            synth.envelope.sustain=that.trk.envelope.sustain;
+            synth.octaves=that.trk.options.octaves;
+            synth.pitchDecay=that.trk.options.pitchDecay;
+            synth.triggerAttackRelease(that.trk.options.freq, '8n', time);
+          };
+        }
 
 
-      let kickVol = new Tone.Gain(0.8).connect(this.gain);
-      synth = new Tone.MembraneSynth().connect(kickVol);
-      synth.play = function (time) {
-        kickVol.gain.value=that.trk.gain;
-        synth.triggerAttackRelease('A0', '8n', time);
-      };
+        if (this.trk.instrument == 'metal') {
+              let kickVol = new Tone.Gain(0.8).connect(this.gain);
+              let options={};
 
-    }
-    synth.beat = function (num) {
-      that.currentStep=num;
+              synth = new Tone.MetalSynth().connect(kickVol);
+              synth.play = function (time) {
+                kickVol.gain.value=that.trk.gain;
+                synth.envelope.attack=that.trk.envelope.attack;
+                synth.envelope.decay=that.trk.envelope.decay;
+                synth.octaves=that.trk.options.octaves;
+                synth.modulationIndex=that.trk.options.modulationIndex;
+                synth.resonance=that.trk.options.resonance;
+                synth.harmonicity=that.trk.options.harmonicity;
 
-    }
+                console.log('metaL!', synth)
+                synth.triggerAttackRelease('8n', time);
+              };
+            }
 
     if (this.trk.instrument == 'dsh') {
 
@@ -615,10 +729,7 @@ Vue.component('tracker', {
         output[i] = Math.random() * 2 - 1;
       }
 
-
-
       synth.triggerAttackRelease = function (gain,freq, decay, endPitch, sineNoiseMix, startTime) {
-
         let osc = Tone.context.createOscillator()
         let mainGainNode = Tone.context.createGain()
         let whiteNoise = Tone.context.createBufferSource();
@@ -631,10 +742,7 @@ Vue.component('tracker', {
         whiteNoise.loop = true;
         whiteNoise.connect(noiseVol);
         noiseVol.connect(mainGainNode)
-
         oscVol.gain.setValueAtTime((1-sineNoiseMix)*2, startTime)
-
-
         osc.start(startTime)
         osc.stop(startTime+decay)
         osc.frequency.setValueAtTime(freq, startTime)
@@ -645,19 +753,23 @@ Vue.component('tracker', {
         mainGainNode.gain.setValueAtTime(gain, startTime)
         mainGainNode.gain.exponentialRampToValueAtTime(0.01, startTime+decay)
       }
-    let options=this.trk.options;
-    options.gain=this.trk.gain;
-    synth.play = function (time) {
-      synth.triggerAttackRelease(that.trk.gain, options.freq, options.decay, options.endPitch, options.sineNoiseMix, time)
+
+      let options=this.trk.options;
+      options.gain=this.trk.gain;
+
+      synth.play = function (time) {
+        synth.triggerAttackRelease(that.trk.gain, options.freq, options.decay, options.endPitch, options.sineNoiseMix, time)
+      }
     }
 
 
-    }
+    synth.beat = function (num) {
+     that.currentStep=num;
 
+    }
     this.loop = new Tone.Sequence(function(time,pitch){
       if(pitch.active) {
           synth.play(time)
-
       }
       synth.beat(pitch.num);
   //    Tone.Draw.schedule(function(){
@@ -693,46 +805,12 @@ Vue.component('metronome', {
       currentStep: 0,
      taps: [],
      newDuration:'16',
+     newInstr:'kick',
      playing: false,
      pressed:false,
      tempo: 90,
      tracks: [
-        {
-          instrument:'kick',
-          pattern: [
-            { active: true, num:0 },
-            { active: false, num:1 },
-            { active: true, num:2 },
-            { active: false, num:3 },
-            { active: false, num:4 },
-            { active: false, num:5},
-            { active: true, num:6 },
-            { active: false, num:7}
-          ],
-          duration: '8n',
-          gain:0.8
-        },
-        {
-          instrument:'dsh',
-          pattern: [
-            { active: false, num:0 },
-            { active: false, num:1 },
-            { active: false, num:2 },
-            { active: false, num:3 },
-            { active: true, num:4 },
-            { active: false, num:5},
-            { active: false, num:6 },
-            { active: false, num:7}
-          ],
-          options: {
-            freq: 110,
-            decay: 0.15,
-            endPitch: 0.9,
-            sineNoiseMix: 0.75
-          },
-          gain: 0.5,
-          duration:'8n'
-        }
+
       ]
     }
   },
@@ -769,33 +847,94 @@ Vue.component('metronome', {
       }
     },
     addTrack: function () {
-      this.tracks.push(
-        {
-          instrument:'dsh',
+      if(this.newInstr=='metal') {
+        this.tracks.push(
+          {
+            instrument:'metal',
+            pattern: [
+              { active: true, num:0 },
+              { active: false, num:1 },
+              { active: true, num:2 },
+              { active: false, num:3 },
+              { active: false, num:4 },
+              { active: false, num:5},
+              { active: true, num:6 },
+              { active: false, num:7}
+            ],
+            duration: this.newDuration+'n',
+            gain:0.8,
+            options: {
+              harmonicity: 1.4,
+              octaves: 1.5,
+              modulationIndex: 32,
+              resonance: 4000,
+              freq:110
+            },
+            envelope  : {
+              attack  : 0.001,
+              decay  : 1.4,
+              release  : 0.2
+            }
+          }
+        )
+      }
+
+      if (this.newInstr=='kick') {
+        this.tracks.push({
+          instrument:'kick',
           pattern: [
-            { active: false, num:0 },
+            { active: true, num:0 },
             { active: false, num:1 },
-            { active: false, num:2 },
+            { active: true, num:2 },
             { active: false, num:3 },
             { active: false, num:4 },
             { active: false, num:5},
-            { active: false, num:6 },
+            { active: true, num:6 },
             { active: false, num:7}
           ],
+          duration: this.newDuration+'n',
+          gain:0.8,
           options: {
-            freq: 110,
-            decay: 0.05,
-            endPitch: 0.9,
-            sineNoiseMix: 0.9
+            pitchDecay:0.05,
+            octaves:10,
+            freq:27.5
           },
-          gain: 0.3,
-          duration:this.newDuration+'n'
-        }
-      )
+          envelope  : {
+            attack  : 0.001 ,
+            decay  : 0.4 ,
+            sustain  : 0.01
+          }
+        })
+      }
+      if (this.newInstr=='dsh') {
+
+        this.tracks.push(
+          {
+            instrument:'dsh',
+            pattern: [
+              { active: false, num:0 },
+              { active: false, num:1 },
+              { active: false, num:2 },
+              { active: false, num:3 },
+              { active: false, num:4 },
+              { active: false, num:5},
+              { active: false, num:6 },
+              { active: false, num:7}
+            ],
+            options: {
+              freq: 110,
+              decay: 0.05,
+              endPitch: 0.9,
+              sineNoiseMix: 0.9
+            },
+            gain: 0.3,
+            duration:this.newDuration+'n'
+          }
+        )
+      }
     },
-    delTrack: function () {
-      this.tracks.pop();
-      this.pattern.pop();
+    delTrack: function (i) {
+      this.tracks.splice(i,1)
       console.log(this.pattern)
     },
     toggleTransport: function () {
@@ -824,8 +963,6 @@ Vue.component('metronome', {
   },
   mounted: function () {
 
-
-    if(!window.AudioContext) this.playing = false // Safari fix
   },
 
 });

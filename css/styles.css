@@ -25,7 +25,9 @@ body {
 .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top {
   top:-4px!important;
 }
-
+.wrap {
+  flex-flow: row wrap;
+}
 .adsr-sliders {
   display:flex;
   flex-flow: row wrap;

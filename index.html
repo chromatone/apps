@@ -37,7 +37,7 @@
           <div class="level-item is-centered">
           <button class="button is-small is-rounded"
             :class="{pushed:play}"
-            @click="toggleTransport()"
+            @click.prevent.stop="toggleTransport()"
             >
             Rythm
           </button>
@@ -74,11 +74,18 @@
 
         <div class="track" v-for="(track,i) in tracks">
 
-<tracker :trk="track"></tracker>
+<tracker @delTrack="delTrack(i)" :trk="track"></tracker>
 
         </div>
         <b-field>
-
+        <b-select v-model="newInstr" size="is-small" placeholder="Duration">
+               <option
+                   v-for="ins in ['kick','dsh','metal']"
+                   :value="ins"
+                   :key="ins">
+                   {{ ins }}
+               </option>
+         </b-select>
           <b-select v-model="newDuration" size="is-small" placeholder="Duration">
                  <option
                      v-for="dur in [4,8,16,32]"
@@ -159,7 +166,7 @@
       </svg>
       <b-collapse class="track-options" :class="{closed:!open}" :open.sync="open">
 
-        <div class="level is-mobile">
+        <div class="level wrap is-mobile">
           <div class="level-item">  <button @click="delBeat()" class="button is-small">
                 -
             </button>
@@ -173,14 +180,20 @@
           </div>
           <div class="level-item  has-text-centered" >
             <knob min="0" max="0.9" param="GAIN"
-            v-model="trk.gain" />
+            v-model="trk.gain"></knob>
           </div>
           <div v-for="option in instruments[trk.instrument].options"
             class="level-item has-text-centered">
             <knob :min="option.min" :max="option.max" :param="option.param"
-            v-model="trk.options[option.name]" />
+            v-model="trk.options[option.name]"></knob>
           </div>
 
+          <div v-for="param in instruments[trk.instrument].envelope"
+            class="level-item has-text-centered">
+            <knob :min="param.min" :max="param.max" :param="param.param"
+            v-model="trk.envelope[param.name]"></knob>
+          </div>
+        </div>
 
         </div>
       </b-collapse>
@@ -339,6 +352,14 @@
 <div class="">
 <div class="level adsr-sliders">
 <div class="level-item">
+  <knob min="-50" max="20" param="VOL"
+  v-model="volume" />
+</div>
+<div class="level-item">
+  <knob min="0" max="0.2" param="PORT"
+  v-model="portamento" />
+</div>
+<div class="level-item">
   <knob min="0.005" max="2" param="ATT"
   v-model="attack" />
 </div>
@@ -442,7 +463,7 @@ v-model="release" />
   <div id="vuetone">
 
     <div class="row switches">
-      <div class="level">
+      <div class="row">
         <div class="logo level-item is-6 has-text-centered">
           <img src="logo.svg" style="min-width:150px">
 
@@ -453,19 +474,15 @@ v-model="release" />
         </vue-slider>
         </div>
 
-        <div class="level is-mobile">
-          <div class="level-item is-4 has-text-centered">
-            <div>
+        <div class="switch-row has-text-centered">
+
                 <button class="button is-small is-rounded"
                   :class="{pushed:open.scales}"
                   @click="open.scales=!open.scales"
                   >
                   Scales
                 </button>
-            </div>
-          </div>
-          <div class="level-item is-4 has-text-centered">
-            <div>
+
               <button class="button is-small is-rounded"
                 :class="{pushed:open.metronome}"
                 @click="open.metronome=!open.metronome"
@@ -473,48 +490,35 @@ v-model="release" />
                 Rythm
               </button>
 
-              </div>
-          </div>
-          <div class="level-item is-4 has-text-centered">
-            <div>
+
               <button class="button is-small is-rounded"
                 :class="{pushed:open.chords}"
                 @click="open.chords=!open.chords"
                 >
                 Chords
               </button>
-              </div>
-          </div>
-          <div class="level-item is-4 has-text-centered">
-            <div>
+
                  <button class="button is-small is-rounded"
                     :class="{pushed:open.field}"
                     @click="open.field=!open.field"
                     >
                     Field
                   </button>
-            </div>
-          </div>
-          <div class="level-item is-4 has-text-centered">
-            <div>
+
               <button class="button is-small is-rounded"
                 :class="{pushed:open.synth}"
                 @click="open.synth=!open.synth"
                 >
                 Synth
               </button>
-            </div>
-          </div>
-          <div class="level-item is-4 has-text-centered">
-            <div>
+
               <button class="button is-small is-rounded"
                 :class="{pushed:open.keys}"
                 @click="open.keys=!open.keys"
                 >
                 Keys
               </button>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
