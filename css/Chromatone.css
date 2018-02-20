@@ -20,7 +20,7 @@
 }
 
 #body {
-  fill:#CCCCC6;
+  fill:#ddd;
 }
 
 #body-shadow {
@@ -141,7 +141,7 @@
 /*
 FRAME CSS
 */
-    .chr0{fill:#CCCCC6;}
+    .chr0{fill:#ddd;}
     .chr1{opacity:0.75;}
     .chr2{fill:#BE0E09;}
     .chr3{fill:#FA4500;}

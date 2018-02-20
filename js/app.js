@@ -16,7 +16,7 @@ var vuetone = new Vue({
       keys:false,
       synth:true,
       field:true,
-      chords:false,
+      chords:true,
       scales:true
     },
     base:440,
@@ -108,12 +108,12 @@ var vuetone = new Vue({
     //  if (Chroma.scale.steps[pitch]) {active=1};
 
       return {
-        identifier: touch.identifier,
+        identifier: touch.identifier || 0,
         clientX: touch.clientX,
         clientY: touch.clientY,
         pitch:pitch,
-        octave:octave,
-        active:active
+        octave:octave
+      //  active:active
        }
     };
     Tone.chromaOptions={

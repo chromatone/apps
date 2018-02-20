@@ -160,7 +160,8 @@ Vue.component('chordion', {
     return {
       notes:Chroma.Notes,
       chords:Chroma.Chords,
-      inversion:-1
+      inversion:-1,
+      playing: false
     }
   },
   props: {
@@ -218,16 +219,19 @@ Vue.component('chordion', {
       Tone.chromaSynth.triggerAttack(toPlay,time);
     },
     slideChord: function (pitch, chord, event) {
-
-      for (i=0;i<event.changedTouches.length;i++) {
-        let clientX=event.changedTouches[i].clientX;
-        let clientY=event.changedTouches[i].clientY;
-        let rect=event.changedTouches[i].target.getBoundingClientRect();
+      if (event.type=="mousedown" || event.type=="touchstart") {
+        this.playing=true;
+      }
+      for (i=0;i<(event.changedTouches ? event.changedTouches.length : 1);i++) {
+        let clientX=event.changedTouches ? event.changedTouches[i].clientX : event.clientX;
+        let clientY=event.changedTouches ? event.changedTouches[i].clientY : event.clientY;
+        let rect=event.changedTouches ? event.changedTouches[i].target.getBoundingClientRect() : event.target.getBoundingClientRect();
         let x=clientX-rect.x-rect.width/2;
         let y= clientY-rect.y-rect.height/2;
         if (chord.handle == 'min') {
           y=-y;
         }
+        if (this.playing) {
             if (chord.inversion!=2 && x>0 && y>0 && Math.sqrt(3)*x+y>50) {
               this.changeChord(pitch,chord,2)
 
@@ -239,6 +243,7 @@ Vue.component('chordion', {
 
             }
       }
+    }
 
     },
     chordTranslate: function (index, size, shift, top, topshift) {
@@ -252,6 +257,8 @@ Vue.component('chordion', {
       return translate
     },
     stopChord: function (pitch, chord, event) {
+
+      this.playing=false;
       let octave=2;
       if (pitch<this.root) {
         octave++
@@ -351,7 +358,8 @@ Vue.component ('field', {
       x:0,
       y:0,
       notes:Chroma.Notes,
-      ongoingTouches:[]
+      ongoingTouches:[],
+      pressed:false
     }
   },
   props: {
@@ -386,7 +394,7 @@ Vue.component ('field', {
 //          console.log('start '+id +' ('+pitch +','+ octave+') '+active);
 
           Tone.field[id]= new Tone.Synth(Tone.chromaOptions).connect(Tone.volume);
-         console.log(Tone.field[id])
+
           let time = Tone.Transport.state=='started' ? Tone.quantization : Tone.context.now();
           Tone.field[id].frequency = Tone.calcFrequency(pitch,octave);
           Tone.field[id].triggerAttack(Tone.calcFrequency(pitch,octave),time)
@@ -405,6 +413,32 @@ Vue.component ('field', {
           delete Tone.field[id]
     //      console.log(Tone.field)
         }, Tone.chromaOptions.envelope.release*1000);
+      }
+    },
+    clickStart: function (event) {
+        var rect = event.target.getBoundingClientRect();
+        let copy = Tone.copyTouch(event,rect);
+        this.pressed=copy;
+        if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
+          this.playNote(0,copy.pitch,copy.octave);
+
+        }
+    },
+    clickChange: function (event) {
+        var rect = event.target.getBoundingClientRect();
+        let copy = Tone.copyTouch(event,rect);
+
+        if (this.pressed && Tone.checkActive(copy.pitch, this.root, this.steps) && (this.pressed.pitch!=copy.pitch || this.pressed.octave!=copy.octave)) {
+          this.changeNote(0,copy.pitch,copy.octave);
+          this.pressed=copy;
+        }
+    },
+    clickStop: function () {
+      var rect = event.target.getBoundingClientRect();
+      let copy = Tone.copyTouch(event,rect);
+      if (this.pressed ) {
+        this.pressed=false;
+        this.stopNote(0);
       }
     },
     touchStart: function (event) {
@@ -522,7 +556,6 @@ Vue.component('tracker', {
     toggleLoop: function () {
       if (!this.play) {
         this.gain.gain.value=1;
-        console.log(this.play)
       } else {
         this.gain.gain.value=0;
       }
@@ -557,7 +590,7 @@ Vue.component('tracker', {
           octaves: {
             min:1,
             max:20,
-            default:10,
+            default:7.5,
             name:'octaves',
             param:'OCT'
           },
@@ -712,8 +745,6 @@ Vue.component('tracker', {
                 synth.modulationIndex=that.trk.options.modulationIndex;
                 synth.resonance=that.trk.options.resonance;
                 synth.harmonicity=that.trk.options.harmonicity;
-
-                console.log('metaL!', synth)
                 synth.triggerAttackRelease('8n', time);
               };
             }
@@ -872,7 +903,7 @@ Vue.component('metronome', {
             },
             envelope  : {
               attack  : 0.001,
-              decay  : 1.4,
+              decay  : 0.05,
               release  : 0.2
             }
           }
@@ -885,18 +916,18 @@ Vue.component('metronome', {
           pattern: [
             { active: true, num:0 },
             { active: false, num:1 },
-            { active: true, num:2 },
+            { active: false, num:2 },
             { active: false, num:3 },
-            { active: false, num:4 },
+            { active: true, num:4 },
             { active: false, num:5},
-            { active: true, num:6 },
+            { active: false, num:6 },
             { active: false, num:7}
           ],
           duration: this.newDuration+'n',
           gain:0.8,
           options: {
             pitchDecay:0.05,
-            octaves:10,
+            octaves:7.5,
             freq:27.5
           },
           envelope  : {

@@ -74,13 +74,18 @@ body {
 }
 .scroller {
   fill:#fff;
-  opacity:0.4;
+  opacity:0.6;
 }
 .scroller-button {
-  fill:#555;
+  fill:#888;
   fill-opacity:0.2;
 }
-
+.chord {
+  opacity:0.5;
+}
+.active-chord {
+  opacity:1;
+}
 .chord-icon {
   display: inline-block;
   width:8%;
@@ -148,7 +153,7 @@ sequencer
 }
 
 .beat.highlight {
-  opacity:0.5;
+  opacity:1;
 }
 
 .toggle-track.playing-track {
