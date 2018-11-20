@@ -11,8 +11,8 @@ var vuetone = new Vue({
     open: {
       rythm: true,
       scales: true,
-      synth: true,
-      field: true,
+      synth: false,
+      field: false,
       chords: false,
       keys: false
     },
@@ -93,9 +93,16 @@ var vuetone = new Vue({
       clientY = touch.clientY;
       let pitch,
         octave,
+        octH,
+        octMix,
+        octTwo,
         active = 0;
+      octH = (rect.bottom - clientY) / (rect.height / 9);
       pitch = Math.floor((clientX - rect.left) / (rect.width / 12));
-      octave = Math.floor((rect.bottom - clientY) / (rect.height / 9));
+      octave = Math.floor(octH); 
+      octMix=1-Math.abs(octH-octave-0.5)  //smooth octave shift experiment
+      octTwo = Math.round(octH) > octave ? octave + 1 :
+octave-1;
       if (pitch > 11) {
         pitch = 11;
       } else if (pitch < 0) {
@@ -113,7 +120,9 @@ var vuetone = new Vue({
         clientX: touch.clientX,
         clientY: touch.clientY,
         pitch,
-        octave
+        octave,
+        octTwo,
+        octMix
       };
     };
     Tone.chromaOptions = {
