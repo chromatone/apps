@@ -1,3 +1,56 @@
+// Oscilloscope
+
+Vue.component("oscilloscope", {
+  template: "#oscilloscope",
+  data() {
+    return {
+      sliceWidth:0,
+      bufferLength:0,
+      dataArray: new Uint8Array(Tone.analyser.fftSize),
+      points:[] 
+    }
+  },
+  mounted() {
+    this.bufferLength = Tone.analyser.fftSize;
+    this.dataArray= new Uint8Array(Tone.analyser.fftSize);
+    Tone.analyser.getByteTimeDomainData(this.dataArray);
+    this.sliceWidth = window.innerWidth / this.bufferLength * 2.0;
+    this.draw();
+    
+  },
+  computed: {
+    pointsSvg() {
+      return this.points.join(','); 
+    }
+  },
+  methods: {
+    draw() {
+      Tone.analyser.getByteTimeDomainData(this.dataArray);
+      let x=0;
+      this.points=[];
+      let firstZero;
+      for (i=1; i<this.bufferLength; i++) {
+        let y = this.dataArray[i] / 128 * 400;
+        if (firstZero !== undefined) {
+          this.points.push(x,y);
+          x+= this.sliceWidth;
+        }
+        if((this.dataArray[i] >= 128 && this.dataArray[i-1] < 128)
+           || (this.dataArray[i] <= 128 && this.dataArray[i-1] > 128)) {
+          if(firstZero === undefined && (this.dataArray[i] >= 128 &&
+                                         this.dataArray[i-1] < 128)) {
+            firstZero = i; 
+          }
+        }
+      }
+      requestAnimationFrame(this.draw)
+    }
+  }
+});
+
+
+
+
 // CHORD VISUALIZATION
 
 Vue.component("visual", {
@@ -585,12 +638,12 @@ Vue.component("field", {
         
       if (!this.synth[id][octave]) {
         this.synth[id][octave] = {}
-        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).toMaster();
+        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).connect(Tone.volume);
         this.synth[id][octave].synth = new Tone.mainSynth(this.synth[id][octave].gain);
       }
       if (!this.synth[id][octTwo]) {
         this.synth[id][octTwo] = {}
-        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).toMaster();
+        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).connect(Tone.volume);
         this.synth[id][octTwo].synth = new Tone.mainSynth(this.synth[id][octTwo].gain);
       }
       
@@ -669,12 +722,12 @@ Vue.component("field", {
         
       if (!this.synth[id][octave]) {
         this.synth[id][octave] = {}
-        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).toMaster();
+        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).connect(Tone.volume);
         this.synth[id][octave].synth = new Tone.mainSynth(this.synth[id][octave].gain);
       }
       if (!this.synth[id][octTwo]) {
         this.synth[id][octTwo] = {}
-        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).toMaster();
+        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).connect(Tone.volume);
         this.synth[id][octTwo].synth = new Tone.mainSynth(this.synth[id][octTwo].gain);
       }
       
@@ -698,7 +751,7 @@ Vue.component("field", {
     },
     changeNotes(id, pitch, octave, octMix, octTwo, trigger=true) {
       
-      console.log('Change: ',id, pitch, octave, octMix, octTwo)
+   //   console.log('Change: ',id, pitch, octave, octMix, octTwo)
       
       let time =
         Tone.Transport.state == "started"
@@ -707,12 +760,12 @@ Vue.component("field", {
       
        if (!this.synth[id][octave]) {
         this.synth[id][octave] = {}
-        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).toMaster();
+        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).connect(Tone.volume);
         this.synth[id][octave].synth = new Tone.mainSynth(this.synth[id][octave].gain);
       }
       if (!this.synth[id][octTwo]) {
         this.synth[id][octTwo] = {}
-        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).toMaster();
+        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).connect(Tone.volume);
         this.synth[id][octTwo].synth = new Tone.mainSynth(this.synth[id][octTwo].gain);
       }
      

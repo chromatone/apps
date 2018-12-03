@@ -15,6 +15,17 @@
   <script src="assets/vue-slider.js"></script>
   <script src="assets/buefy.js"></script>
   <script src="assets/vue-local-storage.js"></script>
+  
+  
+  <script id="oscilloscope" type="x-template">
+  
+  <div id="oscilloscope">
+    <svg viewBox="0 0 800 800">
+      <polyline id="scope" fill="transparent" stroke="rgba(0,0,0,0.3)" stroke-width="2" :points="points.join(',')"/> 
+    </svg>
+  </div>
+  
+  </script>
 
 
   <script id="knob" type="x-template">
@@ -118,16 +129,26 @@
                     class="track-toggle" :class="{open:open}" >
                     <circle   class="toggle-track"
                     r="20" cx="-30" cy="30"/>
-                    <polygon  class="arrow" points="-30,37.6 -22.9,25.2 -37.1,25.2"/>
+                    <polygon class="arrow" points="-35,25 -25,25 -30,35"/>
                   </g>
 
                   <g @click="toggleLoop"
                       @touchstart.prevent.stop="toggleLoop"
-                    class="track-toggle" :class="{open:play}" >
+                    class="track-toggle"  >
                     <circle :class="{'playing-track':play}"  class="toggle-track"
                     r="20" cx="-30" cy="30"/>
-                    <polygon style="transform:rotate(-90deg)" class="arrow" points="-30,37.6 -22.9,25.2 -37.1,25.2"/>
-                  </g>
+                   
+                     <g class="speaker-set" :class="{'playing-track':play}">
+                        <path class="speaker" d="M8.6,22.9v-5.7c0-1.2,1-2.1,2.1-2.1h2.9l4.9-4.7c0.3-0.4,0.9-0.4,1.3-0.1c0.2,0.2,0.3,0.4,0.3,0.7v18.2
+	c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.9L8.6,22.9z"/>
+                        <g class="speaker-waves">
+	                      <path d="M24.1,24c2.2-2.2,2.2-5.8,0-8c-0.3-0.3-0.7-0.3-1,0c-0.1,0.1-0.2,0.3-0.2,0.5v7c0,0.4,0.3,0.7,0.7,0.7
+		C23.8,24.2,24,24.1,24.1,24z"/>
+	                      <path d="M24.9,30.3c5.7-2.7,8.2-9.5,5.5-15.2c-1.1-2.4-3.1-4.4-5.5-5.5c-0.7-0.3-1.6,0.1-1.8,0.9c-0.2,0.7,0,1.4,0.6,1.7
+		c4.3,2,6.1,7.1,4.1,11.4c-0.8,1.8-2.3,3.2-4.1,4.1c-0.7,0.4-0.9,1.3-0.5,2C23.5,30.3,24.2,30.6,24.9,30.3z"/>
+                      </g>
+                    </g>
+                  </g>  
 
 
 
@@ -160,6 +181,9 @@
         <div class="level field wrap is-mobile">
 
             <label class="track-label">{{trk.instrument.toUpperCase()}}&nbsp;</label>
+              <button @click="delTrack()" class="button  is-small" class="del-track">
+              X
+          </button>
 
           <div class="level-item"> <button @click="delBeat()" class="button is-small">
                 -
@@ -170,6 +194,7 @@
             <button @click="addBeat()" class="button  is-small">
               +
           </button>
+         
 
           </div>
           <div class="level-item  has-text-centered">
@@ -461,6 +486,10 @@
         </div>
       </div>
     </div>
+  
+    
+      <oscilloscope v-if="open.oscilloscope"></oscilloscope>
+   
 
     <div v-show="open.rythm" class="row rythm">
       <metronome></metronome>
@@ -533,6 +562,8 @@
     <div v-if="open.keys" class="row">
       <key-stack :root="root" :steps="scale.steps" @play="play" @stop="stop"></key-stack>
     </div>
+  
+
 
 
   </div>

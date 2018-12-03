@@ -12,9 +12,10 @@ var vuetone = new Vue({
       rythm: true,
       scales: true,
       synth: false,
-      field: false,
+      field: true,
       chords: false,
-      keys: false
+      keys: false,
+      oscilloscope:true
     },
     base: 440,
     root: 0,
@@ -140,7 +141,9 @@ octave-1;
     };
 
     Tone.chromaSynth = new Tone.PolySynth(12, Tone.Synth);
-    Tone.volume = new Tone.Volume(0).toMaster();
+    Tone.analyser=Tone.context.createAnalyser().toMaster()
+    Tone.analyser.fftSize = 2048;
+    Tone.volume = new Tone.Volume(0).connect(Tone.analyser);
     Tone.chromaSynth.connect(Tone.volume);
     Tone.mainSynth = Synth.mono;
     Tone.quantization = "@32n";
