@@ -11,10 +11,11 @@ var vuetone = new Vue({
     open: {
       rythm: true,
       scales: true,
-      synth: true,
+      synth: false,
       field: true,
       chords: false,
-      keys: false
+      keys: false,
+      oscilloscope:true
     },
     base: 440,
     root: 0,
@@ -93,9 +94,16 @@ var vuetone = new Vue({
       clientY = touch.clientY;
       let pitch,
         octave,
+        octH,
+        octMix,
+        octTwo,
         active = 0;
+      octH = (rect.bottom - clientY) / (rect.height / 9);
       pitch = Math.floor((clientX - rect.left) / (rect.width / 12));
-      octave = Math.floor((rect.bottom - clientY) / (rect.height / 9));
+      octave = Math.floor(octH); 
+      octMix=1-Math.abs(octH-octave-0.5)  //smooth octave shift experiment
+      octTwo = Math.round(octH) > octave ? octave + 1 :
+octave-1;
       if (pitch > 11) {
         pitch = 11;
       } else if (pitch < 0) {
@@ -113,7 +121,9 @@ var vuetone = new Vue({
         clientX: touch.clientX,
         clientY: touch.clientY,
         pitch,
-        octave
+        octave,
+        octTwo,
+        octMix
       };
     };
     Tone.chromaOptions = {
@@ -131,7 +141,9 @@ var vuetone = new Vue({
     };
 
     Tone.chromaSynth = new Tone.PolySynth(12, Tone.Synth);
-    Tone.volume = new Tone.Volume(0).toMaster();
+    Tone.analyser=Tone.context.createAnalyser().toMaster()
+    Tone.analyser.fftSize = 2048;
+    Tone.volume = new Tone.Volume(0).connect(Tone.analyser);
     Tone.chromaSynth.connect(Tone.volume);
     Tone.mainSynth = Synth.mono;
     Tone.quantization = "@32n";

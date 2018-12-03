@@ -2,6 +2,16 @@
   max-width: 960px;
 }
 
+#oscilloscope {
+   position:absolute;
+  z-index:100;
+  width:100%;
+  height:80vh;
+  pointer-events:none;
+  left:0;
+  top:20vh
+}
+
 .note {
   cursor: pointer;
   opacity: 0.8;
@@ -193,6 +203,13 @@ sequencer
   opacity: 1;
 }
 
+.del-track {
+  color:red;
+  font-weight:bold;
+  border-radius:20px;
+  padding:2px 4px;
+}
+
 .toggle-track.playing-track {
   fill: #7957d5;
 }
@@ -208,9 +225,22 @@ sequencer
   fill: transparent;
   stroke: #333;
 }
+.speaker-set {
+  transform:translate(-50px,10px);
+}
+.playing-track .speaker, .playing-track .speaker-waves  {
+   fill:white;
+   display:block;
+}
+.speaker {
+   fill:grey; 
+}
+.speaker-waves {
+   display:none; 
+}
 .arrow {
   fill: #333;
-  transform-origin: 50% 36%;
+  transform-origin: -30px 30px;
 }
 .track-options {
   border-radius: 0 0 12px 12px;

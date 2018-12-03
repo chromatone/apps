@@ -1,5 +1,3 @@
 # Chromatone
-Interactive color music theory
-
-Active development here:
-https://github.com/fondfrukt/Chromatone
+Interactive color music theory\
+by Development Foundation for Uneversalization, Cooperation and Creativity
