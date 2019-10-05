@@ -3,18 +3,109 @@
 }
 
 #oscilloscope {
-   position:absolute;
+   position:fixed;
   z-index:100;
   width:100%;
   height:80vh;
   pointer-events:none;
   left:0;
-  top:20vh
+  top:0
+}
+
+@font-face {
+  font-family: "Neusa Bold";
+  src: url(https://cdn.glitch.com/1520e3d1-e09f-4c87-bd42-89b5fa497055%2FNeusa-Bold.woff?1543956951264);
+}
+
+/* TONE-GRID */
+
+.tone-table {
+   width:100%; 
+  border-radius:20px;
+}
+.tone-table tr:first-child td:first-child {
+ border-radius:20px 0 0 0 ; 
+}
+.tone-table tr:first-child td:last-child {
+ border-radius:0 20px 0 0 ; 
+}
+.tone-table tr:last-child td:first-child {
+ border-radius:0 0 0 20px ; 
+}
+.tone-table tr:last-child td:last-child {
+ border-radius:0 0 20px 0 ; 
+}
+.grid-block {
+  position:relative;
+}
+.grid-cover {
+  position:absolute;
+  background-color:rgba(100,100,100,0.1);
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:20;
+  border-radius:20px;
+}
+
+.grid-note {
+   margin:6px;
+}
+.grid-note-dot {
+   border-radius:40px;
+   padding:10px;
+  text-align:center;
+  color:white;
+  font-size:10px;
+  font-weight:bold;
+}
+.grid-note-dot.inactive {
+  opacity:0.2;
+}
+/* END of TONE-GRID */
+
+.note-name {
+	font-family: "Neusa Bold";
+	font-size:22px;
+	user-select: none;
+	pointer-events: none;
+	transform-origin:center;
+}
+
+.note-circle, .chord-trigger, .chord-triangle {
+	transition:all 400ms ease-in-out;
+}
+
+.root {
+  stroke:#fff; 
+}
+
+.deactivated {
+  fill:#999;
+  stroke:#aaa;
+}
+
+.chord-name {
+	font-family: "Neusa Bold";
+	font-size:22px;
+	opacity:0.5;
+	user-select: none;
+	pointer-events: none;
+	transform-origin:center;
+}
+
+.chord-triangle.major {
+	opacity:0.7
+}
+
+.chord-trigger {
+	opacity:0.5;
+	mix-blend-mode: screen;
 }
 
 .note {
   cursor: pointer;
-  opacity: 0.8;
 }
 
 body {
@@ -31,6 +122,7 @@ button.is-small.is-rounded {
   font-size: 11px;
   font-weight: bold;
   margin: 0 2px;
+  padding:2px 8px;
   text-transform: uppercase;
 }
 .scale-select .field:not(:last-child) {
@@ -69,7 +161,8 @@ button.is-small.is-rounded {
 }
 
 .letters {
-  pointer-events: none;
+	user-select: none;
+	pointer-events: none;
   font-family: sans-serif;
 }
 
@@ -173,34 +266,69 @@ sequencer
   border-top-right-radius: 16px;
   border-bottom-right-radius: 16px;
 }
-.track-rect {
-  fill: #bbb;
+
+.metro-options {
+  display:flex;
+  justify-content:space-between;
+  flex-flow: row wrap;
+  margin-bottom:6px;
+}
+
+.beat-row {
+  display:grid;
+  grid-template-columns: 48px auto 48px;
+}
+
+.beat-group {
+  display: grid;
+  grid-template-columns:  repeat(auto-fit, minmax(6%,1fr));
+}
+.beat-mute, .beat-open {
+  background-color:#eee; 
+  height: 40px;
+  border-radius: 20px;
+  margin: 4px;
+  border: 2px solid #999;
+}
+.beat-mute.unmute {
+  background-color:#7957d5;
+}
+.beat-block {
+    height: 40px;
+    border-radius: 20px;
+    margin: 4px;
+    border: 2px solid #777;
+    background-color: #aaa;
+}
+.beat-block.fourth {
+  border-color:#444; 
+}
+.beat-block.act {
+  background-color:#a899d2;
+}
+.beat-block.active {
+  background-color:#777; 
+}
+.beat-block.active.act {
+  background-color:#7957d5;
+}
+.arrow-collapse {
+   fill:#999;
+   transform-origin: 10px 10px;
+}
+.open .arrow-collapse {
+   transform:rotate(180deg); 
 }
 .track {
   background-color: #ccc;
-  border-radius: 12px;
+  border-radius: 25px;
   transition: all 0.5s ease;
-}
-.track.open {
   margin-bottom: 10px;
 }
-.bpm {
-  transition: all 100ms ease-out;
-}
-.bpm.active {
-  background-color: #7957d5;
-  color: #fff;
-}
-.beat {
-  fill: rgba(255, 255, 255, 0.5);
-  stroke: #fff;
-  stroke-width: 2px;
-  opacity: 0.2;
-  transition: all 0.1s ease-out;
-}
 
-.beat.highlight {
-  opacity: 1;
+.bpm.active {
+  background-color: #7957d5 !important;
+  color: #fff !important;
 }
 
 .del-track {
@@ -214,20 +342,11 @@ sequencer
   fill: #7957d5;
 }
 
-.beat.fourth {
-  fill: rgba(125, 125, 125, 0.5);
-  stroke: #333;
-}
+
 .track-toggle.open .arrow {
   transform: rotate(180deg);
 }
-.toggle-track {
-  fill: transparent;
-  stroke: #333;
-}
-.speaker-set {
-  transform:translate(-50px,10px);
-}
+
 .playing-track .speaker, .playing-track .speaker-waves  {
    fill:white;
    display:block;
@@ -299,4 +418,69 @@ knob
   font-weight: bold;
   text-anchor: middle;
   fill: #777;
+}
+
+
+/*   PITCH-TABLE    */
+
+.table-holder {
+	width:100%;
+	overflow-x:scroll;
+}
+.pitch-table {
+	border-collapse: separate;
+	border-spacing: 2px;
+}
+.control-row {
+	display:grid;
+	grid-template-columns: 1fr 1fr 3fr;
+}
+.label {
+	place-self:center;
+	text-align: center;
+	margin:10px;
+}
+.button-holder {
+	display:grid;
+	grid-template-columns: 1fr 1fr;
+	margin:0 20px;
+}
+button[disabled="disabled"] {
+	background-color: #3498db;
+	color:white;
+}
+.note-block {
+	font-family: sans-serif;
+	font-size:0.8em;
+}
+.begin {
+	place-self:center;
+	font-weight: bold;
+	grid-row:1 / 3;
+	padding-right:3px;
+	white-space: nowrap;
+}
+.note-button {
+	padding:5px;
+	color:#fff;
+	cursor:pointer;
+	user-select: none;
+	border-radius: 6px;
+	opacity:0.5
+}
+.note-grid {
+	display:grid;
+	grid-template-columns: 1fr 3fr;
+	grid-template-rows: 1fr 1fr;
+}
+.note-button.black-text {
+	color:#000;
+}
+.active-tempo {
+	font-weight: bold;
+	opacity:1;
+}
+.note-freq {
+    font-size: 0.8em;
+    line-height: 16px;
 }

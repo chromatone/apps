@@ -183,7 +183,7 @@ Synth.dsh = function() {
       decay: {
         min: 0.005,
         max: 1,
-        default: 0.005,
+        default: 0.08,
         name: "decay",
         param: "DECAY"
       },
@@ -305,7 +305,7 @@ Synth.mono = function(output) {
     },
     synth,
     triggerAttack(freq, time, opts = { gain: 1, duration: "8n" }) {
-      console.log(freq, time);
+      
       this.vol.gain.value = opts.gain;
       this.synth.set("oscillator.type", opts.oscillator.type);
       this.synth.set("portamento", opts.portamento || 0);

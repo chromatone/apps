@@ -67,8 +67,8 @@ polygon {
   font-size: 32px;
 }
 
-.in-scale {
-  stroke-width: 2;
+.root-select circle, .root-select text {
+   transition: all 400ms ease-in-out;
 }
 
 .chord-text {

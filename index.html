@@ -11,452 +11,9 @@
 
   <script src="assets/StartAudioContext.js"></script>
   <script src="assets/Tone.min.js"></script>
-  <script src="assets/vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
   <script src="assets/vue-slider.js"></script>
   <script src="assets/buefy.js"></script>
-  <script src="assets/vue-local-storage.js"></script>
-  
-  
-  <script id="oscilloscope" type="x-template">
-  
-  <div id="oscilloscope">
-    <svg viewBox="0 0 800 800">
-      <polyline id="scope" fill="transparent" stroke="rgba(0,0,0,0.3)" stroke-width="2" :points="points.join(',')"/> 
-    </svg>
-  </div>
-  
-  </script>
-
-
-  <script id="knob" type="x-template">
-    <svg width="50" height="70" viewBox="0 -15 34 65" class="knob" @mousedown.stop.prevent="activate" @touchstart.stop.prevent="activate">
-     <text x="17" y="-4">{{value | round}}</text>
-      <circle class="shadow" cx="17" cy="17" r="16"></circle>
-      <circle class="mainCircle" cx="17" cy="15" r="13"
-      :class="{ active: active}" />
-      <line x1="17" y1="15" x2="17" y2="3" :transform="knobRotation"/>
-      <text x="17" y="45">{{param}}</text>
-    </svg>
-  </script>
-
-  <script id="visual" type="x-template">
-  <div id="plotframe">
-  <svg width="100%" height="400px" overflow="hidden" id="plot">
-    <g />
-  </svg>
-</div>;
-</script>
-
-  <script id="metronome" type="x-template">
-    <div class="rythm-box ">
-      <div class="level metro-options is-mobile">
-        <div class="level-item is-centered">
-          <button class="button is-small is-rounded" :class="{pushed:play}" @click.prevent.stop="toggleTransport()">
-            Rythm
-          </button>
-        </div>
-
-        <div class="level-item">
-
-          <button @click="tempo--" class="button is-small">
-              -
-          </button>
-          <button  @mousedown="tap()" @touchStart.prevent.stop="tap()" class="button is-small">
-              {{tempo}} BPM
-          </button>
-          <button @click="tempo++" class="button is-small">
-              +
-          </button>
-        </div>
-
-        <div class="level-item is-4 ">
-          <button :class="{active:beat, 'is-static':!beat}" class="button bpm is-small">
-              {{beatFrequency.toFixed(2)}} Hz
-          </button>
-          <button class="button is-small is-static">
-              {{toNote}}
-          </button>
-        </div>
-      </div>
-
-      <div>
-
-
-
-
-        <div class="track" v-for="(track,i) in tracks">
-
-          <tracker @delTrack="delTrack(i)" :trk="track"></tracker>
-
-        </div>
-        <b-field>
-          <b-select v-model="newInstr" size="is-small" placeholder="Synth">
-            <option v-for="ins in ['kick','dsh','metal']" :value="ins" :key="ins">
-              {{ ins }}
-            </option>
-          </b-select>
-          <b-select v-model="newDuration" size="is-small" placeholder="Duration">
-            <option v-for="dur in [4,8,16,32]" :value="dur" :key="dur">
-              {{ '8/'+ dur }}
-            </option>
-          </b-select>
-          <button class="button is-small is-rounded" @click="addTrack()">
-             Add track
-           </button>
-        </b-field>
-      </div>
-
-    </div>
-  </script>
-
-  <script id="tracker" type="x-template">
-    <div class="track" :class="{open:open}">
-      <svg @touchstart.stop.prevent="1" version="1.1" x="0px" y="0px" :viewBox="'-60 0 '+(beatCount+2)*60+' 60'">
-                  <g @mouseleave="pressed=false"
-                    @mouseup="pressed=false"
-                    class="sequencer">
-
-                  <rect
-                    class="track-rect"
-                    height="50"
-                    :width="60*beatCount-10"
-                    :y="5.5" x="5" rx="25"
-                  />
-
-                  <g @click="open=!open"
-                      @touchstart.prevent.stop="open=!open"
-                      :style="{'transform': 'translateX('+60*(beatCount+0.9)+'px)'}"
-                    class="track-toggle" :class="{open:open}" >
-                    <circle   class="toggle-track"
-                    r="20" cx="-30" cy="30"/>
-                    <polygon class="arrow" points="-35,25 -25,25 -30,35"/>
-                  </g>
-
-                  <g @click="toggleLoop"
-                      @touchstart.prevent.stop="toggleLoop"
-                    class="track-toggle"  >
-                    <circle :class="{'playing-track':play}"  class="toggle-track"
-                    r="20" cx="-30" cy="30"/>
-                   
-                     <g class="speaker-set" :class="{'playing-track':play}">
-                        <path class="speaker" d="M8.6,22.9v-5.7c0-1.2,1-2.1,2.1-2.1h2.9l4.9-4.7c0.3-0.4,0.9-0.4,1.3-0.1c0.2,0.2,0.3,0.4,0.3,0.7v18.2
-	c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.9L8.6,22.9z"/>
-                        <g class="speaker-waves">
-	                      <path d="M24.1,24c2.2-2.2,2.2-5.8,0-8c-0.3-0.3-0.7-0.3-1,0c-0.1,0.1-0.2,0.3-0.2,0.5v7c0,0.4,0.3,0.7,0.7,0.7
-		C23.8,24.2,24,24.1,24.1,24z"/>
-	                      <path d="M24.9,30.3c5.7-2.7,8.2-9.5,5.5-15.2c-1.1-2.4-3.1-4.4-5.5-5.5c-0.7-0.3-1.6,0.1-1.8,0.9c-0.2,0.7,0,1.4,0.6,1.7
-		c4.3,2,6.1,7.1,4.1,11.4c-0.8,1.8-2.3,3.2-4.1,4.1c-0.7,0.4-0.9,1.3-0.5,2C23.5,30.3,24.2,30.6,24.9,30.3z"/>
-                      </g>
-                    </g>
-                  </g>  
-
-
-
-                      <g class="cell" v-for="(beat,j) in trk.pattern"
-                        @mousedown="act(j)"
-                        @touchstart.prevent.stop="act(j)"
-                        @touchend.prevent.stop="pressed=false"
-                        >
-                        <circle
-                          class="beat"
-                          r="25"
-                          :class="{highlight: currentStep==j, fourth: j%4==0}"
-
-                          :cx="30+60*j" cy="30"
-                        />
-                        <circle
-                        class="dot"
-                        :class="{active: beat.active, highlight: false}"
-
-                          :cx="30+60*j"
-                          :cy="30"
-                          r="20"
-                        />
-
-                    </g>
-                  </g>
-      </svg>
-      <b-collapse class="track-options" :class="{closed:!open}" :open.sync="open">
-
-        <div class="level field wrap is-mobile">
-
-            <label class="track-label">{{trk.instrument.toUpperCase()}}&nbsp;</label>
-              <button @click="delTrack()" class="button  is-small" class="del-track">
-              X
-          </button>
-
-          <div class="level-item"> <button @click="delBeat()" class="button is-small">
-                -
-            </button>
-            <button class="button is-small is-static" :class="{'is-primary':play}">
-            {{trk.pattern.length+'/'+ trk.duration.split('n')[0]}}
-          </button>
-            <button @click="addBeat()" class="button  is-small">
-              +
-          </button>
-         
-
-          </div>
-          <div class="level-item  has-text-centered">
-            <knob min="0" max="0.9" param="VOL" v-model="trk.gain"></knob>
-          </div>
-          <div v-if="trk.options" class="level-item level adsr">
-            <div class="level-item has-text-centered">OPT</div>
-            <div v-for="option in synth.options" class="level-item has-text-centered">
-              <knob :min="option.min" :max="option.max" :param="option.param" v-model="trk.options[option.name]"></knob>
-            </div>
-          </div>
-          <div v-if="trk.envelope" class="level-item level adsr">
-            <div class="level-item has-text-centered">ENV</div>
-            <div v-for="param in synth.envelope" class="level-item has-text-centered">
-              <knob :min="param.min" :max="param.max" :param="param.param" v-model="trk.envelope[param.name]"></knob>
-            </div>
-          </div>
-        </div>
-
-    </div>
-    </b-collapse>
-
-    </div>
-
-  </script>
-
-  <script id="keys" type="x-template">
-    <svg version="1.1" id="Keys" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="30 0 1090 280" style="enable-background:new 0 0 1090 280;" xml:space="preserve">
-       <rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
-      <g class="note"
-        v-for="(note, pitch) in notes"
-        :data-octave="octave"
-        :data-pitch="pitch"
-        :class="note.name + octave"
-        @touchstart.stop.prevent="down(note, octave,$event)"
-        @touchend.stop.prevent="up(note, octave,$event)"
-        @touchcancel.stop.prevent="up(note, octave,$event)"
-        @mousedown.stop.prevent="down(note, octave,$event)"
-        @mouseup.stop.prevent="up(note, octave,$event)"
-        @mouseout.stop.prevent="up(note, octave,$event)"
-        >
-      <circle :cx="120+note.posX*70" :cy="200-note.posY*120" :r="r "/>
-      <text
-      text-anchor="middle"
-      :x="120+note.posX*70"
-      :y="225-note.posY*120" class="letters">{{note.name}}</text>
-    </g>
-
-    </svg>
-  </script>
-
-  <script id="field" type="x-template">
-    <svg @touchstart.stop.prevent="1" version="1.1" id="Chromatone" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 100 1072 1155" style="enable-background:new 0 100 1072 1155;" xml:space="preserve">
-     <defs>
-         <clipPath id="clip-frame">
-         <rect width="1028" :height="1008" x="21.5" y="220" rx="42px"/>
-         </clipPath>
-     </defs>
-
-      <rect id="body" rx="50" class="chr0" x="0" y="108" width="1072" height="1150"/>
-
-      <g id="cols" class="chr1" style="clip-path: url(#clip-frame);">
-        <rect v-for="oct in 9" x="21.5"
-        :y="1118-(oct-1)*112"
-        :class="{['octave'+(oct-1)]:true}" width="1028" height="112"/>
-      </g>
-
-      <g id="plank">
-      	<rect
-        class="scroller"
-        width="84"
-        height="1090"
-        :x="33+84*root" y="132" rx="42"/>
-      	<circle class="scroller" :cx="75+84*root" cy="177" r="34"/>
-      </g>
-
-      <g id="108notes">
-        <g v-for="(octave,octInd) in notes108">
-          <circle
-          v-for="note in octave"
-          :cx="75 + 84*note.pitch"
-          :cy="1175-112*octInd"
-          r="38"
-          :data-pitch="note.pitch"
-          :data-octave="octInd"
-          :data-active="note.active"/>
-        </g>
-      </g>
-
-      <g  id="chroma-frame" class="frame"
-      @mousedown.stop.prevent= "clickStart($event)"
-      @mousemove.stop.prevent= "clickChange($event)"
-      @mouseenter.stop.prevent="clickChange($event)"
-      @mouseup.stop.prevent= "clickStop()"
-      @mouseout.stop.prevent= "clickStop()"
-      @touchstart.stop.prevent="touchStart($event)"
-      @touchend.stop.prevent="touchEnd($event)"
-      @touchmove.stop.prevent="touchMove($event)"
-      @touchcancel.stop.prevent="touchEnd($event)"
-       >
-      	<path style="transform:translateY(90px)" class="frame-out" d="M63.5,1150.7c-26.3,0-47.7-21.4-47.7-47.7V179c0-26.3,21.4-47.7,47.7-47.7h944c26.3,0,47.7,21.4,47.7,47.7v924c0,26.3-21.4,47.7-47.7,47.7H63.5z"/>
-      	<path style="transform:translateY(90px)" class="frame-in" d="M1007.5,137c23.1,0,42,18.9,42,42v924c0,23.1-18.9,42-42,42h-944c-23.1,0-42-18.9-42-42V179c0-23.1,18.9-42,42-42H1007.5 M1007.5,125.7h-944c-29.4,0-53.3,23.9-53.3,53.3v924c0,29.4,23.9,53.3,53.3,53.3h944c29.4,0,53.3-23.9,53.3-53.3V179C1060.9,149.6,1036.9,125.7,1007.5,125.7L1007.5,125.7z"/>
-      </g>
-
-      <g>
-        <g v-for="(note,ind) in notes">
-        <text
-        text-anchor="middle"
-        :x="75+ind*84"
-        y="192"
-        class="field-notes"
-        :data-pitch="ind"
-        >
-        {{note.name}}</text>
-        <circle @touchstart.stop.prevent="root=ind" @mousedown.stop.prevent="root=ind" :cx="75+ind*84" cy="177" r="30" class="scroller-button"/>
-        </g>
-      </g>
-    </svg>
-  </script>
-
-  <script id="key-stack" type="x-template">
-    <div>
-      <div class="octave-slider">
-        <vue-slider v-model="octaves" :dot-size="24" :max="8" :height="12" direction="horizontal" :piecewise="true" :piecewise-label="true" :tooltip="false"></vue-slider>
-      </div>
-      <div class="keys-container">
-        <div v-for="(octave, ind) in octavesNum">
-          <svg @touchstart.stop.prevent="1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="30 0 1090 280" style="enable-background:new 0 0 1090 280;" xml:space="preserve">
-           <rect x="30" rx="42" y="0" width="1090" height="280" style="opacity:0.75" :class="'octave'+octave"/>
-            <g class="note"
-              v-for="(note, pitch) in notes"
-              :data-octave="octave"
-              :data-pitch="pitch"
-              :class="note.name + octave"
-              @touchstart.stop.prevent="down(note, octave,$event)"
-              @touchend.stop.prevent="up(note, octave,$event)"
-              @touchcancel.stop.prevent="up(note, octave,$event)"
-              @mousedown.stop.prevent="down(note, octave,$event)"
-              @mouseup.stop.prevent="up(note, octave,$event)"
-              @mouseout.stop.prevent="up(note, octave,$event)">
-                <circle :cx="120+note.posX*70" :cy="200-note.posY*120" :r="r "/>
-                <text
-                text-anchor="middle"
-                :x="120+note.posX*70"
-                :y="225-note.posY*120" class="letters">{{note.name}}</text>
-            </g>
-        </svg>
-        </div>
-      </div>
-    </div>
-  </script>
-
-  <script id="synth" type="x-template">
-    <div class="">
-      <div class="level adsr-sliders">
-
-        <div class="level-item">
-          <knob min="0" max="2" param="VOL" v-model="options.gain" />
-        </div>
-
-        <div v-for="option in synth.options" class="level-item">
-          <knob :min="option.min" :max="option.max" :param="option.param" v-model="options[option.name]"  />
-        </div>
-
-        <div class="level-item level  adsr  adsr-sliders">
-          <div class="level-item has-text-centered">ENV</div>
-            <div v-for="(env,i) in synth.envelope" class="level-item">
-              <knob :min="env.min" :max="env.max" :param="env.param" v-model="options.envelope[i]" />
-            </div>
-          </div>
-
-        <div class="level-item level">
-
-          <div class="level-item oscs">
-              OSC:
-          </div>
-
-          <div class="level-item">
-            <b-field >
-              <b-radio-button v-for="type in synth.oscTypes" v-model="options.oscillator.type" :native-value="type" size="is-small">
-                {{type | tri}}
-              </b-radio-button>
-            </b-field>
-          </div>
-
-      </div>
-
-      </div>
-    </div>
-  </script>
-
-  <script id="chordion" type="x-template">
-    <div class="chordion">
-      <svg viewBox="-5 -5 265 100" @touchstart.stop.prevent="1">
-
-        <g  v-for="(note,index) in activeNotes">
-          <g class="chord" :class="{'active-chord':activeNotes[(index+4)%12].active && activeNotes[(index+7)%12].active && note.active}" :transform="chordTranslate(index, 40, 20,50,10)">
-          <polygon
-            :data-active="activeNotes[(index+4)%12].active"
-            :style="{fill:notes[(index+4)%12].color}"
-            points="9.25 16.02 0 32.03 18.49 32.03 9.25 16.02"/>
-          <polygon
-            :data-active="activeNotes[(index+7)%12].active"
-            :style="{fill:notes[(index+7)%12].color}"
-            points="27.74 16.02 18.49 32.03 36.98 32.03 27.74 16.02"/>
-          <polygon
-            :class="{'root-chord':note.pitch==root}"
-            :data-active="note.active"
-            :style="{fill:notes[index].color, stroke:notes[index].color, strokeWidth:0}"
-            points="27.74 16.02 18.49 0 9.25 16.02 18.49 32.03 27.74 16.02 27.74 16.02"/>
-          <text  x="18" y="20" text-anchor="middle" fill="white" style="font-size:8px;font-weight:bold">{{note.name}}</text>
-          <polygon
-            style="fill:transparent"
-            points="27.74 16.02 18.49 0 9.25 16.02 18.49 32.03 27.74 16.02 27.74 16.02"/>
-            <polygon
-            @mousedown.stop.prevent="slideChord(index,chords['maj'], $event)"
-            @mousemove.stop.prevent="slideChord(index,chords['maj'], $event)"
-            @mouseup.stop.prevent="stopChord(index,chords['maj'], $event)"
-            @mouseleave.stop.prevent="stopChord(index,chords['maj'], $event)"
-            @touchstart.stop.prevent="slideChord(index,chords['maj'], $event)"
-            @touchmove.stop.prevent="slideChord(index,chords['maj'], $event)"
-            @touchend.stop.prevent="stopChord(index,chords['maj'], $event)"
-            :style="{stroke:notes[index].color}"
-
-            class="chord-frame" points="18.49 0 0 32.03 36.98 32.03 18.49 0"/>
-          </g>
-
-          <g class="triad">
-            <g class="chord" :class="{'active-chord':activeNotes[(index+3)%12].active && activeNotes[(index+7)%12].active && note.active}" :transform="chordTranslate(index, 40, 0,50,0)">
-            <polygon
-              :data-active="activeNotes[(index+7)%12].active"
-              :style="{fill:notes[(index+7)%12].color}"
-              points="27.74 16.02 36.98 0 18.49 0 27.74 16.02"/>
-            <polygon
-              :data-active="activeNotes[(index+3)%12].active"
-              :style="{fill:notes[(index+4)%12].color}"
-              points="9.25 16.02 18.49 0 0 0 9.25 16.02"/>
-            <polygon
-              :class="{'root-chord':note.pitch==root}"
-              :data-active="note.active"
-              :style="{fill:notes[index].color, stroke:notes[index].color, strokeWidth:0}"
-              points="9.25 16.02 18.49 32.03 27.74 16.02 18.49 0 9.25 16.02 9.25 16.02"/>
-            <text  x="18" y="18" text-anchor="middle" fill="white" style="font-size:6px;font-weight:bold">{{note.name}}m</text>
-            <polygon
-              @mousedown.stop.prevent="slideChord(index,chords['min'], $event)"
-              @mousemove.stop.prevent="slideChord(index,chords['min'], $event)"
-              @mouseup.stop.prevent="stopChord(index,chords['min'], $event)"
-              @mouseleave.stop.prevent="stopChord(index,chords['min'], $event)"
-              @touchstart.stop.prevent="slideChord(index,chords['min'], $event)"
-              @touchmove.stop.prevent="slideChord(index,chords['min'], $event)"
-              @touchend.stop.prevent="stopChord(index,chords['min'], $event)"
-              :style="{stroke:notes[index].color}"
-            class="chord-frame" points="18.49 32.03 36.98 0 0 0 18.49 32.03"/>
-
-            </g>
-
-          </g>
-        </g>
-        </svg>
-    </div>
-  </script>
-
 </head>
 
 
@@ -486,13 +43,13 @@
         </div>
       </div>
     </div>
-  
-    
-      <oscilloscope v-if="open.oscilloscope"></oscilloscope>
-   
 
-    <div v-show="open.rythm" class="row rythm">
-      <metronome></metronome>
+
+      <oscilloscope v-if="open.oscilloscope"></oscilloscope>
+
+
+    <div v-show="open.beat" class="row">
+      <beat></beat>
     </div>
 
     <div v-if="open.scales" class="row">
@@ -511,20 +68,20 @@
             </b-field>
         </div>
         <div class="level-item">
+
           <svg @touchstart.stop.prevent="1" width="100%" viewbox="0 0 390 40">
-            <g v-for="(note, i) in notes"
-                @touchstart.stop.prevent="root=i"
-                @mousedown.stop.prevent="root=i"
+            <g v-for="(note, i) in activeNotes"
+               :key="note"
+                @touchstart.stop.prevent="root=note.pitch"
+                @mousedown.stop.prevent="root=note.pitch"
                 class="root-select">
               <circle
                     r="14"
                     :cx="20+i*32"
                     :cy="20"
-                    :data-pitch="i"
-                    :data-active="activeSteps[i]"
-                    :data-root="root"
-                    class="in-scale"
-                    :class="{'is-root':i==root}"
+                    :data-pitch="note.pitch"
+                    :data-active="note.active"
+                    :class="{'is-root':note.pitch==root}"
                     :style="{stroke:notes[root].color}"></circle>
               <text
                   :x="20+i*32"
@@ -544,32 +101,45 @@
       <synth></synth>
     </div>
 
-  <!--   <div  class="row">
-     <visual/>
+
+  <div v-if="open.grid" class="row">
+      <tone-grid :root="root" :steps="scale.steps"></tone-grid>
     </div>
--->
+
 
     <div v-if="open.field" class="row field">
       <field :root="root" :steps="scale.steps"></field>
     </div>
 
 
-        <div v-show="open.chords" class="row">
-          <chordion :root="root" :scale="scale"></chordion>
-        </div>
+    <div v-if="open.array" class="row">
+          <tonal-array :root="root" :steps="scale.steps"></tonal-array>
+ </div>
 
 
     <div v-if="open.keys" class="row">
       <key-stack :root="root" :steps="scale.steps" @play="play" @stop="stop"></key-stack>
     </div>
-  
+
+  <div v-if="open.table" class="row">
+     <pitch-table></pitch-table>
+  </div>
+
 
 
 
   </div>
   <script src="js/Scales.js"></script>
   <script src="js/Synth.js"></script>
-  <script src="js/components.js"></script>
+  <script src="js/components/tone-grid.js"></script>
+  <script src="js/components/knob.js"></script>
+  <script src="js/components/beat-tracker.js"></script>
+  <script src="js/components/field.js"></script>
+  <script src="js/components/key-stack.js"></script>
+  <script src="js/components/synth.js"></script>
+  <script src="js/components/osc.js"></script>
+  <script src="js/components/tonal-array.js"></script>
+  <script src="js/components/pitch-table.js"></script>
   <script src="js/app.js"></script>
 
 </body>

@@ -1,102 +1,114 @@
 var Chroma = {};
 
+Chroma.octaves = [
+  '#be0e09',
+  '#fa4500',
+  '#f9a417',
+  '#e0ea1b',
+  '#43a648',
+  '#2f95c2',
+  '#3a469b',
+  '#712188',
+  '#b6037e'
+];
+
 Chroma.Notes = [
   {
     name: "A",
     pitch: 0,
     posY: 0,
     posX: 0,
-    color: "#FE130C"
+    color: "#EE342E"
   },
   {
     name: "A#",
     pitch: 1,
     posY: 1,
     posX: 1,
-    color: "#FF8000"
+    color: "#F7941D"
   },
   {
     name: "B",
     pitch: 2,
     posY: 0,
     posX: 2,
-    color: "#fadc00"
+    color: "#FFF200"
   },
   {
     name: "C",
     pitch: 3,
     posY: 0,
     posX: 4,
-    color: "#7AC11D"
+    color: "#87C540"
   },
   {
     name: "C#",
     pitch: 4,
     posY: 1,
     posX: 5,
-    color: "#5BB224"
+    color: "#00A651"
   },
   {
     name: "D",
     pitch: 5,
     posY: 0,
     posX: 6,
-    color: "#41AF7F"
+    color: "#00A99D"
   },
   {
     name: "D#",
     pitch: 6,
     posY: 1,
     posX: 7,
-    color: "#6EC7C1"
+    color: "#00AEEF"
   },
   {
     name: "E",
     pitch: 7,
     posY: 0,
     posX: 8,
-    color: "#3A59A6"
+    color: "#0072BC"
   },
   {
     name: "F",
     pitch: 8,
     posY: 0,
     posX: 10,
-    color: "#202C90"
+    color: "#2E3192"
   },
   {
     name: "F#",
     pitch: 9,
     posY: 1,
     posX: 11,
-    color: "#4F268E"
+    color: "#92278F"
   },
   {
     name: "G",
     pitch: 10,
     posY: 0,
     posX: 12,
-    color: "#963396"
+    color: "#EC008C"
   },
   {
     name: "G#",
     pitch: 11,
     posY: 1,
     posX: 13,
-    color: "#F2187E"
+    color: "#E11156"
   }
 ];
 
 Chroma.Chords = {
-  maj: {
-    handle: "maj",
-    name: "Major",
-    steps: [0, 4, 7]
-  },
   min: {
     handle: "min",
     name: "Minor",
     steps: [0, 3, 7]
+  },
+  maj: {
+    handle: "maj",
+    name: "Major",
+    steps: [0, 4, 7]
   },
   aug: {
     handle: "aug",
@@ -171,17 +183,23 @@ Chroma.Chords = {
 };
 
 Chroma.Scales = {
-  major: {
-    handle: "major",
-    name: "Major (Ionian)",
-    chords: ["maj", "", "min", "", "min", "maj", "", "7", "", "min", "", "dim"],
-    steps: [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1]
-  },
   minor: {
     handle: "minor",
     name: "Minor (Aeolian)",
     chords: ["min", "", "dim", "maj", "", "min", "", "min", "maj", "", "7", ""],
     steps: [1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0]
+  },
+   major: {
+    handle: "major",
+    name: "Major (Ionian)",
+    chords: ["maj", "", "min", "", "min", "maj", "", "7", "", "min", "", "dim"],
+    steps: [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1]
+  },
+  chromatic: {
+    handle: "chromatic",
+    name: "Chromatic",
+    chords: ["1/1","25/24","9/8","6/5","5/4","4/3","45/32","3/2","8/5","5/3", "9/5","15/8" ],
+    steps: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
   },
   dorian: {
     handle: "dorian",
@@ -386,25 +404,6 @@ Chroma.Scales = {
     name: "Whole tone",
     chords: ["", "", "", "", "", "", "", "", "", "", "", ""],
     steps: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
-  },
-  chromatic: {
-    handle: "chromatic",
-    name: "Chromatic",
-    chords: [
-      "1/1",
-      "25/24",
-      "9/8",
-      "6/5",
-      "5/4",
-      "4/3",
-      "45/32",
-      "3/2",
-      "8/5",
-      "5/3",
-      "9/5",
-      "15/8"
-    ],
-    steps: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
   }
 };
 /*
