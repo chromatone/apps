@@ -183,7 +183,7 @@ Vue.component('note-cell', {
 	},
   created() {
     this.filter= Tone.context.createBiquadFilter();
-    this.filter.connect(Tone.volume);
+    this.filter.connect(Synth.volume);
 
   }
 })

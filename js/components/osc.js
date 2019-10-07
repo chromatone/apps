@@ -14,14 +14,14 @@ Vue.component("oscilloscope", {
     return {
       sliceWidth:0,
       bufferLength:0,
-      dataArray: new Uint8Array(Tone.analyser.fftSize),
+      dataArray: new Uint8Array(Synth.analyser.fftSize),
       points:[]
     }
   },
  created() {
-    this.bufferLength = Tone.analyser.fftSize;
-    this.dataArray= new Uint8Array(Tone.analyser.fftSize);
-    Tone.analyser.getByteTimeDomainData(this.dataArray);
+    this.bufferLength = Synth.analyser.fftSize;
+    this.dataArray= new Uint8Array(Synth.analyser.fftSize);
+    Synth.analyser.getByteTimeDomainData(this.dataArray);
     this.sliceWidth = window.innerWidth / this.bufferLength * 2.0;
     this.draw();
 
@@ -33,7 +33,7 @@ Vue.component("oscilloscope", {
   },
   methods: {
     draw() {
-      Tone.analyser.getByteTimeDomainData(this.dataArray);
+      Synth.analyser.getByteTimeDomainData(this.dataArray);
       let x=0;
       this.points=[];
       let firstZero;

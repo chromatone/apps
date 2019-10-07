@@ -1,3 +1,142 @@
+// BEAT
+
+Vue.component("beat", {
+  template: `<div class="rythm-box">
+		<div class="metro-options">
+
+			<div class="">
+				<button class="button " :class="{pushed:play}" @click.prevent.stop="toggleTransport()">
+      &#9654;
+				</button>
+			</div>
+
+			<div class="">
+
+				<button @click="tempo--" class="button">
+						-
+				</button>
+
+				<button  @mousedown="tap()" @touchStart.prevent.stop="tap()" class="button ">
+						{{tempo}} BPM
+				</button>
+
+				<button @click="tempo++" class="button ">
+						+
+				</button>
+
+			</div>
+
+			<div>
+
+				<button :class="{active:beat}" class="button bpm  is-static">
+						{{beatFrequency.toFixed(2)}} Hz
+				</button>
+
+				<button class="button is-static">
+						{{toNote}}
+				</button>
+			</div>
+		</div>
+
+		<tracker v-for="(track,i) in tracks" :key="i" @delTrack="delTrack(i)" :trk="track"></tracker>
+
+    <div class="tracker-options">
+      <b-field label="TYPE">
+        <b-radio-button v-for="(ins,key) in ['kick','dsh','metal']" v-model="newInstr" :key="key"
+            :native-value="ins">
+            <span>{{ins}}</span>
+        </b-radio-button>
+      </b-field>
+
+      <b-field label="VALUE">
+        <b-radio-button v-for="(dur,key) in [4,8,16,32]" :key="key" v-model="newDuration"
+            :native-value="dur">
+            <span>{{ '1/'+ dur }}</span>
+        </b-radio-button>
+      </b-field>
+
+
+        <button class="button" @click="addTrack()">
+
+&#43; track
+       </button>
+
+
+    </div>
+	</div>`,
+  data: function() {
+    return {
+      play: false,
+      pattern: [],
+      beatCount: 16,
+      tracks: [],
+      loop: {},
+      currentStep: 0,
+      taps: [],
+      beat: false,
+      newDuration: 16,
+      newInstr: "kick",
+      playing: false,
+      pressed: false,
+      tempo: 90,
+      tracks: []
+    };
+  },
+  computed: {
+    trackCount() {
+      return this.tracks.length;
+    },
+    beatFrequency: function() {
+      Tone.Transport.bpm.value = this.tempo;
+      return this.tempo / 60;
+    },
+    toNote: function() {
+      return Tone.Frequency(this.beatFrequency, "hz").toNote();
+    }
+  },
+  methods: {
+    tap: function() {
+      let tapCount = 3;
+      let tempo;
+      let sum = 0;
+      let tap = new Date().getTime();
+      if (this.taps.length < tapCount) {
+        this.taps.push(tap);
+      } else {
+        this.taps.shift();
+        this.taps.push(tap);
+        for (let i = 0; i < tapCount - 1; i++) {
+          sum += this.taps[i + 1] - this.taps[i];
+        }
+
+        let tempo = Math.round(60000 / (0.5 * sum));
+
+        this.tempo = tempo > 30 ? tempo : 30;
+      }
+    },
+    addTrack() {
+      this.instrument = new Synth[this.newInstr]();
+      this.tracks.push(this.instrument.getDefault(this.newDuration));
+    },
+    delTrack: function(i) {
+      this.tracks.splice(i, 1);
+    },
+    toggleTransport: function() {
+      this.play = !this.play;
+      Tone.Transport.toggle();
+    }
+  },
+  created() {
+    this.beating = new Tone.Loop(time => {
+      this.beat = !this.beat;
+    }, "8n");
+    this.beating.start();
+  },
+  mounted: function() {
+  this.addTrack()}
+});
+
+
 
 // TRACKER
 
@@ -45,18 +184,18 @@ c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.
 					{{trk.instrument.toUpperCase()}}&nbsp;
 				</label>
 
-				<button @click="delTrack()" class="button  is-small del-track">
+				<button @click="delTrack()" class="button  del-track">
 					X
 				</button>
 
 				<div class="level-item">
-					<button @click="delBeat()" class="button is-small">
+					<button @click="delBeat()" class="button">
 							-
 					</button>
-					<button class="button is-small is-static" :class="{'is-primary':play}">
+					<button class="button is-static" :class="{'is-primary':play}">
 						{{trk.pattern.length+'/'+ trk.duration.split('n')[0]}}
 					</button>
-					<button @click="addBeat()" class="button  is-small">
+					<button @click="addBeat()" class="button ">
 						+
 					</button>
 				</div>
@@ -164,7 +303,7 @@ c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.
     }
   },
   created: function() {
-    this.gain = new Tone.Gain(0).connect(Tone.volume);
+    this.gain = new Tone.Gain(0).connect(Synth.volume);
 
     this.synth = new Synth[this.trk.instrument]();
     this.synth.connect(this.gain);
@@ -188,147 +327,4 @@ c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.
     this.loop.start(0);
     this.toggleLoop();
   }
-});
-
-// BEAT
-
-Vue.component("beat", {
-  template: `<div class="rythm-box ">
-		<div class="metro-options">
-
-			<div class="">
-				<button class="button is-small is-rounded" :class="{pushed:play}" @click.prevent.stop="toggleTransport()">
-					Beat
-				</button>
-			</div>
-
-			<div class="">
-
-				<button @click="tempo--" class="button is-small is-rounded">
-						-
-				</button>
-
-				<button  @mousedown="tap()" @touchStart.prevent.stop="tap()" class="button is-small  is-rounded">
-						{{tempo}} BPM
-				</button>
-
-				<button @click="tempo++" class="button is-small  is-rounded">
-						+
-				</button>
-
-			</div>
-
-			<div class="">
-
-				<button :class="{active:beat}" class="button bpm is-small is-static">
-						{{beatFrequency.toFixed(2)}} Hz
-				</button>
-
-				<button class="button is-small is-static">
-						{{toNote}}
-				</button>
-
-			</div>
-
-			<div class="metro-options">
-
-
-
-					<b-select v-model="newInstr" size="is-small" placeholder="Synth">
-						<option v-for="ins in ['kick','dsh','metal']" :value="ins" :key="ins">
-							{{ ins }}
-						</option>
-					</b-select>
-					<b-select v-model="newDuration" size="is-small" placeholder="Duration">
-						<option v-for="dur in [4,8,16,32]" :value="dur" :key="dur">
-							{{ '8/'+ dur }}
-						</option>
-					</b-select>
-					<button class="button is-small is-rounded" @click="addTrack()">
-					 Add track
-				 </button>
-
-
-			</div>
-
-		</div>
-
-		<div>
-
-				<tracker v-for="(track,i) in tracks" :key="track" @delTrack="delTrack(i)" :trk="track"></tracker>
-
-
-		</div>
-
-	</div>`,
-  data: function() {
-    return {
-      play: false,
-      pattern: [],
-      beatCount: 16,
-      tracks: [],
-      loop: {},
-      currentStep: 0,
-      taps: [],
-      beat: false,
-      newDuration: "16",
-      newInstr: "kick",
-      playing: false,
-      pressed: false,
-      tempo: 90,
-      tracks: []
-    };
-  },
-  computed: {
-    trackCount() {
-      return this.tracks.length;
-    },
-    beatFrequency: function() {
-      Tone.Transport.bpm.value = this.tempo;
-      return this.tempo / 60;
-    },
-    toNote: function() {
-      return Tone.Frequency(this.beatFrequency, "hz").toNote();
-    }
-  },
-  methods: {
-    tap: function() {
-      let tapCount = 3;
-      let tempo;
-      let sum = 0;
-      let tap = new Date().getTime();
-      if (this.taps.length < tapCount) {
-        this.taps.push(tap);
-      } else {
-        this.taps.shift();
-        this.taps.push(tap);
-        for (let i = 0; i < tapCount - 1; i++) {
-          sum += this.taps[i + 1] - this.taps[i];
-        }
-
-        let tempo = Math.round(60000 / (0.5 * sum));
-
-        this.tempo = tempo > 30 ? tempo : 30;
-      }
-    },
-    addTrack() {
-      this.instrument = new Synth[this.newInstr]();
-      this.tracks.unshift(this.instrument.getDefault(this.newDuration));
-    },
-    delTrack: function(i) {
-      this.tracks.splice(i, 1);
-    },
-    toggleTransport: function() {
-      this.play = !this.play;
-      Tone.Transport.toggle();
-    }
-  },
-  created() {
-    this.beating = new Tone.Loop(time => {
-      this.beat = !this.beat;
-    }, "8n");
-    this.beating.start();
-  },
-  mounted: function() {
-  this.addTrack()}
 });

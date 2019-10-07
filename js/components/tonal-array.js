@@ -25,14 +25,14 @@ Vue.component('circle-note', {
 		playNote() {
 			if(!Tone.contextStarted) {Tone.context.resume()}
 			this.playing=true;
-      Tone.chromaSynth.set(Tone.chromaOptions);
+      Synth.chromaSynth.set(Synth.chromaOptions);
       let octave = this.root > this.note.pitch ? 4:3;
-			Tone.chromaSynth.triggerAttack(Tone.calcFrequency(this.note.pitch,octave))
+			Synth.chromaSynth.triggerAttack(Synth.calcFrequency(this.note.pitch,octave))
 		},
 		stopNote() {
 			this.playing=false;
       let octave = this.root > this.note.pitch ? 4:3;
-			Tone.chromaSynth.triggerRelease(Tone.calcFrequency(this.note.pitch,octave))
+			Synth.chromaSynth.triggerRelease(Synth.calcFrequency(this.note.pitch,octave))
 		}
 	}
 })
@@ -55,11 +55,11 @@ Vue.component('chord-trigger', {
 	methods: {
 		playChord() {
 			if(!Tone.contextStarted) {Tone.context.resume()};
-      Tone.chromaSynth.set(Tone.chromaOptions);
-			Tone.chromaSynth.triggerAttack(Tone.calcChord(this.theChord))
+      Synth.chromaSynth.set(Synth.chromaOptions);
+			Synth.chromaSynth.triggerAttack(Tone.calcChord(this.theChord))
 		},
 		stopChord() {
-			Tone.chromaSynth.triggerRelease(Tone.calcChord(this.theChord))
+			Synth.chromaSynth.triggerRelease(Tone.calcChord(this.theChord))
 		}
 	},
 	computed: {
@@ -139,7 +139,7 @@ Vue.component('tonal-array',{
 	},
 	methods: {
 		rotate(A,n) {
-      return Tone.arrayRotate(A,n)
+      return Synth.arrayRotate(A,n)
     },
     hasMajor(pitch) {
      return !this.activeSteps[pitch] || !this.activeSteps[(pitch+4)%12] || !this.activeSteps[(pitch+7)%12]
@@ -152,17 +152,17 @@ Vue.component('tonal-array',{
 
 	},
 	created: function(){
-		Tone.volume = Tone.volume ? Tone.volume : new Tone.Volume(-10).toMaster();
+		Synth.volume = Synth.volume ? Synth.volume : new Synth.volume(-10).toMaster();
 		Tone.calcChord = function (chord) {
-			return chord.map(x => Tone.calcFrequency(x))
+			return chord.map(x => Synth.calcFrequency(x))
 		}
-		Tone.synth = new Tone.PolySynth(8, Tone.Synth).connect(Tone.volume);
+		Tone.synth = new Tone.PolySynth(8, Tone.Synth).connect(Synth.volume);
 
-		Tone.synth.set(Tone.chromaOptions)
+		Tone.synth.set(Synth.chromaOptions)
 	},
 	computed: {
     activeSteps: function() {
-      let activeSteps = Tone.arrayRotate(this.steps, -this.root);
+      let activeSteps = Synth.arrayRotate(this.steps, -this.root);
       return activeSteps;
     },
 		dy() {

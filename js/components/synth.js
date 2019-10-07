@@ -40,8 +40,8 @@ Vue.component("synth", {
   data() {
     return {
       volume: 1,
-      options: Tone.chromaOptions,
-      synth: new Tone.mainSynth(Tone.synthVolume)
+      options: Synth.chromaOptions,
+      synth: new Synth.mainSynth(Synth.synthVolume)
     };
   },
   filters: {
@@ -52,7 +52,7 @@ Vue.component("synth", {
   computed: {},
   watch: {
     volume(val) {
-       Tone.synthVolume.volume.value=this.volume;
+       Synth.synthVolume.volume.value=this.volume;
     }
   }
 });

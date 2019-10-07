@@ -40,19 +40,19 @@ Vue.component("tone-grid", {
   </div>`,
   data: function() {
     return {
-      octaveRange:[0,8],
-      showInactive:true,
+      octaveRange: [0, 8],
+      showInactive: true,
       x: 0,
       y: 0,
       notes: Chroma.Notes,
-      octaveColors:Chroma.octaves,
+      octaveColors: Chroma.octaves,
       ongoingTouches: [],
       pressed: false
     };
   },
   components: {
-		vueSlider: window["vue-slider-component"]
-	},
+    vueSlider: window["vue-slider-component"]
+  },
   props: {
     steps: {
       type: Array
@@ -63,187 +63,205 @@ Vue.component("tone-grid", {
   },
   computed: {
     reversedNotes() {
-			let notes=[...this.notes]
-			return notes.reverse();
-		},
-		octaves() {
-			let octaves=[];
-			for(i=this.octaveRange[0];i<=this.octaveRange[1];i++) {
-				octaves.push(i)
-			}
-			return octaves
-		},
+      let notes = [...this.notes];
+      return notes.reverse();
+    },
+    octaves() {
+      let octaves = [];
+      for (i = this.octaveRange[0]; i <= this.octaveRange[1]; i++) {
+        octaves.push(i);
+      }
+      return octaves;
+    },
     activeSteps() {
-      let activeSteps = Tone.arrayRotate(this.steps, -this.root);
+      let activeSteps = Synth.arrayRotate(this.steps, -this.root);
       return activeSteps;
     },
     activeNotes() {
-      let steps=[];
-      for (step=0;step<this.activeSteps.length;step++) {
-        if(this.activeSteps[step]) {steps.push(step)}
+      let steps = [];
+      for (step = 0; step < this.activeSteps.length; step++) {
+        if (this.activeSteps[step]) {
+          steps.push(step);
+        }
       }
-      return steps
+      return steps;
     }
   },
   methods: {
-      copyTouch(touch, rect) {
-
-        let clientX = touch.clientX;
-        let clientY = touch.clientY;
-        let pitch,
-            pitchH,
-            pitchY,
-            octave,
-            octMix,
-            octTwo,
-            active = 0;
-
-        //    PITCH
-
-        if (this.showInactive) {
-          pitchH = (rect.height/12);
-          pitch = Math.floor(Math.abs((rect.bottom - clientY)/pitchH));
-        } else {
-          pitchH = rect.height / this.activeNotes.length;
-          pitchY = Math.floor(Math.abs( (rect.bottom - clientY)/pitchH ) );
-          pitch = this.activeNotes[pitchY]
+    ongoingTouchIndexById(ongoingTouches, idToFind) {
+      for (var i = 0; i < ongoingTouches.length; i++) {
+        var id = ongoingTouches[i].identifier;
+        if (id == idToFind) {
+          return i;
         }
-        if (pitch > 11) {
-          pitch = 11;
-        } else if (pitch < 0) {
-          pitch = 0;
-        }
+      }
+      return -1; // not found
+    },
+    checkActive(pitch, root, steps) {
+      let act = pitch - root;
+      if (act < 0) {
+        act = act + 12;
+      }
+      return steps[act];
+    },
+    copyTouch(touch, rect) {
+      let clientX = touch.clientX;
+      let clientY = touch.clientY;
+      let pitch,
+        pitchH,
+        pitchY,
+        octave,
+        octMix,
+        octTwo,
+        active = 0;
 
-        // OCTAVE
+      //    PITCH
 
-        let octW = rect.width/this.octaves.length;
-        let octX = clientX - rect.left;
-        octave = Math.floor(octX/octW);
-        if (octave > 8) {
-          octave = 8;
-        } else if (octave < 0) {
-          octave = 0;
-        }
-        octave = this.octaves[octave];
+      if (this.showInactive) {
+        pitchH = rect.height / 12;
+        pitch = Math.floor(Math.abs((rect.bottom - clientY) / pitchH));
+      } else {
+        pitchH = rect.height / this.activeNotes.length;
+        pitchY = Math.floor(Math.abs((rect.bottom - clientY) / pitchH));
+        pitch = this.activeNotes[pitchY];
+      }
+      if (pitch > 11) {
+        pitch = 11;
+      } else if (pitch < 0) {
+        pitch = 0;
+      }
 
-        //OCTAVE MIX
+      // OCTAVE
 
+      let octW = rect.width / this.octaves.length;
+      let octX = clientX - rect.left;
+      octave = Math.floor(octX / octW);
+      if (octave > 8) {
+        octave = 8;
+      } else if (octave < 0) {
+        octave = 0;
+      }
+      octave = this.octaves[octave];
 
-        let octaveCenter = (octave+0.5)*octW;
-        if (octX>octaveCenter) {
-          octTwo = octave+1;
-          octMix = (octX-octaveCenter)/octW;
-        } else {
-          octTwo = octave-1
-          octMix = (octaveCenter-octX)/octW
-        }
+      //OCTAVE MIX
 
-         console.log(pitch, octave,octMix,octTwo);
+      let octaveCenter = (octave + 0.5) * octW;
+      if (octX > octaveCenter) {
+        octTwo = octave + 1;
+        octMix = (octX - octaveCenter) / octW;
+      } else {
+        octTwo = octave - 1;
+        octMix = (octaveCenter - octX) / octW;
+      }
 
+      console.log(pitch, octave, octMix, octTwo);
 
-        return {
-          identifier: touch.identifier || 0,
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-          pitch,
-          octave,
-          octTwo,
-          octMix
-        };
-      },
-     playNote(id, pitch, octave, octMix=0, octTwo) {
+      return {
+        identifier: touch.identifier || 0,
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        pitch,
+        octave,
+        octTwo,
+        octMix
+      };
+    },
+    playNote(id, pitch, octave, octMix = 0, octTwo) {
       this.synth = this.synth || {};
 
-
-        this.synth[id] = new Tone.mainSynth(Tone.volume);
-
+      this.synth[id] = new Synth.mainSynth(Synth.volume);
 
       if (!this.synth[id][octave]) {
-        this.synth[id][octave] = {}
-        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).connect(Tone.volume);
-        this.synth[id][octave].synth = new Tone.mainSynth(this.synth[id][octave].gain);
+        this.synth[id][octave] = {};
+        this.synth[id][octave].gain = new Tone.Gain(octMix.toFixed(2)).connect(
+          Synth.volume
+        );
+        this.synth[id][octave].synth = new Synth.mainSynth(
+          this.synth[id][octave].gain
+        );
       }
 
       if (!this.synth[id][octTwo]) {
-        this.synth[id][octTwo] = {}
-        this.synth[id][octTwo].gain = new Tone.Gain((1-octMix).toFixed(2)).connect(Tone.volume);
-        this.synth[id][octTwo].synth = new Tone.mainSynth(this.synth[id][octTwo].gain);
+        this.synth[id][octTwo] = {};
+        this.synth[id][octTwo].gain = new Tone.Gain(
+          (1 - octMix).toFixed(2)
+        ).connect(Synth.volume);
+        this.synth[id][octTwo].synth = new Synth.mainSynth(
+          this.synth[id][octTwo].gain
+        );
       }
-
 
       let time =
         Tone.Transport.state == "started"
-          ? Tone.quantization
+          ? Synth.quantization
           : Tone.context.now();
 
       this.synth[id].triggerAttack(
-        Tone.calcFrequency(pitch, octave),
+        Synth.calcFrequency(pitch, octave),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
 
-       this.synth[id][octave].synth.triggerAttack(
-        Tone.calcFrequency(pitch, octave),
+      this.synth[id][octave].synth.triggerAttack(
+        Synth.calcFrequency(pitch, octave),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
       this.synth[id][octTwo].synth.triggerAttack(
-        Tone.calcFrequency(pitch, octave),
+        Synth.calcFrequency(pitch, octave),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
     },
     changeNote(id, pitch, octave, octMix, octTwo) {
       let time =
         Tone.Transport.state == "started"
-          ? Tone.quantization
+          ? Synth.quantization
           : Tone.context.now();
 
       this.synth[id].synth.setNote(
-        Tone.calcFrequency(pitch, octave),
+        Synth.calcFrequency(pitch, octave),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
-        this.synth[id][octave].gain.gain.setValueAtTime(octMix, time);
-        this.synth[id][octave].synth.setNote(
-        Tone.calcFrequency(pitch, octave),
+      this.synth[id][octave].gain.gain.setValueAtTime(octMix, time);
+      this.synth[id][octave].synth.setNote(
+        Synth.calcFrequency(pitch, octave),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
-      this.synth[id][octTwo].gain.gain.setValueAtTime(1-octMix, time);
+      this.synth[id][octTwo].gain.gain.setValueAtTime(1 - octMix, time);
       this.synth[id][octTwo].synth.setNote(
-        Tone.calcFrequency(pitch, octTwo),
+        Synth.calcFrequency(pitch, octTwo),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
     },
     stopNote: function(id) {
       let time =
         Tone.Transport.state == "started"
-          ? Tone.quantization
+          ? Synth.quantization
           : Tone.context.now();
-      console.log(id,this.synth);
-        this.synth[id].triggerRelease();
-        this.synth[id].forEach( line => {
-          line.synth.triggerRelease();
-        }
-      );
+      console.log(id, this.synth);
+      this.synth[id].triggerRelease();
+      this.synth[id].forEach(line => {
+        line.synth.triggerRelease();
+      });
 
       if (id) {
         setTimeout(() => {
           this.synth[id].synth.dispose();
           this.synth[id] = null;
           delete this.synth[id];
-        }, Tone.chromaOptions.envelope.release * 1000);
+        }, Synth.chromaOptions.envelope.release * 1000);
       }
     },
     playNotes(id, pitch, octave, octMix, octTwo) {
+      console.log("Play: ", id, pitch, octave, octMix, octTwo);
 
-     console.log('Play: ',id, pitch, octave, octMix, octTwo)
-
-       let time =
+      let time =
         Tone.Transport.state == "started"
-          ? Tone.quantization
+          ? Synth.quantization
           : Tone.context.now();
 
       this.synth = this.synth || {};
@@ -252,168 +270,188 @@ Vue.component("tone-grid", {
       }
 
       if (!this.synth[id][octave]) {
-        this.synth[id][octave] = {}
-        this.synth[id][octave].gain = new Tone.Gain(1-octMix.toFixed(2)).connect(Tone.volume);
-        this.synth[id][octave].synth = new Tone.mainSynth(this.synth[id][octave].gain);
+        this.synth[id][octave] = {};
+        this.synth[id][octave].gain = new Tone.Gain(
+          1 - octMix.toFixed(2)
+        ).connect(Synth.volume);
+        this.synth[id][octave].synth = new Synth.mainSynth(
+          this.synth[id][octave].gain
+        );
       }
 
       if (octTwo) {
-         if (!this.synth[id][octTwo]) {
-          this.synth[id][octTwo] = {}
-          this.synth[id][octTwo].gain = new Tone.Gain(octMix.toFixed(2)).connect(Tone.volume);
-          this.synth[id][octTwo].synth = new Tone.mainSynth(this.synth[id][octTwo].gain);
-          this.synth[id].octTwo=octTwo;
+        if (!this.synth[id][octTwo]) {
+          this.synth[id][octTwo] = {};
+          this.synth[id][octTwo].gain = new Tone.Gain(
+            octMix.toFixed(2)
+          ).connect(Synth.volume);
+          this.synth[id][octTwo].synth = new Synth.mainSynth(
+            this.synth[id][octTwo].gain
+          );
+          this.synth[id].octTwo = octTwo;
         }
         this.synth[id][octTwo].synth.triggerAttack(
-          Tone.calcFrequency(pitch, octave),
+          Synth.calcFrequency(pitch, octave),
           time,
-          Tone.chromaOptions
+          Synth.chromaOptions
         );
-
       }
 
+      this.synth[id].octave = octave;
 
-
-
-
-      this.synth[id].octave=octave;
-
-       this.synth[id][octave].synth.triggerAttack(
-        Tone.calcFrequency(pitch, octave),
+      this.synth[id][octave].synth.triggerAttack(
+        Synth.calcFrequency(pitch, octave),
         time,
-        Tone.chromaOptions
+        Synth.chromaOptions
       );
-
-
-
     },
-    changeNotes(id, pitch, octave, octMix, octTwo, trigger=true) {
-
-   //   console.log('Change: ',id, pitch, octave, octMix, octTwo)
+    changeNotes(id, pitch, octave, octMix, octTwo, trigger = true) {
+      //   console.log('Change: ',id, pitch, octave, octMix, octTwo)
 
       let time =
         Tone.Transport.state == "started"
-          ? Tone.quantization
+          ? Synth.quantization
           : Tone.context.now();
 
-      if (this.synth[id][octave] && this.synth[id].octave!=octave && this.synth[id].octave!=octTwo) {
+      if (
+        this.synth[id][octave] &&
+        this.synth[id].octave != octave &&
+        this.synth[id].octave != octTwo
+      ) {
         this.synth[id][octave].synth.triggerRelease();
-        this.synth[id].octave=octave;
-        console.log(octave)
+        this.synth[id].octave = octave;
+        console.log(octave);
       }
-      if (this.synth[id][octTwo] && this.synth[id].octTwo!=octave && this.synth[id].octTwo!=octTwo) {
+      if (
+        this.synth[id][octTwo] &&
+        this.synth[id].octTwo != octave &&
+        this.synth[id].octTwo != octTwo
+      ) {
         this.synth[id][octTwo].synth.triggerRelease();
-        this.synth[id].octTwo=octTwo;
-        console.log(octTwo)
+        this.synth[id].octTwo = octTwo;
+        console.log(octTwo);
       }
 
-       if (!this.synth[id][octave]) {
-        this.synth[id][octave] = {}
-        this.synth[id][octave].gain = new Tone.Gain(1-octMix.toFixed(2)).connect(Tone.volume);
-        this.synth[id][octave].synth = new Tone.mainSynth(this.synth[id][octave].gain);
-
+      if (!this.synth[id][octave]) {
+        this.synth[id][octave] = {};
+        this.synth[id][octave].gain = new Tone.Gain(
+          1 - octMix.toFixed(2)
+        ).connect(Synth.volume);
+        this.synth[id][octave].synth = new Synth.mainSynth(
+          this.synth[id][octave].gain
+        );
       }
 
       if (octTwo) {
-
         if (!this.synth[id][octTwo]) {
-          this.synth[id][octTwo] = {}
-          this.synth[id][octTwo].gain = new Tone.Gain((octMix).toFixed(2)).connect(Tone.volume);
-          this.synth[id][octTwo].synth = new Tone.mainSynth(this.synth[id][octTwo].gain);
+          this.synth[id][octTwo] = {};
+          this.synth[id][octTwo].gain = new Tone.Gain(
+            octMix.toFixed(2)
+          ).connect(Synth.volume);
+          this.synth[id][octTwo].synth = new Synth.mainSynth(
+            this.synth[id][octTwo].gain
+          );
         }
-        this.synth[id][octTwo].gain.gain.setValueAtTime((octMix).toFixed(2), time);
-          if (trigger) {
-
-              this.synth[id][octTwo].synth.triggerAttack(
-                Tone.calcFrequency(pitch, octTwo),
-                time,
-                Tone.chromaOptions
-              );
-          } else {
-
-                this.synth[id][octTwo].synth.synth.setNote(
-                  Tone.calcFrequency(pitch, octTwo),
-                  time
-                );
-          }
+        this.synth[id][octTwo].gain.gain.setValueAtTime(
+          octMix.toFixed(2),
+          time
+        );
+        if (trigger) {
+          this.synth[id][octTwo].synth.triggerAttack(
+            Synth.calcFrequency(pitch, octTwo),
+            time,
+            Synth.chromaOptions
+          );
+        } else {
+          this.synth[id][octTwo].synth.synth.setNote(
+            Synth.calcFrequency(pitch, octTwo),
+            time
+          );
+        }
       }
 
+      this.synth[id][octave].gain.gain.setValueAtTime(
+        1 - octMix.toFixed(2),
+        time
+      );
 
-
-        this.synth[id][octave].gain.gain.setValueAtTime(1-octMix.toFixed(2), time);
-
-
-        if (trigger) {
-          this.synth[id][octave].synth.triggerAttack(
-            Tone.calcFrequency(pitch, octave),
-            time,
-            Tone.chromaOptions
-          );
-
-        } else {
-            this.synth[id][octave].synth.synth.setNote(
-              Tone.calcFrequency(pitch, octave),
-              time
-            );
-
-        }
-
+      if (trigger) {
+        this.synth[id][octave].synth.triggerAttack(
+          Synth.calcFrequency(pitch, octave),
+          time,
+          Synth.chromaOptions
+        );
+      } else {
+        this.synth[id][octave].synth.synth.setNote(
+          Synth.calcFrequency(pitch, octave),
+          time
+        );
+      }
     },
     stopNotes: function(id) {
-      console.log('Stop: ',id)
+      console.log("Stop: ", id);
       let time =
         Tone.Transport.state == "started"
-          ? Tone.quantization
+          ? Synth.quantization
           : Tone.context.now();
 
-      this.synth[id].forEach( line => {
-          line.synth.triggerRelease();
-        }
-      );
+      this.synth[id].forEach(line => {
+        line.synth.triggerRelease();
+      });
 
       if (id) {
         setTimeout(() => {
-          this.synth[id].forEach( line => {
+          this.synth[id].forEach(line => {
             line.synth.dispose();
             line.synth = null;
             line.gain.dispose();
-          }
-        );
+          });
           this.synth[id] = null;
           delete this.synth[id];
-        }, Tone.chromaOptions.envelope.release * 1000);
+        }, Synth.chromaOptions.envelope.release * 1000);
       }
     },
 
     clickStart: function(event) {
-
       var rect = event.target.getBoundingClientRect();
       let copy = this.copyTouch(event, rect);
       this.pressed = copy;
-      if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
+      if (this.checkActive(copy.pitch, this.root, this.steps)) {
         this.playNotes(0, copy.pitch, copy.octave, copy.octMix, copy.octTwo);
       }
     },
     clickChange: function(event) {
-
-      if(this.pressed) {
+      if (this.pressed) {
         var rect = event.target.getBoundingClientRect();
         let copy = this.copyTouch(event, rect);
 
-        if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
-
-        if (this.pressed.octave != copy.octave
-         || this.pressed.octTwo != copy.octTwo
-         || this.pressed.octMix != copy.octMix) {
-          this.changeNotes(0, copy.pitch, copy.octave, copy.octMix, copy.octTwo, true);
-        } else if (this.pressed.pitch != copy.pitch ) {
-          this.changeNotes(0, copy.pitch, copy.octave, copy.octMix, copy.octTwo, false);
+        if (this.checkActive(copy.pitch, this.root, this.steps)) {
+          if (
+            this.pressed.octave != copy.octave ||
+            this.pressed.octTwo != copy.octTwo ||
+            this.pressed.octMix != copy.octMix
+          ) {
+            this.changeNotes(
+              0,
+              copy.pitch,
+              copy.octave,
+              copy.octMix,
+              copy.octTwo,
+              true
+            );
+          } else if (this.pressed.pitch != copy.pitch) {
+            this.changeNotes(
+              0,
+              copy.pitch,
+              copy.octave,
+              copy.octMix,
+              copy.octTwo,
+              false
+            );
+          }
+          this.pressed = copy;
         }
-        this.pressed = copy;
       }
-
-      }
-
     },
     clickStop: function() {
       if (this.pressed) {
@@ -422,26 +460,22 @@ Vue.component("tone-grid", {
       }
     },
     touchStart: function(event) {
-
       var rect = event.target.getBoundingClientRect();
       var touches = event.changedTouches;
 
       for (var i = 0; i < touches.length; i++) {
-
         let copy = this.copyTouch(touches[i], rect);
 
-        if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
-
+        if (this.checkActive(copy.pitch, this.root, this.steps)) {
           this.ongoingTouches.push(copy);
           this.playNote(copy.identifier, copy.pitch, copy.octave);
-
         }
       }
     },
     touchEnd: function(event) {
       var touches = event.changedTouches;
       for (var i = 0; i < touches.length; i++) {
-        var idx = Tone.ongoingTouchIndexById(
+        var idx = this.ongoingTouchIndexById(
           this.ongoingTouches,
           touches[i].identifier
         );
@@ -457,14 +491,14 @@ Vue.component("tone-grid", {
       var rect = event.target.getBoundingClientRect();
       var touches = event.changedTouches;
       for (var i = 0; i < touches.length; i++) {
-        var idx = Tone.ongoingTouchIndexById(
+        var idx = this.ongoingTouchIndexById(
           this.ongoingTouches,
           touches[i].identifier
         );
         if (idx >= 0) {
           let copy = this.copyTouch(touches[i], rect);
           if (
-            Tone.checkActive(copy.pitch, this.root, this.steps) &&
+            this.checkActive(copy.pitch, this.root, this.steps) &&
             (this.ongoingTouches[idx].pitch != copy.pitch ||
               this.ongoingTouches[idx].octave != copy.octave)
           ) {
@@ -474,7 +508,7 @@ Vue.component("tone-grid", {
           }
         } else {
           let copy = this.copyTouch(touches[i], rect);
-          if (Tone.checkActive(copy.pitch, this.root, this.steps)) {
+          if (this.checkActive(copy.pitch, this.root, this.steps)) {
             this.ongoingTouches.push(copy);
             this.playNote(copy.identifier, copy.pitch, copy.octave);
             //            console.log('play '+copy.identifier +' '+ copy.pitch+' '+ copy.octave, this.ongoingTouches)
@@ -483,6 +517,5 @@ Vue.component("tone-grid", {
       }
     }
   },
-  created: function() {
-  }
+  created: function() {}
 });

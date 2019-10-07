@@ -305,7 +305,7 @@ Synth.mono = function(output) {
     },
     synth,
     triggerAttack(freq, time, opts = { gain: 1, duration: "8n" }) {
-      
+
       this.vol.gain.value = opts.gain;
       this.synth.set("oscillator.type", opts.oscillator.type);
       this.synth.set("portamento", opts.portamento || 0);
@@ -384,3 +384,38 @@ Synth.fm = function(output) {
     }
   };
 };
+
+
+// SYNTH base
+
+Synth.arrayRotate = function(A, n, l = A.length) {
+  const offset = ((n % l) + l) % l;
+  return A.slice(offset).concat(A.slice(0, offset));
+};
+
+Synth.calcFrequency = function(pitch, octave = 3) {
+  return Number(440 * Math.pow(2, octave - 4 + pitch / 12));
+};
+
+Synth.chromaOptions = {
+  gain: 1,
+  portamento: 0,
+  oscillator: {
+    type: "triangle"
+  },
+  envelope: {
+    attack: 0.15,
+    decay: 0.4,
+    sustain: 0.7,
+    release: 1
+  }
+};
+
+Synth.chromaSynth = new Tone.PolySynth(12, Tone.Synth);
+Synth.analyser = Tone.context.createAnalyser().toMaster();
+Synth.analyser.fftSize = 2048;
+Synth.volume = new Tone.Volume(0).connect(Synth.analyser);
+Synth.synthVolume = new Tone.Volume(1).connect(Synth.volume);
+Synth.chromaSynth.connect(Synth.synthVolume);
+Synth.mainSynth = Synth.mono;
+Synth.quantization = "@32n";

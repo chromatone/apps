@@ -11,6 +11,9 @@
   left:0;
   top:0
 }
+#chromatone {
+  background-color: #eee;
+}
 
 @font-face {
   font-family: "Neusa Bold";
@@ -20,20 +23,20 @@
 /* TONE-GRID */
 
 .tone-table {
-   width:100%; 
+   width:100%;
   border-radius:20px;
 }
 .tone-table tr:first-child td:first-child {
- border-radius:20px 0 0 0 ; 
+ border-radius:20px 0 0 0 ;
 }
 .tone-table tr:first-child td:last-child {
- border-radius:0 20px 0 0 ; 
+ border-radius:0 20px 0 0 ;
 }
 .tone-table tr:last-child td:first-child {
- border-radius:0 0 0 20px ; 
+ border-radius:0 0 0 20px ;
 }
 .tone-table tr:last-child td:last-child {
- border-radius:0 0 20px 0 ; 
+ border-radius:0 0 20px 0 ;
 }
 .grid-block {
   position:relative;
@@ -78,7 +81,7 @@
 }
 
 .root {
-  stroke:#fff; 
+  stroke:#fff;
 }
 
 .deactivated {
@@ -267,11 +270,27 @@ sequencer
   border-bottom-right-radius: 16px;
 }
 
+.field:not(:last-child) {
+  margin-bottom:0!important;
+}
+
+.tracker-options {
+  margin-bottom:6px;
+  padding:12px;
+  border-radius:4px;
+  background-color: #ccc;
+}
+
 .metro-options {
+  margin-bottom:10px;
+}
+
+.metro-options, .tracker-options {
   display:flex;
   justify-content:space-between;
   flex-flow: row wrap;
-  margin-bottom:6px;
+  align-items: center;
+
 }
 
 .beat-row {
@@ -284,30 +303,30 @@ sequencer
   grid-template-columns:  repeat(auto-fit, minmax(6%,1fr));
 }
 .beat-mute, .beat-open {
-  background-color:#eee; 
+  background-color:#eee;
   height: 40px;
-  border-radius: 20px;
+  border-radius: 4px;
   margin: 4px;
-  border: 2px solid #999;
+  border: 1px solid #999;
 }
 .beat-mute.unmute {
   background-color:#7957d5;
 }
 .beat-block {
     height: 40px;
-    border-radius: 20px;
+    border-radius: 4px;
     margin: 4px;
-    border: 2px solid #777;
+    border: 1px solid #777;
     background-color: #aaa;
 }
 .beat-block.fourth {
-  border-color:#444; 
+  border-color:#444;
 }
 .beat-block.act {
   background-color:#a899d2;
 }
 .beat-block.active {
-  background-color:#777; 
+  background-color:#777;
 }
 .beat-block.active.act {
   background-color:#7957d5;
@@ -317,11 +336,11 @@ sequencer
    transform-origin: 10px 10px;
 }
 .open .arrow-collapse {
-   transform:rotate(180deg); 
+   transform:rotate(180deg);
 }
 .track {
   background-color: #ccc;
-  border-radius: 25px;
+  border-radius: 4px;
   transition: all 0.5s ease;
   margin-bottom: 10px;
 }
@@ -352,10 +371,10 @@ sequencer
    display:block;
 }
 .speaker {
-   fill:grey; 
+   fill:grey;
 }
 .speaker-waves {
-   display:none; 
+   display:none;
 }
 .arrow {
   fill: #333;
