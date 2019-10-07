@@ -76,7 +76,10 @@ Vue.component("field", {
   },
   props: {
     steps: {
-      type: Array
+      type: Array,
+      default() {
+        return Chroma.Scales.major.steps
+      }
     },
     root: {
       default: 0

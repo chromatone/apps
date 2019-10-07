@@ -245,8 +245,9 @@ sequencer
 }
 
 .adsr {
-  background-color: #e5e5e5;
-  border-radius: 16px;
+  border:1px solid #eee;
+  line-height:1em;
+  border-radius: 4px;
   margin: 4px;
   padding: 4px;
 }
@@ -295,29 +296,48 @@ sequencer
 
 .beat-row {
   display:grid;
-  grid-template-columns: 48px auto 48px;
+  grid-template-columns: 48px 32px auto 32px 32px;
 }
 
 .beat-group {
   display: grid;
+  background: #aaa;
+  margin:0 2px;
   grid-template-columns:  repeat(auto-fit, minmax(6%,1fr));
+}
+.beat-mute {
+    font-size:10px;
 }
 .beat-mute, .beat-open {
   background-color:#eee;
+  display:flex;
+  flex-flow:column;
+  align-items: center;
+  justify-content: center;
   height: 40px;
   border-radius: 4px;
   margin: 4px;
+  cursor: pointer;
   border: 1px solid #999;
 }
 .beat-mute.unmute {
   background-color:#7957d5;
+  color:white;
+  font-weight: bold;
 }
 .beat-block {
     height: 40px;
+    min-width:12px;
     border-radius: 4px;
     margin: 4px;
     border: 1px solid #777;
     background-color: #aaa;
+}
+.beat-block.plus {
+  font-weight: bold;
+  font-size:18px;
+  padding:0;
+  background-color: #ddd;
 }
 .beat-block.fourth {
   border-color:#444;
@@ -333,7 +353,8 @@ sequencer
 }
 .arrow-collapse {
    fill:#999;
-   transform-origin: 10px 10px;
+   transform-origin: 7px 12px;
+   transition: all ease 400ms;
 }
 .open .arrow-collapse {
    transform:rotate(180deg);
@@ -351,9 +372,8 @@ sequencer
 }
 
 .del-track {
-  color:red;
-  font-weight:bold;
-  border-radius:20px;
+  font-weight:normal;
+  font-size: 10px !important;
   padding:2px 4px;
 }
 
@@ -381,16 +401,14 @@ sequencer
   transform-origin: -30px 30px;
 }
 .track-options {
-  border-radius: 0 0 12px 12px;
-  background-color: #eee;
-  padding: 8px;
-  font-weight: bold;
-  font-size: 12px;
+  height:auto;
+  padding: 8px 8px 8px 8px;
   overflow: scroll;
   transition: all 0.5s ease;
 }
 .track-options.closed {
-  padding: 0;
+  padding:0 8px;
+  height:0;
 }
 .rythm-box {
   padding: 12px;
@@ -402,13 +420,40 @@ sequencer
   background-color: #7957d5 !important;
   color: #fff !important;
 }
+
+/*
+sqnob
+*/
+
+.sqnob {
+  position:relative;
+  cursor: pointer;
+  border:1px solid hsla(0,0%,0%,0.25);
+  border-radius: 4px;
+  font-size:1em;
+  margin:0 4px;
+}
+
+.sqnob-info {
+  user-select: none;
+  padding:4px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.sqnob-value {
+  background-color: hsla(0,0%,0%,0.25);
+  position:absolute;
+  width:100%;
+  bottom:0;
+}
+
+
 /*
 knob
 */
 
-.knob {
-  user-select: none;
-}
+
 .knob circle.mainCircle {
   fill: #eee;
   stroke: #aaa;

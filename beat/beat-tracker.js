@@ -41,17 +41,17 @@ Vue.component("beat", {
 		<tracker v-for="(track,i) in tracks" :key="i" @delTrack="delTrack(i)" :trk="track"></tracker>
 
     <div class="tracker-options">
-      <b-field label="TYPE">
+      <b-field label="TYPE" class="adsr">
         <b-radio-button v-for="(ins,key) in ['kick','dsh','metal']" v-model="newInstr" :key="key"
             :native-value="ins">
             <span>{{ins}}</span>
         </b-radio-button>
       </b-field>
 
-      <b-field label="VALUE">
-        <b-radio-button v-for="(dur,key) in [4,8,16,32]" :key="key" v-model="newDuration"
-            :native-value="dur">
-            <span>{{ '1/'+ dur }}</span>
+      <b-field label="VALUE" class="adsr">
+        <b-radio-button v-for="(dur,key) in durations" :key="key" v-model="newDuration"
+            :native-value="dur.num">
+            <span>{{ '1/'+ dur.num }}</span>
         </b-radio-button>
       </b-field>
 
@@ -79,6 +79,7 @@ Vue.component("beat", {
       playing: false,
       pressed: false,
       tempo: 90,
+      durations:[{num:4,symbol:'&#9833;'},{num:8,symbol:'	&#9834;'},{num:16,symbol:'&#9835;'}, {num:32, symbol:'&#9836;'}],
       tracks: []
     };
   },
@@ -146,30 +147,29 @@ Vue.component("tracker", {
 		<div class="beat-row">
 
 			<div class="beat-mute" :class="{'unmute':play}" @click="toggleLoop" @touchstart.prevent.stop="toggleLoop">
-			<svg viewBox="0 1 40 40">
-				<g :class="{'playing-track':play}">
-											<path class="speaker" d="M8.6,22.9v-5.7c0-1.2,1-2.1,2.1-2.1h2.9l4.9-4.7c0.3-0.4,0.9-0.4,1.3-0.1c0.2,0.2,0.3,0.4,0.3,0.7v18.2
-c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.9L8.6,22.9z"/>
-											<g class="speaker-waves">
-											<path d="M24.1,24c2.2-2.2,2.2-5.8,0-8c-0.3-0.3-0.7-0.3-1,0c-0.1,0.1-0.2,0.3-0.2,0.5v7c0,0.4,0.3,0.7,0.7,0.7
-	C23.8,24.2,24,24.1,24.1,24z"/>
-											<path d="M24.9,30.3c5.7-2.7,8.2-9.5,5.5-15.2c-1.1-2.4-3.1-4.4-5.5-5.5c-0.7-0.3-1.6,0.1-1.8,0.9c-0.2,0.7,0,1.4,0.6,1.7
-	c4.3,2,6.1,7.1,4.1,11.4c-0.8,1.8-2.3,3.2-4.1,4.1c-0.7,0.4-0.9,1.3-0.5,2C23.5,30.3,24.2,30.6,24.9,30.3z"/>
-										</g>
-									</g>
-			</svg>
+        <span>{{trk.instrument.toUpperCase()}}</span>
+        <span>{{trk.pattern.length+'/'+ trk.duration.split('n')[0]}}</span>
+
 			</div>
+      <button @click="delBeat()" class="beat-block plus">
+          -
+      </button>
 			<div class="beat-group">
+
 				<div class="beat-block" :class="{active: beat.active,act: currentStep==j, fourth: j%4==0}" v-for="(beat,j) in trk.pattern"
 												@mousedown="act(j)"
 												@touchstart.prevent.stop="act(j)"
 												@touchend.prevent.stop="pressed=false">
 				</div>
 			</div>
+
+
+      <button @click="addBeat()" class="beat-block plus">
+        +
+      </button>
 			<div class="beat-open" :class="{open:open}" @click="open=!open" @touchstart.prevent.stop="open=!open">
-				<svg viewBox="0 0 20 20">
-									<polygon class="arrow-collapse" points="8,7 12,7 10,12"/>
-				</svg>
+
+<span class="arrow-collapse">&#9660;</span>
 			</div>
 
 		</div>
@@ -180,28 +180,13 @@ c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.
 
 			<div class="level field wrap is-mobile">
 
-				<label class="track-label">
-					{{trk.instrument.toUpperCase()}}&nbsp;
-				</label>
+        <button @click="delTrack()" class="beat-open del-track">
 
-				<button @click="delTrack()" class="button  del-track">
-					X
-				</button>
-
-				<div class="level-item">
-					<button @click="delBeat()" class="button">
-							-
-					</button>
-					<button class="button is-static" :class="{'is-primary':play}">
-						{{trk.pattern.length+'/'+ trk.duration.split('n')[0]}}
-					</button>
-					<button @click="addBeat()" class="button ">
-						+
-					</button>
-				</div>
+          &#10060;
+        </button>
 
 				<div class="level-item  has-text-centered">
-					<knob min="0" max="0.9" param="VOL" v-model="trk.gain"></knob>
+					<sqnob min="0" max="0.9" param="VOL" v-model="trk.gain"></sqnob>
 				</div>
 
 				<div v-if="trk.options" class="level-item level adsr">
@@ -210,10 +195,10 @@ c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.
 					</div>
 
 					<div v-for="option in synth.options" class="level-item has-text-centered">
-						<knob :min="option.min"
+						<sqnob :min="option.min"
 									:max="option.max"
 									:param="option.param"
-									v-model="trk.options[option.name]"></knob>
+									v-model="trk.options[option.name]"></sqnob>
 					</div>
 				</div>
 
@@ -222,12 +207,13 @@ c0,0.5-0.4,0.9-0.9,0.9c-0.3,0-0.5-0.1-0.7-0.3L13.6,25h-2.9C9.5,25,8.6,24,8.6,22.
 						ENV
 					</div>
 					<div v-for="param in synth.envelope" class="level-item has-text-centered">
-						<knob :min="param.min"
+						<sqnob :min="param.min"
 									:max="param.max"
 									:param="param.param"
-									v-model="trk.envelope[param.name]"></knob>
+									v-model="trk.envelope[param.name]"></sqnob>
 					</div>
 				</div>
+
 			</div>
 
 

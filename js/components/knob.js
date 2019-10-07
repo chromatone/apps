@@ -5,7 +5,7 @@ Vue.component("knob", {
         class="knob" @mousedown.stop.prevent="activate"
         @touchstart.stop.prevent="activate">
           <text x="17" y="-4">{{value | round}}</text>
-          <circle class="shadow" cx="17" cy="17" r="16"></circle>
+        
           <circle class="mainCircle" cx="17" cy="15" r="13" :class="{ active: active}" />
           <line x1="17" y1="15" x2="17" y2="3" :transform="knobRotation"/>
           <text x="17" y="45">{{param}}</text>

@@ -5,17 +5,17 @@ Vue.component("synth", {
 		<div class="level adsr-sliders">
 
 			<div class="level-item">
-				<knob min="-30" max="0" param="VOL" v-model="volume" />
+				<sqnob min="-30" max="0" param="VOL" v-model="volume" />
 			</div>
 
 			<div v-for="option in synth.options" class="level-item">
-				<knob :min="option.min" :max="option.max" :param="option.param" v-model="options[option.name]"  />
+				<sqnob :min="option.min" :max="option.max" :param="option.param" v-model="options[option.name]"  />
 			</div>
 
 			<div class="level-item level  adsr  adsr-sliders">
 				<div class="level-item has-text-centered">ENV</div>
 					<div v-for="(env,i) in synth.envelope" class="level-item">
-						<knob :min="env.min" :max="env.max" :param="env.param" v-model="options.envelope[i]" />
+						<sqnob :min="env.min" :max="env.max" :param="env.param" v-model="options.envelope[i]" />
 					</div>
 				</div>
 

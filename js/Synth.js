@@ -34,6 +34,8 @@ const synthProto = {
   }
 };
 
+Synth.rythm = {};
+
 Synth.kick = function() {
   return {
     name: "kick",
