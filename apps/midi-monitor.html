@@ -3,29 +3,29 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Chromatone app beta</title>
-
+  <title>MIDI monitor @chromatone</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-  <link rel="stylesheet" href="../assets/buefy.min.css" />
   <link rel="stylesheet" href="../css/styles.css" />
   <script src="../assets/StartAudioContext.js"></script>
   <script src="../assets/Tone.min.js"></script>
   <script src="../assets/vue.js"></script>
-  <script src="../assets/buefy.js"></script>
+
+
+
 </head>
 
 <body>
 
 
   <div id="chromatone">
-      <beat></beat>
+    <midi-bus :absolute="true" :channels.sync="channels" :bus="midiBus"></midi-bus>
+    <midi-monitor :bus="midiBus" :channels="channels"></midi-monitor>
   </div>
 
 
-
-  <script src="../js/Synth.js"></script>
-  <script src="../js/sqnob.js"></script>
-  <script src="beat-tracker.js"></script>
+  <script type="text/javascript" src="../assets/webmidi.js"></script>
+  <script type="text/javascript" src="../js/components/midi-monitor.js"></script>
+  <script type="text/javascript" src="../js/components/midi-bus.js"></script>
   <script src="../js/chromatone.js"></script>
 
 </body>

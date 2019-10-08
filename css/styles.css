@@ -12,12 +12,115 @@
   top:0
 }
 #chromatone {
-  background-color: #eee;
+  width: 100%;
+  height: 100%;
 }
 
 @font-face {
   font-family: "Neusa Bold";
   src: url(https://cdn.glitch.com/1520e3d1-e09f-4c87-bd42-89b5fa497055%2FNeusa-Bold.woff?1543956951264);
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+/* Scale canvas with resize attribute to full size */
+.paper{
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+}
+
+.midi-bus {
+padding: 6px;
+font-size:12px;
+}
+
+.absolute {
+  position:absolute;
+}
+
+.status {
+border:#999 2px solid;
+border-radius:2px;
+color:#999;
+padding:4px;
+margin:4px;
+line-height: 2;
+cursor: pointer;
+}
+
+.status.active {
+border-color:green;
+color:green;
+}
+
+.status.error {
+border-color:red;
+color:red;
+}
+
+/* MIDI-monitor */
+
+.midi-monitor {
+  display:flex;
+  height:100%;
+  align-items: stretch;
+}
+
+.midi-channel {
+  max-height: 100%;
+  flex:1 0 14px;
+  margin:0 2px;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: stretch;
+	align-items: stretch;
+	align-content: center;
+  background-color: hsla(60,0%,50%,0.1);
+}
+
+.midi-cc {
+  flex:1 1 6%;
+  display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items:baseline;
+	align-content:center;
+
+}
+
+.cc-bar {
+  background-color: #bbb;
+  height:100%;
+  display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items:center;
+	align-content:center;
+}
+
+.midi-notes.channel-name {
+  color:black;
+}
+
+.midi-notes {
+  padding:4px;
+  flex:1 1 6%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+  color:white;
+  background-color: hsla(60,0%,60%,0.2);
 }
 
 /* TONE-GRID */
@@ -111,10 +214,6 @@
   cursor: pointer;
 }
 
-body {
-  margin: 4% !important;
-  -webkit-font-smoothing: antialiased;
-}
 .oscs {
   margin: 4px;
 }
