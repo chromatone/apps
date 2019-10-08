@@ -5,7 +5,7 @@ const midiMonitor = Vue.component('midi-monitor',{
       <div class="midi-notes channel-name">
         {{ch}}
       </div>
-      <div @mousedown="playNote(note)" @mouseup="stopNote(note)" :style="{backgroundColor:getHsla(note.digit,note.velocity),order:127-note.number}"  v-for="(note, key) in channel.notes" class="midi-notes">
+      <div @mousedown="playNote(note)" @mouseout="stopNote(note)" @mouseup="stopNote(note)" :style="{backgroundColor:getHsla(note.digit,note.velocity),order:127-note.number}"  v-for="(note, key) in channel.notes" class="midi-notes">
         {{key}}
       </div>
       <div :style="{order:256-cckey}"  v-for="(cc,cckey) in channel.cc" class="midi-cc">
@@ -26,11 +26,11 @@ const midiMonitor = Vue.component('midi-monitor',{
   methods: {
     playNote(note) {
       note.velocity=0.75;
-      this.bus.$emit('noteon'+note.channel,note)
+      this.bus.$emit('noteouton',note)
     },
     stopNote(note) {
       note.velocity=0.0;
-      this.bus.$emit('noteoff'+note.channel,note)
+    this.bus.$emit('noteoutoff',note)
     },
     getHsla(digit, velocity=0.8) {
       return 'hsla('+digit*30+','+velocity*100+'%,50%,1)'

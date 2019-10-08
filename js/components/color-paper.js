@@ -36,9 +36,9 @@ const colorPaper = Vue.component('paper',{
 
   },
   created() {
-  //  this.bus.$on('noteon',this.onNote);
+  //  this.bus.$on('noteinon',this.onNote);
     this.bus.$on('reset',this.reset);
-  //  this.bus.$on('noteoff', this.noteOff)
+  //  this.bus.$on('noteinoff', this.noteOff)
   //  this.bus.$on('controlchange')
 
   },
