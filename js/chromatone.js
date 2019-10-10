@@ -1,10 +1,11 @@
 
 if (window.Buefy) {  Vue.use(Buefy.default); }
 
+Vue.prototype.$midiBus = new Vue(); // Global event bus
+
 const ct = new Vue({
   el:"#chromatone",
   data: {
-    midiBus:new Vue(),
     channels:{}
   },
   mounted: function() {

@@ -55,7 +55,10 @@ Vue.component("tone-grid", {
   },
   props: {
     steps: {
-      type: Array
+      type: Array,
+      default() {
+        return [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1]
+      }
     },
     root: {
       default: 0
@@ -154,7 +157,7 @@ Vue.component("tone-grid", {
         octMix = (octaveCenter - octX) / octW;
       }
 
-      console.log(pitch, octave, octMix, octTwo);
+    //  console.log(pitch, octave, octMix, octTwo);
 
       return {
         identifier: touch.identifier || 0,

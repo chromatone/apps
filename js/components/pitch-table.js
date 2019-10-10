@@ -1,9 +1,7 @@
-
-
 Vue.component('pitch-table', {
 	template: `  <div id="pitch-table">
 	  <div class="slider-holder">
-			<div class="label">Octaves</div>
+			<div class="label">Pitch table ctaves</div>
 			<vue-slider v-model="octaveRange" :piecewise="true" :interval="1" :dot-size="12" :min="-6" :max="8" :height="6" direction="horizontal" tooltip="always"></vue-slider>
 		</div>
 
@@ -11,7 +9,7 @@ Vue.component('pitch-table', {
 			<table class="pitch-table">
 				<tr v-for="note in reversedNotes" class="note-block" >
 
-					<td is="note-cell" v-for="octave in octaves" :key="octave" :root="rootFreq" :note="note" :octave="octave" :tuning="tuning" :type="oscType"></note-cell>
+					<td is="note-cell" v-for="octave in octaves" :key="octave" :root="rootFreq" :note="note" :octave="octave" :tuning="tuning" :type="oscType"></td>
 
 
 				</tr>

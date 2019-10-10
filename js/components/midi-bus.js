@@ -8,7 +8,7 @@ const midiBus = Vue.component('midi-bus', {
 
     </div>
   `,
-  props: ['bus', 'absolute'],
+  props: ['absolute'],
   data() {
     return {
       midi: {
@@ -33,7 +33,7 @@ const midiBus = Vue.component('midi-bus', {
     },
     checkChannel(ch) {
       if (!this.channels[ch]) {
-        this.$set(this.channels, ch, {notes:{}, cc:{}})
+        this.$set(this.channels, ch, {num:ch,notes:{}, cc:{}})
       }
     },
     makeNote(ev) {
@@ -48,21 +48,21 @@ const midiBus = Vue.component('midi-bus', {
     },
     noteInOn(ev) {
       let note = this.makeNote(ev)
-      this.bus.$emit('noteinon'+note.channel,note);
+      this.$midiBus.$emit('noteinon'+note.channel,note);
       this.checkChannel(ev.channel);
       this.$set(this.channels[ev.channel].notes, note.nameOct, note)
       this.$emit('update:channels', this.channels)
     },
     noteInOff(ev) {
       let note = this.makeNote(ev)
-      this.bus.$emit('noteinoff', note)
+      this.$midiBus.$emit('noteinoff'+note.channel, note)
       if (this.channels[ev.channel] && this.channels[ev.channel].notes && this.channels[ev.channel].notes[note.nameOct]) {
         this.channels[ev.channel].notes[note.nameOct].velocity=0;
       }
       this.$emit('update:channels', this.channels)
     },
     ccInChange(ev) {
-      this.bus.$emit('controlchange',ev)
+      this.$midiBus.$emit(ev.channel+'cc'+ev.controller.number,ev.value)
       this.checkChannel(ev.channel)
       this.$set(this.channels[ev.channel].cc,ev.controller.number,ev.value);
       this.$emit('update:channels', this.channels)
@@ -84,7 +84,7 @@ const midiBus = Vue.component('midi-bus', {
     }, */
     reset(e) {
       this.resetChannels();
-      this.bus.$emit('reset');
+      this.$midiBus.$emit('reset');
       this.$emit('update:channels', this.channels)
     },
     setListeners(input) {
@@ -103,7 +103,7 @@ const midiBus = Vue.component('midi-bus', {
     if (WebMidi.supported) {
       WebMidi.enable();
     }
-  /*  this.bus.$on('noteouton', this.noteOutOn)
-    this.bus.$on('noteoutoff', this.noteOutOff) */
+  /*  this.$midiBus.$on('noteouton', this.noteOutOn)
+    this.$midiBus.$on('noteoutoff', this.noteOutOff) */
   }
 })

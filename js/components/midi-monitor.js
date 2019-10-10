@@ -17,7 +17,7 @@ const midiMonitor = Vue.component('midi-monitor',{
     </div>
   </div>
   `,
-  props: ['channels','bus'],
+  props: ['channels'],
   data() {
     return {
 
@@ -26,11 +26,11 @@ const midiMonitor = Vue.component('midi-monitor',{
   methods: {
     playNote(note) {
       note.velocity=0.75;
-      this.bus.$emit('noteouton',note)
+      this.$midiBus.$emit('noteouton',note)
     },
     stopNote(note) {
       note.velocity=0.0;
-    this.bus.$emit('noteoutoff',note)
+    this.$midiBus.$emit('noteoutoff',note)
     },
     getHsla(digit, velocity=0.8) {
       return 'hsla('+digit*30+','+velocity*100+'%,50%,1)'
