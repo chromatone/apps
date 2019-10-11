@@ -26,9 +26,9 @@
     <div class="row switches">
       <div class="row">
         <div class="logo level-item is-6 has-text-centered">
-          <a href="http://www.chromatone.center"><img src="logo.svg" style="min-width:150px"></a>
+          <a href="http://www.chromatone.center"><img src="svg/logo.svg" style="min-width:150px"></a>
 
-          <knob min="-30" max="0" param="VOL" v-model="vol" />
+          <sqnob min="-30" max="0" param="VOL" v-model="vol" />
 
           <div class="tip" slot="tooltip">VOL<br><b>{{setVolume}}</b></div>
           </vue-slider>
@@ -93,7 +93,6 @@
   <script src="js/Scales.js"></script>
   <script src="js/Synth.js"></script>
   <script src="js/components/tone-grid.js"></script>
-  <script src="js/components/knob.js"></script>
   <script src="js/sqnob.js"></script>
   <script src="js/components/beats.js"></script>
   <script src="js/components/field.js"></script>
