@@ -151,7 +151,7 @@ Vue.component('tonal-array',{
 	watch: {
 
 	},
-	created: function(){
+	created(){
 		Synth.volume = Synth.volume ? Synth.volume : new Synth.volume(-10).toMaster();
 		Tone.calcChord = function (chord) {
 			return chord.map(x => Synth.calcFrequency(x))
@@ -162,7 +162,7 @@ Vue.component('tonal-array',{
 	},
 	computed: {
     activeSteps: function() {
-      let activeSteps = Synth.arrayRotate(this.steps, -this.root);
+      let activeSteps = Synth.arrayRotate(this.scale.steps, this.root);
       return activeSteps;
     },
 		dy() {

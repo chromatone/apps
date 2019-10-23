@@ -10,17 +10,21 @@ var vuetone = new Vue({
     vueSlider: window["vue-slider-component"]
   },
   data: {
-    open: {
-      beat: true,
-      scales: true,
-      synth: true,
-      grid: true,
-      field: false,
-      array: false,
-      keys: false,
-      table:false,
-      oscilloscope: false
-    },
+    components: [
+      'beat',
+      'scales',
+      'synth',
+      'grid',
+      'field',
+      'array',
+      'keys',
+      'table',
+      'oscilloscope',
+      'tunings',
+      'harmonics',
+      'midi-monitor'
+    ],
+    opened:'beat',
     base: 440,
     root: 0,
     octaves: [2, 4],

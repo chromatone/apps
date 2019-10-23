@@ -1,5 +1,3 @@
-// BEAT
-
 Vue.component("beat", {
   template: `<div class="rythm-box">
 		<div class="metro-options">
@@ -136,10 +134,6 @@ Vue.component("beat", {
   mounted: function() {
   this.addTrack()}
 });
-
-
-
-// TRACKER
 
 Vue.component("tracker", {
   template: `<div class="track" :class="{open:open}">

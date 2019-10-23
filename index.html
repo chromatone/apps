@@ -12,8 +12,10 @@
   <script src="assets/StartAudioContext.js"></script>
   <script src="assets/Tone.min.js"></script>
   <script src="assets/vue.js"></script>
+  <script type="text/javascript" src="../assets/webmidi.js"></script>
   <script src="assets/vue-slider.js"></script>
   <script src="assets/buefy.js"></script>
+  <script src="assets/zdog.dist.js"></script>
 </head>
 
 
@@ -21,71 +23,94 @@
 
 
 
-  <div id="vuetone">
+  <div id="chromatone">
 
     <div class="row switches">
       <div class="row">
         <div class="logo level-item is-6 has-text-centered">
           <a href="http://www.chromatone.center"><img src="svg/logo.svg" style="min-width:150px"></a>
-
-          <sqnob min="-30" max="0" param="VOL" v-model="vol" />
-
-          <div class="tip" slot="tooltip">VOL<br><b>{{setVolume}}</b></div>
-          </vue-slider>
         </div>
 
         <div class="switch-row has-text-centered">
+          <b-field grouped group-multiline>
+             <b-radio-button v-for="comp in components"  v-model="opened"
+                 :native-value="comp">
+                 <span>{{comp}}</span>
+             </b-radio-button>
+         </b-field>
 
-          <button v-for="(block,i) in open" class="button is-small is-rounded" :class="{pushed:open[i]}" @click="open[i]=!open[i]">
-            {{i}}
-          </button>
+{{opened}}
 
         </div>
       </div>
     </div>
 
 
-      <oscilloscope v-if="open.oscilloscope"></oscilloscope>
+      <oscilloscope v-if="opened == 'oscilloscope'"></oscilloscope>
 
 
-    <div v-show="open.beat" class="row">
+    <div v-if="opened == 'beat'" class="row">
       <beat></beat>
     </div>
 
-    <div v-if="open.scales" class="row">
+    <div v-if="opened == 'scales'" class="row">
       <scales></scales>
     </div>
 
 
 
-    <div v-show="open.synth" class="row">
+    <div v-if="opened == 'synth'" class="row">
       <synth></synth>
     </div>
 
 
-  <div v-if="open.grid" class="row">
-      <tone-grid :root="root" :steps="scale.steps"></tone-grid>
+  <div v-if="opened == 'grid'" class="row">
+      <tone-grid ></tone-grid>
     </div>
 
 
-    <div v-if="open.field" class="row field">
-      <field :root="root" :steps="scale.steps"></field>
+    <div v-if="opened == 'field'" class="row field">
+      <field ></field>
     </div>
 
 
-    <div v-if="open.array" class="row">
-          <tonal-array :root="root" :steps="scale.steps"></tonal-array>
+    <div v-if="opened == 'array'" class="row">
+          <tonal-array ></tonal-array>
  </div>
 
 
-    <div v-if="open.keys" class="row">
-      <key-stack :root="root" :steps="scale.steps" @play="play" @stop="stop"></key-stack>
+    <div v-if="opened == 'keys'" class="row">
+      <key-stack ></key-stack>
     </div>
 
-  <div v-if="open.table" class="row">
+  <div v-if="opened == 'table'" class="row">
      <pitch-table></pitch-table>
   </div>
 
+  <div v-if="opened == 'tunings'" class="row">
+     <tunings></tunings>
+  </div>
+
+  <div v-if="opened == 'harmonics'" class="row">
+     <harmonics></harmonics>
+  </div>
+
+  <div v-if="opened == 'midi-monitor'" class="row">
+    <midi-bus :absolute="true" :channels.sync="channels"></midi-bus>
+    <midi-monitor :channels="channels"></midi-monitor>
+  </div>
+
+  <div v-if="opened == 'longitudal'" class="row">
+     <longitudal></longitudal>
+  </div>
+
+  <div v-if="opened == 'radiation'" class="row">
+     <radiation></radiation>
+  </div>
+
+  <div v-if="opened == 'scale-wheel'" class="row">
+    <scale-wheel></scale-wheel>
+  </div>
 
 
 
@@ -97,11 +122,19 @@
   <script src="js/components/beats.js"></script>
   <script src="js/components/field.js"></script>
   <script src="js/components/key-stack.js"></script>
+  <script src="js/components/scales.js"></script>
   <script src="js/components/synth.js"></script>
   <script src="js/components/osc.js"></script>
   <script src="js/components/tonal-array.js"></script>
   <script src="js/components/pitch-table.js"></script>
-  <script src="js/app.js"></script>
+    <script src="js/components/tunings.js"></script>
+    <script src="js/components/midi-bus.js"></script>
+    <script src="js/components/midi-monitor.js"></script>
+    <script src="js/components/harmonics.js"></script>
+    <script src="js/components/longitudal.js"></script>
+    <script src="js/components/radiation.js"></script>
+    <script src="js/components/scale-wheel.js"></script>
+  <script src="js/chromatone.js"></script>
 
 </body>
 

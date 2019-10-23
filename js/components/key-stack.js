@@ -68,27 +68,12 @@ Vue.component("key-stack", {
     }
   },
   methods: {
-    down: function(note, octave, ev) {
+    down(note, octave, ev) {
 
-      let touches = ev.changedTouches;
-      if (ev.type == "touchstart") {
-        for (let i = 0; i < touches.length; i++) {
-          this.$emit("play", note, octave, touches[i].identifier);
-        }
-      } else {
-        this.$emit("play", note, octave, 0);
-      }
+      Synth.chromaSynth.triggerAttack(Synth.calcFrequency(note.pitch, octave));
     },
-    up: function(note, octave, ev) {
-
-      let touches = ev.changedTouches;
-      if (ev.type == "touchend" || ev.type == "touchcancel") {
-        for (let i = 0; i < touches.length; i++) {
-          this.$emit("stop", note, octave, touches[i].identifier);
-        }
-      } else {
-        this.$emit("stop", note, octave, 0);
-      }
+    up(note, octave, ev) {
+        Synth.chromaSynth.triggerRelease(Synth.calcFrequency(note.pitch, octave));
     }
   }
 });

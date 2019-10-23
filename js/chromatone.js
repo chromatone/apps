@@ -6,7 +6,25 @@ Vue.prototype.$midiBus = new Vue(); // Global event bus
 const ct = new Vue({
   el:"#chromatone",
   data: {
-    channels:{}
+    channels:{},
+    components: [
+      'beat',
+      'scales',
+      'synth',
+      'grid',
+      'field',
+      'array',
+      'keys',
+      'table',
+      'oscilloscope',
+      'tunings',
+      'harmonics',
+      'midi-monitor',
+      'longitudal',
+      'radiation',
+      'scale-wheel'
+    ],
+    opened:'beat'
   },
   mounted: function() {
     if (
