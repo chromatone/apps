@@ -131,8 +131,7 @@ color:red;
 /* tone table */
 
 .slider-holder {
-  display:block;
-  margin-right:80px;
+  padding:0 40px;
 }
 
 /* TONE-GRID */
@@ -600,12 +599,12 @@ knob
 	overflow-x:scroll;
 }
 .pitch-table {
-	border-collapse: separate;
-	border-spacing: 2px;
+
 }
 .control-row {
 	display:grid;
-	grid-template-columns: 1fr 1fr 3fr;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding:1em 2em;
 }
 .label {
 	place-self:center;
@@ -637,11 +636,11 @@ button[disabled="disabled"] {
 	color:#fff;
 	cursor:pointer;
 	user-select: none;
-	border-radius: 6px;
-	opacity:0.5
+	opacity:1
 }
 .note-grid {
 	display:grid;
+  grid-gap:0;
 	grid-template-columns: 1fr 3fr;
 	grid-template-rows: 1fr 1fr;
 }

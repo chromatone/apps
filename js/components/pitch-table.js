@@ -1,8 +1,13 @@
 Vue.component('pitch-table', {
 	template: `  <div id="pitch-table">
 	  <div class="slider-holder">
-			<div class="label">Pitch table ctaves</div>
-			<b-slider v-model="octaveRange" type="is-primary" ticks :min="-6" :max="9"></b-slider>
+			<b-field label="Pitch table octaves">
+				<b-slider v-model="octaveRange" type="is-primary" :min="-6" :max="9">
+					<template v-for="val in [-4,-2,0,2,4,6,8]">
+									 <b-slider-tick :value="val" :key="val">{{ val }}</b-slider-tick>
+							 </template>
+				</b-slider>
+			</b-field>
 		</div>
 
 		<div class="table-holder">
@@ -29,24 +34,18 @@ Vue.component('pitch-table', {
 				:native-value="type" v-model="oscType">{{type}}</b-radio-button>
 		</b-field>
 	</div>
+	<div>
+		<b-field label="Low Pass">
+			<sqnob v-model="filterFreq" unit=" Hz" param="LP FILTER" :step="1" :min="20" :max="25000"></sqnob>
+		</b-field>
+	</div>
 
+	<div>
+		<b-field label="A4">
+			<sqnob v-model="rootFreq" unit=" Hz" param="FREQUENCY" :step="1" :min="415" :max="500"></sqnob>
+		</b-field>
+	</div>
 
-		<div class="slider-holder">
-			<b-field label="A4 frequency, Hz">
-				<b-slider v-model="rootFreq" type="is-primary" :step="0.5" :min="400" :max="450">
-					<template v-for="val in [420, 432, 440,450]">
-									 <b-slider-tick :value="val" :key="val">{{ val }}</b-slider-tick>
-							 </template>
-				</b-slider>
-			</b-field>
-			<b-field label="Filter frequency, Hz">
-				<b-slider v-model="filter.frequency.value" type="is-primary" :min="20" :max="25000">
-					<template v-for="val in [350, 2000, 5000,7500,10000,15000,20000,25000]">
-									 <b-slider-tick :value="val" :key="val">{{ val }}</b-slider-tick>
-							 </template>
-				</b-slider>
-			</b-field>
-		</div>
 
 	</div>
 
@@ -62,6 +61,7 @@ Vue.component('pitch-table', {
       sound:false,
       started:false,
       rootFreq:440,
+			filterFreq: 350,
       osc:'',
 			filter:Tone.context.createBiquadFilter()
 	  }
@@ -85,6 +85,9 @@ Vue.component('pitch-table', {
 	watch: {
 		frequency() {
 			this.osc && this.osc.frequency.setValueAtTime(this.frequency,Tone.context.currentTime)
+		},
+		filterFreq (val) {
+			this.filter.frequency.value=val
 		}
 	},
 	created() {
@@ -101,9 +104,9 @@ Vue.component('pitch-table', {
 Vue.component('note-cell', {
 	template:`
 	<td	class="note-button"
-				:style="{backgroundColor:note.color}"
+				:style="{backgroundColor:color, color:textColor}"
 				@click="toggle()"
-				:class="{'active-tempo':active,'black-text':note.pitch==2}"
+				:class="{'active-tempo':active}"
 				>
 		<div class="note-grid">
 
@@ -135,6 +138,16 @@ Vue.component('note-cell', {
 		},
 		bpm() {
 			return (this.frequency*60).toFixed(1)
+		},
+		textColor() {
+			if (Math.abs(this.octave+2)*8>40) {
+				return 'hsla(0,0%,0%,'+(this.active  ? '1' : '0.8')+')'
+			} else {
+				return 'hsla(0,0%,1000%,'+(this.active  ? '1' : '0.8')+')'
+			}
+		},
+		color() {
+			return 'hsla('+this.note.pitch*30+','+ (this.active  ? '100' : '50') +'%,'+Math.abs(this.octave+2)*8+'%)'
 		}
 	},
 	watch: {
@@ -173,7 +186,6 @@ Vue.component('note-cell', {
 				this.active=false;
 				this.osc.stop();
 				this.osc.disconnect();
-
 			}
 		},
 		calcFreq(pitch, octave=3, root=this.root) {

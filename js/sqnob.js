@@ -2,28 +2,31 @@
 
 Vue.component("sqnob", {
   template: `
-  <div @mousedown.stop.prevent="activate"
-  @touchstart.stop.prevent="activate" class="sqnob">
+  <div @mousedown.prevent="activate"
+  @touchstart.prevent="activate" @dblclick="reset()" class="sqnob">
     <div class="sqnob-info">
-      {{value | round}}<br>
+      {{value | round}}{{unit}}<br>
       {{param}}
 
     </div>
     <div class="sqnob-value" :style="{height:internalValue+'%'}"></div>
   </div>
   `,
-  props: ["max", "min", "value", "step", "param"],
+  props: ["max", "min", "value", "step", "param","unit","log"],
   data() {
     return {
       internalValue: this.mapNumber(this.value, this.min, this.max, 0, 100),
+      logValue: 0,
       active: false,
       initialX: undefined,
       initialY: undefined,
       initialDragValue: undefined,
-      shiftPressed: false
+      shiftPressed: false,
+      initialValue: this.mapNumber(this.value, this.min, this.max, 0, 100)
     };
   },
   created() {
+
     document.addEventListener("keydown", e => {
       if (e.key == "Shift") this.shiftPressed = true;
     });
@@ -48,14 +51,20 @@ Vue.component("sqnob", {
     }
   },
   methods: {
-    mapNumber(value, inputmin, inputmax, rangemin, rangemax) {
+    reset() {
+      this.internalValue=this.initialValue;
+      this.$emit(
+        "input",
+        this.mapNumber(this.internalValue, 0, 100, this.min, this.max)
+      );
+    },
+    mapNumber(value, inputmin=0, inputmax=100, rangemin=0, rangemax=100) {
       rangemax = parseFloat(rangemax);
       rangemin = parseFloat(rangemin);
       inputmax = parseFloat(inputmax);
       inputmin = parseFloat(inputmin);
       let result =
-        (value - inputmin) * (rangemax - rangemin) / (inputmax - inputmin) +
-        rangemin;
+        (value - inputmin) * (rangemax - rangemin) / (inputmax - inputmin) + rangemin;
 
       return Math.round(result * (this.step || 100)) / (this.step || 100);
     },
