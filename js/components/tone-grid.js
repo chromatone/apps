@@ -18,23 +18,23 @@ Vue.component("tone-grid", {
 
       <table class="tone-table">
         <tr v-if="activeSteps[note.pitch] || showInactive"  v-for="note in reversedNotes">
-          <td class="grid-note" :style="{backgroundColor:octaveColors[octave]}" v-for="(octave,oct) in octaves">
-            <div :class="{inactive:!activeSteps[note.pitch]}" :style="{backgroundColor:note.color}" class="grid-note-dot">{{note.name}}{{octave}}</div>
+          <td class="grid-note" :style="{backgroundColor:'hsla(0,0%,'+octave*10+'%)'}" v-for="(octave,oct) in octaves">
+            <div :class="{inactive:!activeSteps[note.pitch]}" :style="{backgroundColor:'hsla('+note.pitch*30+',80%,'+(octave*6+20)+'%)', color:'hsla(0,0%,'+(octave*6+20 > 40 ? 0 : 100)+'%)'}" class="grid-note-dot">{{note.name}}{{octave}}</div>
           </td>
         </tr>
       </table>
     </div>
 
     <div class="grid-controls">
-       <button class="button is-small is-rounded" :class="{pushed:showInactive}" @click="showInactive=!showInactive">
+       <button class="button" :class="{pushed:showInactive}" @click="showInactive=!showInactive">
           Show inactive
         </button>
+        <b-field class="slider-holder" label="Octaves">
+          <b-slider v-model="octaveRange" ticks :step="1" :min="0" :max="8"></b-slider>
+        </b-field>
     </div>
 
-    <div class="slider-holder">
-      <div class="label">Octaves</div>
-      <vue-slider v-model="octaveRange" :piecewise="true" :interval="1" :dot-size="12" :min="0" :max="8" :height="6" direction="horizontal" tooltip="always"></vue-slider>
-    </div>
+
 
 
   </div>`,
@@ -50,9 +50,7 @@ Vue.component("tone-grid", {
       pressed: false
     };
   },
-  components: {
-    vueSlider: window["vue-slider-component"]
-  },
+
   props: {
     steps: {
       type: Array,
@@ -91,6 +89,7 @@ Vue.component("tone-grid", {
     }
   },
   methods: {
+
     ongoingTouchIndexById(ongoingTouches, idToFind) {
       for (var i = 0; i < ongoingTouches.length; i++) {
         var id = ongoingTouches[i].identifier;

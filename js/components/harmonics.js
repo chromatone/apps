@@ -51,12 +51,12 @@ Vue.component("harmonics", {
 			<div style="padding:0px 20px 100px 20px;display:grid;grid-template-columns:1fr 1fr">
 
         <b-field label="Frequency, Hz">
-           <b-slider v-model="frequency" :step="0.01" :min="0.05" :max="1"></b-slider>
+           <b-slider v-model="frequency" ticks :step="0.01" :min="0.05" :max="1"></b-slider>
         </b-field>
 
 
           <b-field label="Harmonics">
-            <b-slider v-model="harmNum" :step="1" :min="1" :max="25"></b-slider>
+            <b-slider v-model="harmNum" ticks :step="1" :min="1" :max="25"></b-slider>
           </b-field>
 
 			</div>

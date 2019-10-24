@@ -30,8 +30,20 @@ body {
 }
 
 .zdog-canvas {
+  display: block;
+ width: 100%;
+ height:100%;
   background: #FDB;
   cursor: move;
+}
+
+.abs-note {
+  display:block;
+  position:absolute;
+  top:0;
+  right:0;
+  padding:1em;
+  user-select:none;
 }
 
 /* Scale canvas with resize attribute to full size */
@@ -165,12 +177,15 @@ color:red;
   z-index:20;
   border-radius:20px;
 }
-
+.grid-controls {
+  display:grid;
+  grid-template-columns: 1fr 2fr;
+}
 .grid-note {
    margin:6px;
 }
 .grid-note-dot {
-   border-radius:40px;
+   border-radius:0px;
    padding:10px;
   text-align:center;
   color:white;
@@ -290,6 +305,7 @@ button.is-small.is-rounded {
   padding: 8px;
   background-color: #ddd;
   border-radius: 4px;
+  position:relative;
 }
 
 .field {
@@ -599,7 +615,7 @@ knob
 	overflow-x:scroll;
 }
 .pitch-table {
-
+  border-collapse: separate;
 }
 .control-row {
 	display:grid;
@@ -636,9 +652,11 @@ button[disabled="disabled"] {
 	color:#fff;
 	cursor:pointer;
 	user-select: none;
-	opacity:1
+	opacity:1;
+  border:1px solid hsla(0,0%,0%,0);
 }
 .note-grid {
+
 	display:grid;
   grid-gap:0;
 	grid-template-columns: 1fr 3fr;
@@ -647,8 +665,8 @@ button[disabled="disabled"] {
 .note-button.black-text {
 	color:#000;
 }
-.active-tempo {
-	font-weight: bold;
+.active-cell {
+	border-color: #fff;
 	opacity:1;
 }
 .note-freq {

@@ -33,7 +33,7 @@
 
         <div class="switch-row has-text-centered">
           <b-field grouped group-multiline>
-             <b-radio-button v-for="comp in components"  v-model="opened"
+             <b-radio-button :key="comp" v-for="comp in components"  v-model="opened"
                  :native-value="comp">
                  <span>{{comp}}</span>
              </b-radio-button>
@@ -105,6 +105,7 @@
   </div>
 
   <div v-if="opened == 'radiation'" class="row">
+    <div class="abs-note">drag to rotate</div>
      <radiation></radiation>
   </div>
 

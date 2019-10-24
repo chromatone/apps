@@ -106,7 +106,7 @@ Vue.component('note-cell', {
 	<td	class="note-button"
 				:style="{backgroundColor:color, color:textColor}"
 				@click="toggle()"
-				:class="{'active-tempo':active}"
+				:class="{'active-cell':active}"
 				>
 		<div class="note-grid">
 
@@ -147,7 +147,7 @@ Vue.component('note-cell', {
 			}
 		},
 		color() {
-			return 'hsla('+this.note.pitch*30+','+ (this.active  ? '100' : '50') +'%,'+Math.abs(this.octave+2)*8+'%)'
+			return 'hsla('+this.note.pitch*30+','+ (this.active  ? '100' : '75') +'%,'+Math.abs(this.octave+2)*8+'%)'
 		}
 	},
 	watch: {
