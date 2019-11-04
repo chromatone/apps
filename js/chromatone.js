@@ -22,9 +22,10 @@ const ct = new Vue({
       'midi-monitor',
       'longitudal',
       'radiation',
-      'scale-wheel'
+      'scale-wheel',
+      'noise'
     ],
-    opened:'beat'
+    opened:'noise'
   },
   mounted: function() {
     if (

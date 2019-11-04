@@ -39,8 +39,6 @@
              </b-radio-button>
          </b-field>
 
-{{opened}}
-
         </div>
       </div>
     </div>
@@ -113,6 +111,10 @@
     <scale-wheel></scale-wheel>
   </div>
 
+  <div v-if="opened == 'noise'" class="row">
+    <noise></noise>
+  </div>
+
 
 
   </div>
@@ -128,13 +130,14 @@
   <script src="js/components/osc.js"></script>
   <script src="js/components/tonal-array.js"></script>
   <script src="js/components/pitch-table.js"></script>
-    <script src="js/components/tunings.js"></script>
-    <script src="js/components/midi-bus.js"></script>
-    <script src="js/components/midi-monitor.js"></script>
-    <script src="js/components/harmonics.js"></script>
-    <script src="js/components/longitudal.js"></script>
-    <script src="js/components/radiation.js"></script>
-    <script src="js/components/scale-wheel.js"></script>
+  <script src="js/components/tunings.js"></script>
+  <script src="js/components/midi-bus.js"></script>
+  <script src="js/components/midi-monitor.js"></script>
+  <script src="js/components/harmonics.js"></script>
+  <script src="js/components/longitudal.js"></script>
+  <script src="js/components/radiation.js"></script>
+  <script src="js/components/scale-wheel.js"></script>
+  <script src="js/components/noise-generator.js"></script>
   <script src="js/chromatone.js"></script>
 
 </body>

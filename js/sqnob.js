@@ -66,7 +66,7 @@ Vue.component("sqnob", {
       let result =
         (value - inputmin) * (rangemax - rangemin) / (inputmax - inputmin) + rangemin;
 
-      return Math.round(result * (this.step || 100)) / (this.step || 100);
+      return result * (this.step || 100) / (this.step || 100);
     },
     activate(event) {
       this.initialX = event.pageX || event.changedTouches[0].pageX;

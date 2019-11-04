@@ -3,7 +3,7 @@
 Vue.component("key-stack", {
   template: ` <div>
       <div class="octave-slider">
-        <vue-slider v-model="octaves" :dot-size="24" :max="8" :height="12" direction="horizontal" :piecewise="true" :piecewise-label="true" :tooltip="false"></vue-slider>
+        <b-slider v-model="octaves" :max="8" :height="12" :step="1"></b-slider>
       </div>
       <div class="keys-container">
         <div v-for="(octave, ind) in octavesNum">
