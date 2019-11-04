@@ -29,6 +29,7 @@ body {
   font-family: sans-serif;
 }
 
+
 .zdog-canvas {
   display: block;
  width: 100%;
@@ -572,6 +573,11 @@ sqnob
 }
 
 
+.field {
+  margin:0.5em;
+  display:flex;
+  flex-wrap:wrap;
+}
 /*
 knob
 */
@@ -678,7 +684,7 @@ button[disabled="disabled"] {
 
 /* TUNINGS */
 
-<style>
+
 .st0{fill:none;stroke:#E0E1E2;stroke-width:2.8346;stroke-miterlimit:10;}
 .st1{fill:none;stroke:#EB008B;stroke-width:2.8346;stroke-miterlimit:10;}
 .st2{fill:none;stroke:#85C340;stroke-width:2.8346;stroke-miterlimit:10;}
@@ -807,4 +813,3 @@ user-select: none;
 .note-name.just {
 font-size:24px;
 }
-</style>

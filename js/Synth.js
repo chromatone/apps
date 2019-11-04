@@ -414,8 +414,8 @@ Synth.chromaOptions = {
 };
 
 Synth.chromaSynth = new Tone.PolySynth(12, Tone.Synth);
-Synth.analyser = Tone.context.createAnalyser().toMaster();
-Synth.analyser.fftSize = 2048;
+Synth.analyser = new Tone.Analyser('fft',2048);
+Synth.analyser.toMaster();
 Synth.volume = new Tone.Volume(0).connect(Synth.analyser);
 Synth.synthVolume = new Tone.Volume(1).connect(Synth.volume);
 Synth.chromaSynth.connect(Synth.synthVolume);

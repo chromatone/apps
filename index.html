@@ -10,10 +10,9 @@
   <link rel="stylesheet" href="css/Chromatone.css" />
 
   <script src="assets/StartAudioContext.js"></script>
-  <script src="assets/Tone.min.js"></script>
+  <script src="assets/Tone.js"></script>
   <script src="assets/vue.js"></script>
   <script type="text/javascript" src="../assets/webmidi.js"></script>
-  <script src="assets/vue-slider.js"></script>
   <script src="assets/buefy.js"></script>
   <script src="assets/zdog.dist.js"></script>
 </head>
@@ -113,8 +112,18 @@
 
   <div v-if="opened == 'noise'" class="row">
     <noise></noise>
+
   </div>
 
+  <div v-if="opened == 'noise'" class="row">
+    <autofilter></autofilter>
+
+  </div>
+
+  <div v-if="opened == 'noise'" class="row">
+    
+    <autopanner></autopanner>
+  </div>
 
 
   </div>
@@ -122,6 +131,7 @@
   <script src="js/Synth.js"></script>
   <script src="js/components/tone-grid.js"></script>
   <script src="js/sqnob.js"></script>
+  <script src="js/components/filters.js"></script>
   <script src="js/components/beats.js"></script>
   <script src="js/components/field.js"></script>
   <script src="js/components/key-stack.js"></script>
@@ -138,6 +148,7 @@
   <script src="js/components/radiation.js"></script>
   <script src="js/components/scale-wheel.js"></script>
   <script src="js/components/noise-generator.js"></script>
+
   <script src="js/chromatone.js"></script>
 
 </body>
