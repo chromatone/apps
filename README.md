@@ -1,10 +1,18 @@
 # Chromatone
-Visual music language interactive education, research and practice tools
+Visual music language interactive education, research and practice tools.
 
 Chromatone is based on a scientifical view of human perception of colors, sounds and their relationships. 
 Red is first visible frequency of light spectrum, that we can join in a wheel and equally divide into 12 main colors. A is first among those 12 notes that equally divide cyclical acoustic octaves. So we come up with a connection of two sense systems, that happens in our brain. And it appears to be a great tool to better feel and understand music, visual design and beyond.
 
 We develop a toolset for anyone who wants to see music and hear colors by themselves. Essentially it's an artifical synesthesia development toolkit. And you can use it to learn and teach, explore and compose, memorize and visualize music and even convert pictures to melodies.
+
+Glitch
+-----
+
+The most recent version of the apps can be checked at https://chromatone.glitch.me/. You can view and edit all the code online with Glitch editor https://glitch.com/edit/#!/chromatone.
+
+Technologies
+------
 
 Chromatone apps are built around Vue.js components in a modular way. We're not using any backend build procedures, so anyone with a modern browser can directly open the source files directly on a computer or even a mobile locally. The apps we utilize such features as:
   
