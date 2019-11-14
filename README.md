@@ -1,8 +1,8 @@
-# Chromatone
+# Chromatone apps
 
 Visual music language interactive education, research and practice tools.
 
-Chromatone is based on a scientifical view of human perception of colors, sounds and their relationships.
+Chromatone is based on a scientific view on human perception of colors, sounds and relationships between them.
 Red is first visible frequency of light spectrum, that we can join in a wheel and equally divide into 12 main colors. A is first among those 12 notes that equally divide cyclical acoustic octaves. So we come up with a connection of two sense systems, that happens in our brain. And it appears to be a great tool to better feel and understand music, visual design and beyond.
 
 We develop a toolset for anyone who wants to see music and hear colors by themselves. Essentially it's an artifical synesthesia development toolkit. And you can use it to learn and teach, explore and compose, memorize and visualize music and even convert pictures to melodies.
@@ -11,16 +11,17 @@ We develop a toolset for anyone who wants to see music and hear colors by themse
 
 ## Glitch
 
-The most recent version of the apps can be checked at [chromatone.glitch.me](https://chromatone.glitch.me/). You can view and edit all the code online with [Glitch editor](https://glitch.com/edit/#!/chromatone).
+The most recent version of the apps is at [chromatone.glitch.me](https://chromatone.glitch.me/). You can view and edit all the code online with [Glitch editor](https://glitch.com/edit/#!/chromatone).
 
 ## Technologies
 
-Chromatone apps are built around Vue.js components in a modular way. We're not using any backend build procedures, so anyone with a modern browser can directly open the source files directly on a computer or even a mobile locally. The apps we utilize such features as:
+Chromatone apps are built around Vue.js components in a modular way. We're not using any backend build procedures, so anyone with a modern browser can directly open the source files on any device locally and online. It's our vision of open source apps built in open browser environment. We monitor the development of Web stardards and it's implemention in different browsers. And using the powers of modern ECMAScript we try to combine different browser APIs:
 
 - [Web Audio API](https://developer.mozilla.org/ru/docs/Web/API/Web_Audio_API)
 - [Canvas API](https://developer.mozilla.org/ru/docs/Web/API/Canvas_API)
 - [SVG](https://developer.mozilla.org/ru/docs/Web/SVG)
 - [WebGl](https://developer.mozilla.org/ru/docs/Web/API/WebGL_API)
+- and also DeviceOrientation and more
 
 We use different JS frameworks:
 
@@ -29,7 +30,7 @@ We use different JS frameworks:
 - [Tone.js](https://tonejs.github.io/) to deal with sound synthesis and processing
 - [Zdog.js](https://github.com/metafizzy/zdog) to create 3D illustrations
 
-  We divide the components by main function: to learn or to explore. The difference is in the level of interactivity.
+We categorize the components by main function: to learn or to explore. The difference is in the level of interactivity and creative possibilities.
 
 # MODULES
 
