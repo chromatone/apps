@@ -16,6 +16,8 @@ const midiBus = Vue.component('midi-bus', {
         inputs:WebMidi.inputs,
         outputs:WebMidi.outputs
       },
+      opz:{},
+      lc:{},
       channels:{}
     }
   },
@@ -94,6 +96,39 @@ const midiBus = Vue.component('midi-bus', {
       input.addListener('controlchange', "all", this.ccInChange);
       input.addListener('stop', 'all', this.reset)
 
+    },
+    onMIDISuccess(midiAccess) {
+      console.log( "MIDI ready!", midiAccess );
+      midiAccess.inputs.forEach(input => {
+        if (input.name == 'OP-Z') {
+          this.opz.in=input;
+          this.opz.in.onmidimessage = this.opzMIDIMessage
+        }
+        if (input.name == 'Launch Control XL') {
+          this.lc.in = input;
+          this.lc.in.onmidimessage = this.lcMIDIMessage
+        }
+      })
+      midiAccess.outputs.forEach(output => {
+        console.log(output.name)
+        if (output.name == 'OP-Z') {
+          this.opz.out=output
+        } else if (output.name == 'Launch Control XL') {
+          this.lc.out = output
+        }
+      })
+    },
+    onMIDIFailure(msg) {
+      console.log( "Failed to get MIDI access - " + msg );
+    },
+    opzMIDIMessage(event) {
+      if (event.data == 248) {return}
+      if(event.data[1]!=1) {
+        this.lc.out.send(event.data, event.timestamp)
+      }
+    },
+    lcMIDIMessage(event) {
+      this.opz.out.send(event.data, event.timestamp)
     }
   },
   computed: {
@@ -103,6 +138,8 @@ const midiBus = Vue.component('midi-bus', {
     if (WebMidi.supported) {
       WebMidi.enable();
     }
+
+    navigator.requestMIDIAccess().then( this.onMIDISuccess, this.onMIDIFailure );
   /*  this.$midiBus.$on('noteouton', this.noteOutOn)
     this.$midiBus.$on('noteoutoff', this.noteOutOff) */
   }
