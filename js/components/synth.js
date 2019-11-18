@@ -1,6 +1,10 @@
 // SYNTH
+import {sqnob} from '../sqnob.js'
 
-Vue.component("synth", {
+export const synth =  {
+  components: {
+    sqnob
+  },
   template: `<div class="">
 		<div class="level adsr-sliders">
 
@@ -55,4 +59,4 @@ Vue.component("synth", {
        Synth.synthVolume.volume.value=this.volume;
     }
   }
-});
+}

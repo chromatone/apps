@@ -2,7 +2,7 @@
 
 // Oscilloscope
 
-Vue.component("oscilloscope", {
+export const oscilloscope = {
   template: ` <div id="oscilloscope">
     <svg viewBox="0 0 800 800">
       <polyline id="scope" fill="transparent"
@@ -21,7 +21,7 @@ Vue.component("oscilloscope", {
  created() {
     this.bufferLength = Synth.analyser.fftSize;
     this.dataArray= new Uint8Array(Synth.analyser.fftSize);
-    Synth.analyser.getByteTimeDomainData(this.dataArray);
+    Synth.analyser.input.getByteTimeDomainData(this.dataArray);
     this.sliceWidth = window.innerWidth / this.bufferLength * 2.0;
     this.draw();
 
@@ -33,11 +33,11 @@ Vue.component("oscilloscope", {
   },
   methods: {
     draw() {
-      Synth.analyser.getByteTimeDomainData(this.dataArray);
+      Synth.analyser.input.getByteTimeDomainData(this.dataArray);
       let x=0;
       this.points=[];
       let firstZero;
-      for (i=1; i<this.bufferLength; i++) {
+      for (let i=1; i<this.bufferLength; i++) {
         let y = this.dataArray[i] / 128 * 400;
         if (firstZero !== undefined) {
           this.points.push(x,y);
@@ -54,4 +54,4 @@ Vue.component("oscilloscope", {
       requestAnimationFrame(this.draw)
     }
   }
-});
+}

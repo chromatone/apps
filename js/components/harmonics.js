@@ -1,4 +1,4 @@
-Vue.component("harmonics", {
+export const harmonics =  {
   template: `
   <div id="harmonic-series">
 		<svg id="artwork" viewBox="-10 -65 420 420">
@@ -101,7 +101,7 @@ Vue.component("harmonics", {
   },
   watch: {
   		harmNum: function(){
-  			for (i=0;i<this.harmNum;i++) {
+  			for (let i=0;i<this.harmNum;i++) {
   					this.waves[i]={
   						front:[],
   						back:[],
@@ -128,14 +128,14 @@ Vue.component("harmonics", {
 			let vm = this;
 
 			vm.time=(Date.now()-vm.date)/1000;
-			for (i=0; i<vm.harmonicsNumber; i++) {
+			for (let i=0; i<vm.harmonicsNumber; i++) {
 				vm.harmonics[i].path=vm.calcPath(i)
 			};
 
 			let y1,y2,shift;
-			for (x=0;x<=vm.length/2;x++) {
+			for (let x=0;x<=vm.length/2;x++) {
 				vm.full.y[x]=0;
-				for (i=0;i<vm.harmNum;i++) {
+				for (let i=0;i<vm.harmNum;i++) {
 					if(vm.combine) {
 						shift=0;
 					} else {
@@ -161,7 +161,7 @@ Vue.component("harmonics", {
 			let shift = Math.sin( vm.time * Math.PI * vm.frequency * (num+1) ) * vm.amplitude / (0.5*num+1);
 			let harm=[];
 			harm.push('M 0 ', h,' q ', w, ' ', shift, ' ', w*2, ' 0');
-			for (j=0; j<num; j++) {
+			for (let j=0; j<num; j++) {
 				harm.push(' t ', w*2, ' 0')
 			}
 			return harm.join('')
@@ -176,7 +176,7 @@ Vue.component("harmonics", {
 		}
   },
   created: function() {
-    for (harm=0;harm<=this.harmonicsNumber;harm++) {
+    for (let harm=0;harm<=this.harmonicsNumber;harm++) {
 			this.harmonics.push({
 				path:'M0 0',
 				phase:0,
@@ -185,7 +185,7 @@ Vue.component("harmonics", {
 			})
 		}
 
-		for (i=0;i<this.harmNum;i++) {
+		for (let i=0;i<this.harmNum;i++) {
 		this.waves[i]={
 			front:[],
 			back:[],
@@ -196,4 +196,4 @@ Vue.component("harmonics", {
 
 		this.draw();
   }
-});
+}

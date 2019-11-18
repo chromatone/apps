@@ -12,7 +12,6 @@
   <script src="assets/StartAudioContext.js"></script>
   <script src="assets/Tone.js"></script>
   <script src="assets/vue.js"></script>
-  <script type="text/javascript" src="../assets/webmidi.js"></script>
   <script src="assets/buefy.js"></script>
   <script src="assets/zdog.dist.js"></script>
 </head>
@@ -47,7 +46,7 @@
 
 
   <div v-if="opened == 'midi-monitor'" class="row">
-    <midi-bus :absolute="true" :channels.sync="channels"></midi-bus>
+    <midi-bus :channels.sync="channels"></midi-bus>
     <midi-monitor :channels="channels"></midi-monitor>
   </div>
 
@@ -57,16 +56,6 @@
   </div>
   <script src="js/Scales.js"></script>
   <script src="js/Synth.js"></script>
-  <script src="js/components/key-stack.js"></script>
-  <script src="js/components/scales.js"></script>
-  <script src="js/components/synth.js"></script>
-  <script src="js/components/osc.js"></script>
-  <script src="js/components/tunings.js"></script>
-  <script src="js/components/midi-bus.js"></script>
-  <script src="js/components/midi-monitor.js"></script>
-  <script src="js/components/harmonics.js"></script>
-  <script src="js/components/radiation.js"></script>
-  <script src="js/components/scale-wheel.js"></script>
 
   <script type="module" src="js/chromatone.js"></script>
 

@@ -1,4 +1,4 @@
-const midiMonitor = Vue.component('midi-monitor',{
+export const midiMonitor = {
   template: `
   <div class="midi-monitor">
     <div v-for="(channel,ch) in channels" class="midi-channel">
@@ -36,4 +36,4 @@ const midiMonitor = Vue.component('midi-monitor',{
       return 'hsla('+digit*30+','+velocity*100+'%,50%,1)'
     }
   }
-})
+}

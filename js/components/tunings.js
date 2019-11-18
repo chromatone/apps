@@ -1,5 +1,5 @@
 
-Vue.component('note-circle', {
+const noteCircle = {
 	template:`<circle @mousedown.stop.prevent="playing ? stop(hz) : play(hz)"
 										@touchstart.stop.prevent="play(hz)"
 										@touchend.stop.prevent="stop(hz)"
@@ -27,10 +27,13 @@ Vue.component('note-circle', {
 			Tone.synth.triggerRelease(note)
 		}
 	}
-})
+}
 
 
-Vue.component('tunings', {
+export const tunings = {
+	components: {
+		noteCircle
+	},
 	template: `<div>
   <svg version="1.1" id="tunings"  x="0px" y="0px"
 			 viewBox="0 0 1155 1155" style="enable-background:new 0 0 1153.3 1153.3;" xml:space="preserve">
@@ -953,4 +956,4 @@ Vue.component('tunings', {
 			}
 		})
 	}
-});
+}

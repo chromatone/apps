@@ -1,4 +1,6 @@
-const midiBus = Vue.component('midi-bus', {
+import WebMidi from '../../assets/webmidi.js'
+
+export const midiBus = {
   template:`
     <div class="midi-bus" :class="{'absolute':absolute}">
       <div class="devices">
@@ -137,10 +139,11 @@ const midiBus = Vue.component('midi-bus', {
   created() {
     if (WebMidi.supported) {
       WebMidi.enable();
-    }
+
 
     navigator.requestMIDIAccess().then( this.onMIDISuccess, this.onMIDIFailure );
+    }
   /*  this.$midiBus.$on('noteouton', this.noteOutOn)
     this.$midiBus.$on('noteoutoff', this.noteOutOff) */
   }
-})
+}

@@ -1,6 +1,5 @@
 // KNOB
-
-Vue.component("scales", {
+export const scales = {
   template: `   <div class="scale-select level wrap is-mobile">
     <div class="level-item">
         Scale
@@ -140,4 +139,4 @@ Vue.component("scales", {
       this.active = false;
     }
   }
-});
+}

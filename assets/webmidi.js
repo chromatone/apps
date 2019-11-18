@@ -1731,7 +1731,7 @@
     if(!wm.nrpnEventsEnabled) {
       return;
     }
-    
+
     // nrpn enabled, message not valid for nrpn
     if(
       !(
@@ -1868,7 +1868,7 @@
         },
         value: nrpnValue
       };
-      
+
       // now we are done building an NRPN, so clear the NRPN buffer for this channel
       wm._nrpnBuffer[channelBufferIndex] = [];
       // If some callbacks have been defined for this event, on that device and channel, execute
@@ -4418,7 +4418,9 @@
   } else if (typeof module !== "undefined" && module.exports) {
     module.exports = wm;
   } else {
-    if (!scope.WebMidi) { scope.WebMidi = wm; }
+    if (!window.WebMidi) { window.WebMidi = wm; }
   }
 
 }(this));
+
+export default WebMidi

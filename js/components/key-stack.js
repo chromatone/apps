@@ -1,6 +1,6 @@
 //KEY stack
 
-Vue.component("key-stack", {
+export const keyStack = {
   template: ` <div>
       <div class="octave-slider">
         <b-slider v-model="octaves" :max="8" :height="12" :step="1"></b-slider>
@@ -76,4 +76,4 @@ Vue.component("key-stack", {
         Synth.chromaSynth.triggerRelease(Synth.calcFrequency(note.pitch, octave));
     }
   }
-});
+}

@@ -1,4 +1,4 @@
-Vue.component("radiation", {
+export const radiation = {
   template: `<canvas class="zdog-canvas"></canvas>`,
   data: function() {
     return {
@@ -80,7 +80,7 @@ Vue.component("radiation", {
       stroke: 10,
       color: '#636'
     });
-    console.log(this.paths.mf)
+
     this.paths.ef =  new Zdog.Shape({
       addTo: this.waveGroup,
       path: this.createPath(),
@@ -102,4 +102,4 @@ Vue.component("radiation", {
 
     this.animate();
   }
-});
+}

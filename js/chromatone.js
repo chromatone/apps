@@ -10,15 +10,35 @@ import {field} from './components/field.js'
 import {noise} from './components/noise-generator.js'
 import {beats} from './components/beats.js'
 import {tonalArray} from './components/tonal-array.js'
+import {synth} from './components/synth.js'
+import {keyStack} from './components/key-stack.js'
+import {tunings} from './components/tunings.js'
+import {harmonics} from './components/harmonics.js'
+import {scaleWheel} from './components/scale-wheel.js'
+import {radiation} from './components/radiation.js'
+import {midiBus} from './components/midi-bus.js'
+import {midiMonitor} from './components/midi-monitor.js'
+import {oscilloscope} from './components/osc.js'
+import {scales} from './components/scales.js'
 
 const components = {
   longitudal,
-  'pitch-table': pitchTable,
-  'tone-grid':toneGrid,
+  pitchTable,
+  toneGrid,
   field,
   noise,
   beats,
-  tonalArray
+  tonalArray,
+  synth,
+  keyStack,
+  tunings,
+  harmonics,
+  scaleWheel,
+  radiation,
+  midiBus,
+  midiMonitor,
+  oscilloscope,
+  scales
 }
 
 

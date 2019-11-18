@@ -1,6 +1,6 @@
 
 
-Vue.component("scale-wheel", {
+export const scaleWheel = {
   template: `
           <svg version="1.1" id="Chromatic-wheel" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
              y="0px" viewBox="0 0 1000 1000" style="enable-background:new 0 0 1000 1000;" xml:space="preserve">
@@ -411,7 +411,7 @@ Vue.component("scale-wheel", {
 
            $('#note').text(noteNames[Chroma.wheel.root]);
            setKeys(Chroma.wheel.root,Chroma.scale.steps);
-         
+
      }
   }
-});
+}
