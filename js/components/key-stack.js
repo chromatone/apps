@@ -1,4 +1,4 @@
-//KEY stack
+import Chroma from '../Scales.js'
 
 export const keyStack = {
   template: ` <div>

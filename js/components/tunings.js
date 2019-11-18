@@ -1,3 +1,4 @@
+import Chroma from '../Scales.js'
 
 const noteCircle = {
 	template:`<circle @mousedown.stop.prevent="playing ? stop(hz) : play(hz)"

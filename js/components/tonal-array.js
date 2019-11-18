@@ -1,4 +1,4 @@
-//Circle-note
+import Chroma from '../Scales.js'
 
 const circleNote = {
 	template:`<g><circle

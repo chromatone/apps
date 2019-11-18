@@ -6,28 +6,35 @@
   <title>MIDI monitor @chromatone</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="../css/styles.css" />
-  <script src="../assets/StartAudioContext.js"></script>
-  <script src="../assets/Tone.min.js"></script>
   <script src="../assets/vue.js"></script>
-  <script src="../assets/webmidi.js"></script>
+  <script type="module">
+  Vue.prototype.$midiBus = new Vue(); // Global event bus
 
+  import {midiBus} from '../js/components/midi-bus.js'
+  import {midiMonitor} from '../js/components/midi-monitor.js'
 
+  const midiMon = new Vue({
+    el:"#midi-monitor",
+    components: {
+      midiBus,
+      midiMonitor
+    },
+    data: {
+      channels:{}
+    }
+  })
 
+  </script>
 </head>
 
 <body>
 
 
-  <div id="chromatone">
-    <midi-bus :absolute="true" :channels.sync="channels"></midi-bus>
+  <div id="midi-monitor">
+    <midi-bus :channels.sync="channels"></midi-bus>
     <midi-monitor :channels="channels"></midi-monitor>
   </div>
 
-
-
-  <script type="text/javascript" src="../js/components/midi-monitor.js"></script>
-  <script type="text/javascript" src="../js/components/midi-bus.js"></script>
-  <script src="../js/chromatone.js"></script>
 
 </body>
 

@@ -1,4 +1,5 @@
-// KNOB
+import Chroma from '../Scales.js'
+
 export const scales = {
   template: `   <div class="scale-select level wrap is-mobile">
     <div class="level-item">

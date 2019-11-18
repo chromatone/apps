@@ -19,7 +19,7 @@ import {radiation} from './components/radiation.js'
 import {midiBus} from './components/midi-bus.js'
 import {midiMonitor} from './components/midi-monitor.js'
 import {oscilloscope} from './components/osc.js'
-import {scales} from './components/scales.js'
+import {scales} from './components/Scales.js'
 
 const components = {
   longitudal,

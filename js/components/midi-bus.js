@@ -25,9 +25,10 @@ export const midiBus = {
   },
   watch: {
     'midi.inputs': function (inputs) {
-      for (input of inputs) {
+      console.log(inputs)
+      inputs.forEach((input) => {
         this.setListeners(input)
-      }
+      }) 
 
     }
   },

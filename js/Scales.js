@@ -429,3 +429,5 @@ Chroma.Scales = {
     steps:[0,0,0,0,0,0,0,0,0,0,0,0]
   }
   */
+
+export default Chroma

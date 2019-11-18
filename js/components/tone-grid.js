@@ -1,4 +1,4 @@
-// TONE-GRID !!!!!!
+import Chroma from '../Scales.js'
 
 export const toneGrid = {
   template: `<div class="tone-grid">
