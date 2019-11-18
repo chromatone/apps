@@ -1,107 +1,6 @@
-Vue.component('pitch-table', {
-	template: `  <div id="pitch-table">
-	  <div class="slider-holder">
-			<b-field label="Pitch table octaves">
-				<b-slider v-model="octaveRange" type="is-primary" :min="-6" :max="9">
-					<template v-for="val in [-4,-2,0,2,4,6,8]">
-									 <b-slider-tick :value="val" :key="val">{{ val }}</b-slider-tick>
-							 </template>
-				</b-slider>
-			</b-field>
-		</div>
+import {sqnob} from '../sqnob.js'
 
-		<div class="table-holder">
-			<table class="pitch-table">
-				<tr v-for="note in reversedNotes" class="note-block" >
-
-					<td is="note-cell" v-for="octave in octaves" :key="octave" :root="rootFreq" :note="note" :octave="octave" :tuning="tuning" :filter="filter" :type="oscType"></td>
-
-
-				</tr>
-			</table>
-		</div>
-
-	<div class="control-row">
-	<div>
-		<b-field grouped group-multiline  label="Intonation system">
-			<b-radio-button  size="is-small" native-value="equal" v-model="tuning" >EQUAL</b-radio-button>
-			<b-radio-button  size="is-small" native-value="just" v-model="tuning">JUST</b-radio-button>
-		</b-field>
-	</div>
-	<div>
-		<b-field grouped group-multiline label="Oscillator type">
-			<b-radio-button :key="type"  size="is-small" v-for="type in oscTypes"
-				:native-value="type" v-model="oscType">{{type}}</b-radio-button>
-		</b-field>
-	</div>
-	<div>
-		<b-field label="Low Pass">
-			<sqnob v-model="filterFreq" unit=" Hz" param="LP FILTER" :step="1" :min="20" :max="25000"></sqnob>
-		</b-field>
-	</div>
-
-	<div>
-		<b-field label="A4">
-			<sqnob v-model="rootFreq" unit=" Hz" param="FREQUENCY" :step="1" :min="415" :max="500"></sqnob>
-		</b-field>
-	</div>
-
-
-	</div>
-
-	</div>`,
-	data() {
-    return {
-      notes:Chroma.Notes,
-      octaveRange:[0,6],
-      frequency:1,
-      oscType:'sawtooth',
-      oscTypes:['sine','triangle','sawtooth','square'],
-      tuning:'equal',
-      sound:false,
-      started:false,
-      rootFreq:440,
-			filterFreq: 350,
-      osc:'',
-			filter:Tone.context.createBiquadFilter()
-	  }
-  },
-	computed: {
-		reversedNotes() {
-			let notes=[...this.notes]
-			return notes.reverse();
-		},
-		octaves() {
-			let octaves=[];
-			for(i=this.octaveRange[0];i<=this.octaveRange[1];i++) {
-				octaves.push(i)
-			}
-			return octaves
-		}
-	},
-	methods: {
-
-	},
-	watch: {
-		frequency() {
-			this.osc && this.osc.frequency.setValueAtTime(this.frequency,Tone.context.currentTime)
-		},
-		filterFreq (val) {
-			this.filter.frequency.value=val
-		}
-	},
-	created() {
-    this.filter.connect(Synth.volume);
-  },
-  beforeDestroy() {
-		this.filter.disconnect();
-	}
-});
-
-
-// grid-cell
-
-Vue.component('note-cell', {
+const noteCell = {
 	template:`
 	<td	class="note-button"
 				:style="{backgroundColor:color, color:textColor}"
@@ -177,7 +76,7 @@ Vue.component('note-cell', {
 					this.osc.type=this.type;
 					this.osc.frequency.value=this.frequency;
 
-					this.osc.connect(this.filter);
+					this.osc.connect(this.filter.input);
 					this.osc.start();
 					this.started=true;
 
@@ -201,4 +100,108 @@ Vue.component('note-cell', {
 			 return hz
 		},
 	}
-})
+}
+
+export const pitchTable = {
+	components: {
+		'note-cell':noteCell,
+		sqnob
+	},
+	template: `  <div id="pitch-table">
+	  <div class="slider-holder">
+			<b-field label="Pitch table octaves">
+				<b-slider v-model="octaveRange" type="is-primary" :min="-6" :max="9">
+					<template v-for="val in [-4,-2,0,2,4,6,8]">
+									 <b-slider-tick :value="val" :key="val">{{ val }}</b-slider-tick>
+							 </template>
+				</b-slider>
+			</b-field>
+		</div>
+
+		<div class="table-holder">
+			<table class="pitch-table">
+				<tr v-for="note in reversedNotes" class="note-block" >
+
+					<td is="note-cell" v-for="octave in octaves" :key="octave" :root="rootFreq" :note="note" :octave="octave" :tuning="tuning" :filter="filter" :type="oscType"></td>
+
+
+				</tr>
+			</table>
+		</div>
+
+	<div class="control-row">
+	<div>
+		<b-field grouped group-multiline  label="Intonation system">
+			<b-radio-button  size="is-small" native-value="equal" v-model="tuning" >EQUAL</b-radio-button>
+			<b-radio-button  size="is-small" native-value="just" v-model="tuning">JUST</b-radio-button>
+		</b-field>
+	</div>
+	<div>
+		<b-field grouped group-multiline label="Oscillator type">
+			<b-radio-button :key="type"  size="is-small" v-for="type in oscTypes"
+				:native-value="type" v-model="oscType">{{type}}</b-radio-button>
+		</b-field>
+	</div>
+	<div>
+		<b-field label="Low Pass">
+			<sqnob v-model="filterFreq" unit=" Hz" param="LP FILTER" :step="1" :min="20" :max="25000"></sqnob>
+		</b-field>
+	</div>
+
+	<div>
+		<b-field label="A4">
+			<sqnob v-model="rootFreq" unit=" Hz" param="FREQUENCY" :step="1" :min="415" :max="500"></sqnob>
+		</b-field>
+	</div>
+
+
+	</div>
+
+	</div>`,
+	data() {
+    return {
+      notes:Chroma.Notes,
+      octaveRange:[0,6],
+      frequency:1,
+      oscType:'sawtooth',
+      oscTypes:['sine','triangle','sawtooth','square'],
+      tuning:'equal',
+      sound:false,
+      started:false,
+      rootFreq:440,
+			filterFreq: 350,
+      osc:'',
+			filter: new Tone.AutoFilter()
+	  }
+  },
+	computed: {
+		reversedNotes() {
+			let notes=[...this.notes]
+			return notes.reverse();
+		},
+		octaves() {
+			let octaves=[];
+			for(let i=this.octaveRange[0];i<=this.octaveRange[1];i++) {
+				octaves.push(i)
+			}
+			return octaves
+		}
+	},
+	methods: {
+
+	},
+	watch: {
+		frequency() {
+			this.osc && this.osc.frequency.setValueAtTime(this.frequency,Tone.context.currentTime)
+		},
+		filterFreq (val) {
+			this.filter.frequency.rampTo(val)
+		}
+	},
+	mounted() {
+    this.filter.connect(Synth.volume);
+  },
+  beforeDestroy() {
+		this.filter.disconnect();
+	}
+}

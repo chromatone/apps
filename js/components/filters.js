@@ -1,4 +1,9 @@
-Vue.component("autofilter", {
+import {sqnob} from '../sqnob.js'
+
+export const autoFilter = {
+  components:{
+    sqnob
+  },
   template: `
   <div id="autoFilter">
 
@@ -77,9 +82,12 @@ Vue.component("autofilter", {
   beforeDestroy() {
 
   }
-});
+}
 
-Vue.component("autopanner", {
+export const autoPanner = {
+  components:{
+    sqnob
+  },
   template: `
   <div id="autoPanner">
 
@@ -128,4 +136,4 @@ Vue.component("autopanner", {
   beforeDestroy() {
 
   }
-});
+}

@@ -1,4 +1,4 @@
-Vue.component("longitudal", {
+export const longitudal = {
   template: `
 
   <div id="longitudal-waves">
@@ -42,7 +42,7 @@ Vue.component("longitudal", {
 
 			vm.time=(Date.now()-vm.date)/1000;
 		  vm.string=vm.calcPath();
-			for (i=0;i<vm.lines.length;i++) {
+			for (let i=0;i<vm.lines.length;i++) {
 				vm.displacements[i]=vm.lines[i] + Math.sin((vm.time-i/10)*Math.PI*vm.frequency)*vm.amplitude/2;
 
 			}
@@ -62,11 +62,11 @@ Vue.component("longitudal", {
 	},
 	mounted: function(){
 
-		for (x=0;x<this.linesNum;x++) {
+		for (let x=0;x<this.linesNum;x++) {
 			this.lines.push(x*4)
 		}
 
 		this.draw();
 
 	}
-});
+}

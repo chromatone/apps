@@ -1,6 +1,8 @@
-Vue.component("noise", {
-  template: `
+import {autoFilter, autoPanner} from './filters.js'
+import {sqnob} from '../sqnob.js'
 
+export const noise = {
+  template: `
   <div id="noise-generator">
       <b-field>
         <b-field>
@@ -10,7 +12,7 @@ Vue.component("noise", {
             @touchstart.stop="playNoise()"
             @touchend.stop="stopNoise()"
             @touchcancel.stop="stopNoise()" @mouseup="stopNoise()">NOISE</div>
-            
+
         <b-switch  v-model="active"></b-switch>
       </b-field>
         <b-field >
@@ -37,10 +39,16 @@ Vue.component("noise", {
 
       </b-field>
     </b-field>
-
+<autoFilter></autoFilter>
+<autoPanner></autoPanner>
 </div>
 
   `,
+  components:{
+    autoFilter,
+    autoPanner,
+    sqnob
+  },
   data() {
     return {
       noiseOptions: {
@@ -114,4 +122,4 @@ Vue.component("noise", {
   beforeDestroy() {
     this.synth.triggerRelease();
   }
-});
+}

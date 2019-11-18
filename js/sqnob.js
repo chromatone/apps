@@ -1,6 +1,4 @@
-// KNOB
-
-Vue.component("sqnob", {
+export const sqnob = {
   template: `
   <div @mousedown.prevent="activate"
   @touchstart.prevent="activate" @dblclick="reset()" class="sqnob">
@@ -106,4 +104,4 @@ Vue.component("sqnob", {
       this.active = false;
     }
   }
-});
+}

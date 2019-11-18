@@ -1,141 +1,9 @@
-Vue.component("beat", {
-  template: `<div class="rythm-box">
-		<div class="metro-options">
+import {sqnob} from '../sqnob.js'
 
-			<div class="">
-				<button class="button " :class="{pushed:play}" @click.prevent.stop="toggleTransport()">
-      &#9654;
-				</button>
-			</div>
-
-			<div class="">
-
-				<button @click="tempo--" class="button">
-						-
-				</button>
-
-				<button  @mousedown="tap()" @touchStart.prevent.stop="tap()" class="button ">
-						{{tempo}} BPM
-				</button>
-
-				<button @click="tempo++" class="button ">
-						+
-				</button>
-
-			</div>
-
-			<div>
-
-				<button :class="{active:beat}" class="button bpm  is-static">
-						{{beatFrequency.toFixed(2)}} Hz
-				</button>
-
-				<button class="button is-static">
-						{{toNote}}
-				</button>
-			</div>
-		</div>
-
-		<tracker v-for="(track,i) in tracks" :key="i" @delTrack="delTrack(i)" :trk="track"></tracker>
-
-    <div class="tracker-options">
-      <b-field label="TYPE" class="adsr">
-        <b-radio-button v-for="(ins,key) in ['kick','dsh','metal']" v-model="newInstr" :key="key"
-            :native-value="ins">
-            <span>{{ins}}</span>
-        </b-radio-button>
-      </b-field>
-
-      <b-field label="VALUE" class="adsr">
-        <b-radio-button v-for="(dur,key) in durations" :key="key" v-model="newDuration"
-            :native-value="dur.num">
-            <span>{{ '1/'+ dur.num }}</span>
-        </b-radio-button>
-      </b-field>
-
-
-        <button class="button" @click="addTrack()">
-
-&#43; track
-       </button>
-
-
-    </div>
-	</div>`,
-  data: function() {
-    return {
-      play: false,
-      pattern: [],
-      beatCount: 16,
-      tracks: [],
-      loop: {},
-      currentStep: 0,
-      taps: [],
-      beat: false,
-      newDuration: 16,
-      newInstr: "kick",
-      playing: false,
-      pressed: false,
-      tempo: 90,
-      durations:[{num:4,symbol:'&#9833;'},{num:8,symbol:'	&#9834;'},{num:16,symbol:'&#9835;'}, {num:32, symbol:'&#9836;'}],
-      tracks: []
-    };
+export const tracker = {
+  components: {
+    sqnob
   },
-  computed: {
-    trackCount() {
-      return this.tracks.length;
-    },
-    beatFrequency: function() {
-      Tone.Transport.bpm.value = this.tempo;
-      return this.tempo / 60;
-    },
-    toNote: function() {
-      return Tone.Frequency(this.beatFrequency, "hz").toNote();
-    }
-  },
-  methods: {
-    tap: function() {
-      let tapCount = 3;
-      let tempo;
-      let sum = 0;
-      let tap = new Date().getTime();
-      if (this.taps.length < tapCount) {
-        this.taps.push(tap);
-      } else {
-        this.taps.shift();
-        this.taps.push(tap);
-        for (let i = 0; i < tapCount - 1; i++) {
-          sum += this.taps[i + 1] - this.taps[i];
-        }
-
-        let tempo = Math.round(60000 / (0.5 * sum));
-
-        this.tempo = tempo > 30 ? tempo : 30;
-      }
-    },
-    addTrack() {
-      this.instrument = new Synth[this.newInstr]();
-      this.tracks.push(this.instrument.getDefault(this.newDuration));
-    },
-    delTrack: function(i) {
-      this.tracks.splice(i, 1);
-    },
-    toggleTransport: function() {
-      this.play = !this.play;
-      Tone.Transport.toggle();
-    }
-  },
-  created() {
-    this.beating = new Tone.Loop(time => {
-      this.beat = !this.beat;
-    }, "8n");
-    this.beating.start();
-  },
-  mounted: function() {
-  this.addTrack()}
-});
-
-Vue.component("tracker", {
   template: `<div class="track" :class="{open:open}">
 
 		<div class="beat-row">
@@ -307,4 +175,144 @@ Vue.component("tracker", {
     this.loop.start(0);
     this.toggleLoop();
   }
-});
+}
+
+export const beats = {
+  components: {
+      tracker
+  },
+  template: `<div class="rythm-box">
+		<div class="metro-options">
+
+			<div class="">
+				<button class="button " :class="{pushed:play}" @click.prevent.stop="toggleTransport()">
+      &#9654;
+				</button>
+			</div>
+
+			<div class="">
+
+				<button @click="tempo--" class="button">
+						-
+				</button>
+
+				<button  @mousedown="tap()" @touchStart.prevent.stop="tap()" class="button ">
+						{{tempo}} BPM
+				</button>
+
+				<button @click="tempo++" class="button ">
+						+
+				</button>
+
+			</div>
+
+			<div>
+
+				<button :class="{active:beat}" class="button bpm  is-static">
+						{{beatFrequency.toFixed(2)}} Hz
+				</button>
+
+				<button class="button is-static">
+						{{toNote}}
+				</button>
+			</div>
+		</div>
+
+		<tracker v-for="(track,i) in tracks" :key="i" @delTrack="delTrack(i)" :trk="track"></tracker>
+
+    <div class="tracker-options">
+      <b-field label="TYPE" class="adsr">
+        <b-radio-button v-for="(ins,key) in ['kick','dsh','metal']" v-model="newInstr" :key="key"
+            :native-value="ins">
+            <span>{{ins}}</span>
+        </b-radio-button>
+      </b-field>
+
+      <b-field label="VALUE" class="adsr">
+        <b-radio-button v-for="(dur,key) in durations" :key="key" v-model="newDuration"
+            :native-value="dur.num">
+            <span>{{ '1/'+ dur.num }}</span>
+        </b-radio-button>
+      </b-field>
+
+
+        <button class="button" @click="addTrack()">
+
+&#43; track
+       </button>
+
+
+    </div>
+	</div>`,
+  data: function() {
+    return {
+      play: false,
+      pattern: [],
+      beatCount: 16,
+      tracks: [],
+      loop: {},
+      currentStep: 0,
+      taps: [],
+      beat: false,
+      newDuration: 16,
+      newInstr: "kick",
+      playing: false,
+      pressed: false,
+      tempo: 90,
+      durations:[{num:4,symbol:'&#9833;'},{num:8,symbol:'	&#9834;'},{num:16,symbol:'&#9835;'}, {num:32, symbol:'&#9836;'}],
+      tracks: []
+    };
+  },
+  computed: {
+    trackCount() {
+      return this.tracks.length;
+    },
+    beatFrequency: function() {
+      Tone.Transport.bpm.value = this.tempo;
+      return this.tempo / 60;
+    },
+    toNote: function() {
+      return Tone.Frequency(this.beatFrequency, "hz").toNote();
+    }
+  },
+  methods: {
+    tap: function() {
+      let tapCount = 3;
+      let tempo;
+      let sum = 0;
+      let tap = new Date().getTime();
+      if (this.taps.length < tapCount) {
+        this.taps.push(tap);
+      } else {
+        this.taps.shift();
+        this.taps.push(tap);
+        for (let i = 0; i < tapCount - 1; i++) {
+          sum += this.taps[i + 1] - this.taps[i];
+        }
+
+        let tempo = Math.round(60000 / (0.5 * sum));
+
+        this.tempo = tempo > 30 ? tempo : 30;
+      }
+    },
+    addTrack() {
+      this.instrument = new Synth[this.newInstr]();
+      this.tracks.push(this.instrument.getDefault(this.newDuration));
+    },
+    delTrack: function(i) {
+      this.tracks.splice(i, 1);
+    },
+    toggleTransport: function() {
+      this.play = !this.play;
+      Tone.Transport.toggle();
+    }
+  },
+  created() {
+    this.beating = new Tone.Loop(time => {
+      this.beat = !this.beat;
+    }, "8n");
+    this.beating.start();
+  },
+  mounted: function() {
+  this.addTrack()}
+}

@@ -1,6 +1,6 @@
 // TONE-GRID !!!!!!
 
-Vue.component("tone-grid", {
+export const toneGrid = {
   template: `<div class="tone-grid">
 
     <div class="grid-block"
@@ -69,7 +69,7 @@ Vue.component("tone-grid", {
     },
     octaves() {
       let octaves = [];
-      for (i = this.octaveRange[0]; i <= this.octaveRange[1]; i++) {
+      for (let i = this.octaveRange[0]; i <= this.octaveRange[1]; i++) {
         octaves.push(i);
       }
       return octaves;
@@ -520,4 +520,4 @@ Vue.component("tone-grid", {
     }
   },
   created: function() {}
-});
+}

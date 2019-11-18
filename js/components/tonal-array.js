@@ -1,6 +1,6 @@
 //Circle-note
 
-Vue.component('circle-note', {
+const circleNote = {
 	template:`<g><circle
 	@mousedown.stop.prevent="playNote"
 	@touchstart.stop.prevent="playNote"
@@ -35,11 +35,11 @@ Vue.component('circle-note', {
 			Synth.chromaSynth.triggerRelease(Synth.calcFrequency(this.note.pitch,octave))
 		}
 	}
-})
+}
 
 //Chord-trigger
 
-Vue.component('chord-trigger', {
+const chordTrigger ={
 	template:`<polygon
 	:transform="'rotate('+60*p+')'"
 	@mousedown.stop.prevent="playChord"
@@ -75,11 +75,16 @@ Vue.component('chord-trigger', {
 			return this.chord.map( x => x+this.note.pitch)
 		}
 	}
-})
+}
 
 // MAIN Tonnetz-grid
 
-Vue.component('tonal-array',{
+export const tonalArray = {
+	components: {
+		'chord-trigger':chordTrigger,
+		'circle-note':circleNote,
+		vueSlider: window["vue-slider-component"]
+	},
 	template: `<svg id="tonal-array" viewBox="-80 -110 1040 770">
   <clipPath id="grid-mask">
     <rect x="-80" y="-110" width="1040" height="770" ry="20" rx="20"></rect>
@@ -114,9 +119,6 @@ Vue.component('tonal-array',{
 
 		</svg>`,
   props: ['steps','root'],
-	components: {
-    vueSlider: window["vue-slider-component"]
-  },
 	data() {
     return {
       notes: Chroma.Notes,
@@ -176,4 +178,4 @@ Vue.component('tonal-array',{
 			return fifths
 		}
 	}
-});
+}
