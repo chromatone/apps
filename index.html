@@ -41,115 +41,34 @@
         </div>
       </div>
     </div>
-
-
-      <oscilloscope v-if="opened == 'oscilloscope'"></oscilloscope>
-
-
-    <div v-if="opened == 'beat'" class="row">
-      <beat></beat>
+    <div class="row">
+        <component :is="opened"></component>
     </div>
 
-    <div v-if="opened == 'scales'" class="row">
-      <scales></scales>
-    </div>
-
-
-
-    <div v-if="opened == 'synth'" class="row">
-      <synth></synth>
-    </div>
-
-
-  <div v-if="opened == 'grid'" class="row">
-      <tone-grid ></tone-grid>
-    </div>
-
-
-    <div v-if="opened == 'field'" class="row field">
-      <field ></field>
-    </div>
-
-
-    <div v-if="opened == 'array'" class="row">
-          <tonal-array ></tonal-array>
- </div>
-
-
-    <div v-if="opened == 'keys'" class="row">
-      <key-stack ></key-stack>
-    </div>
-
-  <div v-if="opened == 'table'" class="row">
-     <pitch-table></pitch-table>
-  </div>
-
-  <div v-if="opened == 'tunings'" class="row">
-     <tunings></tunings>
-  </div>
-
-  <div v-if="opened == 'harmonics'" class="row">
-     <harmonics></harmonics>
-  </div>
 
   <div v-if="opened == 'midi-monitor'" class="row">
     <midi-bus :absolute="true" :channels.sync="channels"></midi-bus>
     <midi-monitor :channels="channels"></midi-monitor>
   </div>
 
-  <div v-if="opened == 'longitudal'" class="row">
-     <longitudal></longitudal>
-  </div>
 
-  <div v-if="opened == 'radiation'" class="row">
-    <div class="abs-note">drag to rotate</div>
-     <radiation></radiation>
-  </div>
-
-  <div v-if="opened == 'scale-wheel'" class="row">
-    <scale-wheel></scale-wheel>
-  </div>
-
-  <div v-if="opened == 'noise'" class="row">
-    <noise></noise>
-
-  </div>
-
-  <div v-if="opened == 'noise'" class="row">
-    <autofilter></autofilter>
-
-  </div>
-
-  <div v-if="opened == 'noise'" class="row">
-    
-    <autopanner></autopanner>
-  </div>
 
 
   </div>
   <script src="js/Scales.js"></script>
   <script src="js/Synth.js"></script>
-  <script src="js/components/tone-grid.js"></script>
-  <script src="js/sqnob.js"></script>
-  <script src="js/components/filters.js"></script>
-  <script src="js/components/beats.js"></script>
-  <script src="js/components/field.js"></script>
   <script src="js/components/key-stack.js"></script>
   <script src="js/components/scales.js"></script>
   <script src="js/components/synth.js"></script>
   <script src="js/components/osc.js"></script>
-  <script src="js/components/tonal-array.js"></script>
-  <script src="js/components/pitch-table.js"></script>
   <script src="js/components/tunings.js"></script>
   <script src="js/components/midi-bus.js"></script>
   <script src="js/components/midi-monitor.js"></script>
   <script src="js/components/harmonics.js"></script>
-  <script src="js/components/longitudal.js"></script>
   <script src="js/components/radiation.js"></script>
   <script src="js/components/scale-wheel.js"></script>
-  <script src="js/components/noise-generator.js"></script>
 
-  <script src="js/chromatone.js"></script>
+  <script type="module" src="js/chromatone.js"></script>
 
 </body>
 
