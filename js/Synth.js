@@ -1,4 +1,4 @@
-
+import Tone from '../assets/Tone.min.js'
 
 const Synth = {
   arrayRotate (A, n, l = A.length) {

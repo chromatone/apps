@@ -8,25 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="assets/buefy.min.css" />
   <link rel="stylesheet" href="css/Chromatone.css" />
-
-  <script src="assets/StartAudioContext.js"></script>
-  <script src="assets/Tone.js"></script>
-  <script src="assets/zdog.dist.js"></script>
 </head>
 
-
 <body>
-
-
-
   <div id="chromatone">
-
     <div class="row switches">
       <div class="row">
         <div class="logo level-item is-6 has-text-centered">
           <a href="http://www.chromatone.center"><img src="svg/logo.svg" style="min-width:150px"></a>
         </div>
-
         <div class="switch-row has-text-centered">
           <b-field grouped group-multiline>
              <b-radio-button :key="comp" v-for="comp in components"  v-model="opened"

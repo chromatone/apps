@@ -1,5 +1,6 @@
 import Vue from '../assets/vue.min.js'
 import Buefy from '../assets/buefy.js'
+import StartAudioContext from '../assets/StartAudioContext.js'
 
 Vue.use(Buefy.default)
 

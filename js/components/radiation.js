@@ -1,3 +1,5 @@
+import Zdog from '../../assets/zdog.dist.js'
+
 export const radiation = {
   template: `<canvas class="zdog-canvas"></canvas>`,
   data: function() {
