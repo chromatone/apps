@@ -12,7 +12,7 @@
 	} else {
 		root.StartAudioContext = factory()
   }
-}(this, function () {
+}(window, function () {
 
 	//TAP LISTENER/////////////////////////////////////////////////////////////
 
@@ -183,3 +183,5 @@
 
 	return StartAudioContext
 }))
+
+export default StartAudioContext

@@ -19,7 +19,7 @@
     // browser global
     root.Zdog = factory();
   }
-}( this, function factory() {
+}( window, function factory() {
 
 var Zdog = {};
 
@@ -86,7 +86,7 @@ return Zdog;
     // browser global
     root.Zdog.CanvasRenderer = factory();
   }
-}( this, function factory() {
+}( window, function factory() {
 
 var CanvasRenderer = { isCanvas: true };
 
@@ -157,7 +157,7 @@ return CanvasRenderer;
     // browser global
     root.Zdog.SvgRenderer = factory();
   }
-}( this, function factory() {
+}( window, function factory() {
 
 var SvgRenderer = { isSvg: true };
 
@@ -239,7 +239,7 @@ return SvgRenderer;
     Zdog.Vector = factory( Zdog );
   }
 
-}( this, function factory( utils ) {
+}( window, function factory( utils ) {
 
 function Vector( position ) {
   this.set( position );
@@ -401,7 +401,7 @@ return Vector;
     Zdog.Anchor = factory( Zdog, Zdog.Vector, Zdog.CanvasRenderer,
         Zdog.SvgRenderer );
   }
-}( this, function factory( utils, Vector, CanvasRenderer, SvgRenderer ) {
+}( window, function factory( utils, Vector, CanvasRenderer, SvgRenderer ) {
 
 var TAU = utils.TAU;
 var onePoint = { x: 1, y: 1, z: 1 };
@@ -646,7 +646,7 @@ return Anchor;
     // browser global
     root.Zdog.Dragger = factory();
   }
-}( this, function factory() {
+}( window, function factory() {
 
 // quick & dirty drag event stuff
 // messes up if multiple pointers/touches
@@ -774,7 +774,7 @@ return Dragger;
     var Zdog = root.Zdog;
     Zdog.Illustration = factory( Zdog, Zdog.Anchor, Zdog.Dragger );
   }
-}( this, function factory( utils, Anchor, Dragger ) {
+}( window, function factory( utils, Anchor, Dragger ) {
 
 function noop() {}
 var TAU = utils.TAU;
@@ -1021,7 +1021,7 @@ return Illustration;
     var Zdog = root.Zdog;
     Zdog.PathCommand = factory( Zdog.Vector );
   }
-}( this, function factory( Vector ) {
+}( window, function factory( Vector ) {
 
 function PathCommand( method, points, previousPoint ) {
   this.method = method;
@@ -1113,7 +1113,7 @@ return PathCommand;
     var Zdog = root.Zdog;
     Zdog.Shape = factory( Zdog, Zdog.Vector, Zdog.PathCommand, Zdog.Anchor );
   }
-}( this, function factory( utils, Vector, PathCommand, Anchor ) {
+}(window, function factory( utils, Vector, PathCommand, Anchor ) {
 
 var Shape = Anchor.subclass({
   stroke: 1,
@@ -1328,7 +1328,7 @@ return Shape;
     var Zdog = root.Zdog;
     Zdog.Group = factory( Zdog.Anchor );
   }
-}( this, function factory( Anchor ) {
+}( window, function factory( Anchor ) {
 
 var Group = Anchor.subclass({
   updateSort: false,
@@ -1393,7 +1393,7 @@ return Group;
     var Zdog = root.Zdog;
     Zdog.Rect = factory( Zdog.Shape );
   }
-}( this, function factory( Shape ) {
+}( window, function factory( Shape ) {
 
 var Rect = Shape.subclass({
   width: 1,
@@ -1429,7 +1429,7 @@ return Rect;
     var Zdog = root.Zdog;
     Zdog.RoundedRect = factory( Zdog.Shape );
   }
-}( this, function factory( Shape ) {
+}( window, function factory( Shape ) {
 
 var RoundedRect = Shape.subclass({
   width: 1,
@@ -1507,7 +1507,7 @@ return RoundedRect;
     Zdog.Ellipse = factory( Zdog.Shape );
   }
 
-}( this, function factory( Shape ) {
+}( window, function factory( Shape ) {
 
 var Ellipse = Shape.subclass({
   diameter: 1,
@@ -1569,7 +1569,7 @@ return Ellipse;
     var Zdog = root.Zdog;
     Zdog.Polygon = factory( Zdog, Zdog.Shape );
   }
-}( this, function factory( utils, Shape ) {
+}( window, function factory( utils, Shape ) {
 
 var Polygon = Shape.subclass({
   sides: 3,
@@ -1606,7 +1606,7 @@ return Polygon;
     var Zdog = root.Zdog;
     Zdog.Hemisphere = factory( Zdog, Zdog.Vector, Zdog.Anchor, Zdog.Ellipse );
   }
-}( this, function factory( utils, Vector, Anchor, Ellipse ) {
+}( window, function factory( utils, Vector, Anchor, Ellipse ) {
 
 var Hemisphere = Ellipse.subclass({
   fill: true,
@@ -1704,7 +1704,7 @@ return Hemisphere;
     Zdog.Cylinder = factory( Zdog, Zdog.PathCommand, Zdog.Shape,
         Zdog.Group, Zdog.Ellipse );
   }
-}( this, function factory( utils, PathCommand, Shape, Group, Ellipse ) {
+}( window, function factory( utils, PathCommand, Shape, Group, Ellipse ) {
 
 function noop() {}
 
@@ -1866,7 +1866,7 @@ return Cylinder;
     Zdog.Cone = factory( Zdog, Zdog.Vector, Zdog.PathCommand,
         Zdog.Anchor, Zdog.Ellipse );
   }
-}( this, function factory( utils, Vector, PathCommand, Anchor, Ellipse ) {
+}( window, function factory( utils, Vector, PathCommand, Anchor, Ellipse ) {
 
 var Cone = Ellipse.subclass({
   length: 1,
@@ -1998,7 +1998,7 @@ return Cone;
     var Zdog = root.Zdog;
     Zdog.Box = factory( Zdog, Zdog.Anchor, Zdog.Shape, Zdog.Rect );
   }
-}( this, function factory( utils, Anchor, Shape, Rect ) {
+}( window, function factory( utils, Anchor, Shape, Rect ) {
 
 // ----- BoxRect ----- //
 
@@ -2183,7 +2183,7 @@ return Box;
     /* globals define */ // AMD
     define( 'zdog', [], root.Zdog );
   }
-})( this, function factory( Zdog, CanvasRenderer, SvgRenderer, Vector, Anchor,
+})( window, function factory( Zdog, CanvasRenderer, SvgRenderer, Vector, Anchor,
     Dragger, Illustration, PathCommand, Shape, Group, Rect, RoundedRect,
     Ellipse, Polygon, Hemisphere, Cylinder, Cone, Box ) {
 
@@ -2207,3 +2207,5 @@ return Box;
 
       return Zdog;
 });
+
+export default Zdog
