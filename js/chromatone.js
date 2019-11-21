@@ -1,5 +1,7 @@
+import Vue from '../assets/vue.min.js'
+import Buefy from '../assets/buefy.js'
 
-if (window.Buefy) {  Vue.use(Buefy.default); }
+Vue.use(Buefy.default)
 
 Vue.prototype.$midiBus = new Vue(); // Global event bus
 
@@ -65,7 +67,7 @@ const ct = new Vue({
       'scale-wheel',
       'noise'
     ],
-    opened:'pitch-table'
+    opened:'beats'
   },
   mounted: function() {
     if (

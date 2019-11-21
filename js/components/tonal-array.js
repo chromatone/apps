@@ -1,4 +1,5 @@
 import Chroma from '../Scales.js'
+import Synth from '../Synth.js'
 
 const circleNote = {
 	template:`<g><circle

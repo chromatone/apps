@@ -1,8 +1,10 @@
 import Chroma from '../Scales.js'
+import Synth from '../Synth.js'
+import {synth} from './synth.js'
 
 export const toneGrid = {
   template: `<div class="tone-grid">
-
+  <synth></synth>
     <div class="grid-block"
     @mousedown.stop.prevent= "clickStart($event)"
     @mousemove.stop.prevent= "clickChange($event)"
@@ -38,6 +40,9 @@ export const toneGrid = {
 
 
   </div>`,
+  components: {
+    synth
+  },
   data: function() {
     return {
       octaveRange: [0, 8],
@@ -80,7 +85,7 @@ export const toneGrid = {
     },
     activeNotes() {
       let steps = [];
-      for (step = 0; step < this.activeSteps.length; step++) {
+      for (let step = 0; step < this.activeSteps.length; step++) {
         if (this.activeSteps[step]) {
           steps.push(step);
         }
@@ -245,10 +250,10 @@ export const toneGrid = {
           ? Synth.quantization
           : Tone.context.now();
       console.log(id, this.synth);
-      this.synth[id].triggerRelease();
-      this.synth[id].forEach(line => {
-        line.synth.triggerRelease();
-      });
+      for (let line in this.synth) {
+        this.synth[line].triggerRelease()
+      }
+
 
       if (id) {
         setTimeout(() => {

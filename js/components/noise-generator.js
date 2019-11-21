@@ -1,5 +1,6 @@
 import {autoFilter, autoPanner} from './filters.js'
 import {sqnob} from '../sqnob.js'
+import Synth from '../Synth.js'
 
 export const noise = {
   template: `
@@ -9,9 +10,9 @@ export const noise = {
           <div :class="{'is-primary': active}"
             class="button line-button"
             @mousedown="playNoise()"
-            @touchstart.stop="playNoise()"
-            @touchend.stop="stopNoise()"
-            @touchcancel.stop="stopNoise()" @mouseup="stopNoise()">NOISE</div>
+            @touchstart.stop.prevent="playNoise()"
+            @touchend.stop.prevent="stopNoise()"
+            @touchcancel.stop.prevent="stopNoise()" @mouseup="stopNoise()">NOISE</div>
 
         <b-switch  v-model="active"></b-switch>
       </b-field>

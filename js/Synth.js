@@ -1,36 +1,12 @@
-const Synth = {};
 
-const synthProto = {
-  connect(output) {
-    this.vol.connect(output);
+
+const Synth = {
+  arrayRotate (A, n, l = A.length) {
+    const offset = ((n % l) + l) % l;
+    return A.slice(offset).concat(A.slice(0, offset));
   },
-  getDefault(duration = 16) {
-    let setup = {
-      instrument: this.name,
-      pattern: [
-        { active: true, num: 0 },
-        { active: false, num: 1 },
-        { active: false, num: 2 },
-        { active: true, num: 3 },
-        { active: false, num: 4 },
-        { active: false, num: 5 },
-        { active: true, num: 6 },
-        { active: false, num: 7 }
-      ],
-      duration: duration + "n",
-      gain: 0.6
-    };
-    setup.options = {};
-    for (let option in this.options) {
-      setup.options[option] = this.options[option].default;
-    }
-    if (this.envelope) {
-      setup.envelope = {};
-      for (let env in this.envelope) {
-        setup.envelope[env] = this.envelope[env].default;
-      }
-    }
-    return setup;
+  calcFrequency (pitch, octave = 3) {
+    return Number(440 * Math.pow(2, octave - 4 + pitch / 12));
   }
 };
 
@@ -39,7 +15,6 @@ Synth.rythm = {};
 Synth.kick = function() {
   return {
     name: "kick",
-    __proto__: synthProto,
     options: {
       pitchDecay: {
         min: 0.01,
@@ -63,6 +38,8 @@ Synth.kick = function() {
         param: "FREQ"
       }
     },
+    getDefault,
+    connect,
     envelope: {
       attack: {
         min: 0.001,
@@ -106,7 +83,8 @@ Synth.kick = function() {
 Synth.metal = function() {
   return {
     name: "metal",
-    __proto__: synthProto,
+    getDefault,
+    connect,
     options: {
       harmonicity: {
         min: 0.1,
@@ -115,6 +93,7 @@ Synth.metal = function() {
         name: "harmonicity",
         param: "HARM"
       },
+
       octaves: {
         min: 0.1,
         max: 3,
@@ -173,7 +152,8 @@ Synth.metal = function() {
 Synth.dsh = function() {
   return {
     name: "dsh",
-    __proto__: synthProto,
+    getDefault,
+    connect,
     options: {
       freq: {
         min: 10,
@@ -207,13 +187,13 @@ Synth.dsh = function() {
     vol: new Tone.Gain(0.8),
     init() {
       this.initiated = true;
-      let bufferSize = 2 * Tone.context.sampleRate,
-        noiseBuffer = Tone.context.createBuffer(
+      let bufferSize = 2 * Tone.context.sampleRate;
+      let noiseBuffer = Tone.context.createBuffer(
           1,
           bufferSize,
           Tone.context.sampleRate
-        ),
-        output = noiseBuffer.getChannelData(0);
+      );
+      let output = noiseBuffer.getChannelData(0);
       this.noiseBuffer = noiseBuffer;
       for (var i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
@@ -221,16 +201,14 @@ Synth.dsh = function() {
     },
     triggerAttackRelease(opts, startTime) {
       let { gain, options: { freq, decay, endPitch, sineNoiseMix } } = opts;
-      let osc = Tone.context.createOscillator();
-      let mainGainNode = Tone.context.createGain();
-      let whiteNoise = Tone.context.createBufferSource();
-      let oscVol = Tone.context.createGain();
+      let osc = new Tone.Oscillator();
+      let mainGainNode = new Tone.Gain();
+      let whiteNoise = new Tone.Player(this.noiseBuffer);
+      let oscVol = new Tone.Gain();
       osc.connect(oscVol);
-      oscVol.connect(mainGainNode);
+      oscVol.connect(mainGainNode.gain);
       mainGainNode.connect(this.vol);
-      let noiseVol = Tone.context.createGain();
-      whiteNoise.buffer = this.noiseBuffer;
-      whiteNoise.loop = true;
+      let noiseVol = new Tone.Gain();
       whiteNoise.connect(noiseVol);
       noiseVol.connect(mainGainNode);
       oscVol.gain.setValueAtTime((1 - sineNoiseMix) * 2, startTime);
@@ -258,11 +236,10 @@ Synth.dsh = function() {
 };
 
 Synth.mono = function(output) {
-  vol = new Tone.Gain(0.8).connect(output);
-  synth = new Tone.Synth().connect(vol);
+  let vol = new Tone.Gain(0.8).connect(output);
+  let synth = new Tone.Synth().connect(vol);
   return {
     name: "mono",
-    __proto__: synthProto,
     oscType: "triangle",
     oscTypes: ["sine", "triangle", "square", "sawtooth", "pulse", "pwm"],
     vol,
@@ -325,7 +302,6 @@ Synth.fm = function(output) {
   synth = new Tone.PolySynth(4, Tone.FMSynth).connect(vol);
   return {
     name: "mono",
-    __proto__: synthProto,
     oscType: "triangle",
     oscTypes: ["sine", "triangle", "square", "sawtooth", "pulse", "pwm"],
     vol,
@@ -390,15 +366,6 @@ Synth.fm = function(output) {
 
 // SYNTH base
 
-Synth.arrayRotate = function(A, n, l = A.length) {
-  const offset = ((n % l) + l) % l;
-  return A.slice(offset).concat(A.slice(0, offset));
-};
-
-Synth.calcFrequency = function(pitch, octave = 3) {
-  return Number(440 * Math.pow(2, octave - 4 + pitch / 12));
-};
-
 Synth.chromaOptions = {
   gain: 1,
   portamento: 0,
@@ -421,3 +388,38 @@ Synth.synthVolume = new Tone.Volume(1).connect(Synth.volume);
 Synth.chromaSynth.connect(Synth.synthVolume);
 Synth.mainSynth = Synth.mono;
 Synth.quantization = "@32n";
+
+export default Synth
+
+function getDefault(duration = 16) {
+  let setup = {
+    instrument: this.name,
+    pattern: [
+      { active: true, num: 0 },
+      { active: false, num: 1 },
+      { active: false, num: 2 },
+      { active: true, num: 3 },
+      { active: false, num: 4 },
+      { active: false, num: 5 },
+      { active: true, num: 6 },
+      { active: false, num: 7 }
+    ],
+    duration: duration + "n",
+    gain: 0.6
+  };
+  setup.options = {};
+  for (let option in this.options) {
+    setup.options[option] = this.options[option].default;
+  }
+  if (this.envelope) {
+    setup.envelope = {};
+    for (let env in this.envelope) {
+      setup.envelope[env] = this.envelope[env].default;
+    }
+  }
+  return setup;
+};
+
+function connect(output) {
+  this.vol.connect(output);
+};

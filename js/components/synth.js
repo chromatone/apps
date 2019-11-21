@@ -1,5 +1,6 @@
 // SYNTH
 import {sqnob} from '../sqnob.js'
+import Synth from '../Synth.js'
 
 export const synth =  {
   components: {

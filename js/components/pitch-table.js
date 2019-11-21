@@ -1,5 +1,6 @@
 import {sqnob} from '../sqnob.js'
 import Chroma from '../Scales.js'
+import Synth from '../Synth.js'
 
 const noteCell = {
 	template:`

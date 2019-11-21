@@ -1,4 +1,4 @@
-
+import Synth from '../Synth.js'
 
 // Oscilloscope
 
