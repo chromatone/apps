@@ -18,10 +18,11 @@ The most recent version of the apps is at [chromatone.glitch.me](https://chromat
 Chromatone apps are built around Vue.js components in a modular way. We're not using any backend build procedures, so anyone with a modern browser can directly open the source files on any device locally and online. It's our vision of open source apps built in open browser environment. We monitor the development of Web stardards and it's implemention in different browsers. And using the powers of modern ECMAScript we try to combine different browser APIs:
 
 - [Web Audio API](https://developer.mozilla.org/ru/docs/Web/API/Web_Audio_API)
+- [Web MIDI API](https://developer.mozilla.org/en-US/docs/Web/API/MIDIAccess)
 - [Canvas API](https://developer.mozilla.org/ru/docs/Web/API/Canvas_API)
 - [SVG](https://developer.mozilla.org/ru/docs/Web/SVG)
 - [WebGl](https://developer.mozilla.org/ru/docs/Web/API/WebGL_API)
-- and also DeviceOrientation and more
+- DeviceOrientation and more
 
 We use different JS frameworks:
 
