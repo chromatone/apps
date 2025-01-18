@@ -8,6 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="assets/buefy.min.css" />
   <link rel="stylesheet" href="css/Chromatone.css" />
+  <script defer async src="https://stats.chromatone.center/script.js"
+    data-website-id="961fb39e-52a4-44be-a26b-372f5a2dd21b"></script>
 </head>
 
 <body>
@@ -19,24 +21,23 @@
         </div>
         <div class="switch-row has-text-centered">
           <b-field grouped group-multiline>
-             <b-radio-button :key="comp" v-for="comp in components"  v-model="opened"
-                 :native-value="comp">
-                 <span>{{comp}}</span>
-             </b-radio-button>
-         </b-field>
+            <b-radio-button :key="comp" v-for="comp in components" v-model="opened" :native-value="comp">
+              <span>{{comp}}</span>
+            </b-radio-button>
+          </b-field>
 
         </div>
       </div>
     </div>
     <div class="row">
-        <component :is="opened"></component>
+      <component :is="opened"></component>
     </div>
 
 
-  <div v-if="opened == 'midi-monitor'" class="row">
-    <midi-bus :channels.sync="channels"></midi-bus>
-    <midi-monitor :channels="channels"></midi-monitor>
-  </div>
+    <div v-if="opened == 'midi-monitor'" class="row">
+      <midi-bus :channels.sync="channels"></midi-bus>
+      <midi-monitor :channels="channels"></midi-monitor>
+    </div>
 
 
 
